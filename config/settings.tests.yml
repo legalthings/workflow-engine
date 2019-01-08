@@ -1,0 +1,7 @@
+debug: true
+display_errors: true
+
+db:
+  default:
+    client: mongodb://localhost:27017
+    database: lto_workflow_tests

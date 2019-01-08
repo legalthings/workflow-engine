@@ -1,0 +1,83 @@
+{
+    "name": "legalthings/workflow-engine",
+    "description": "Workflow Engine",
+    "license": "MIT",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/legalthings/jmespath.php"
+        }
+    ],
+    "require": {
+        "php": "^7.2.0",
+        "ext-iconv": "*",
+        "ext-intl": "*",
+        "ext-json": "*",
+        "ext-sodium": "2.*",
+        "ext-mongodb": "*",
+        "ext-curl": "*",
+        "ext-date": "*",
+        "ext-filter": "*",
+        "ext-gettext": "*",
+        "ext-pcre": "*",
+        "ext-session": "*",
+        "ext-spl": "*",
+        "jasny/application-env": "^1.0",
+        "jasny/autowire": "^1.1",
+        "jasny/controller": "^1.2",
+        "jasny/container": "^1.2",
+        "jasny/config" : "^2.0",
+        "jasny/db": "^2.4.12",
+        "jasny/db-mongo" : "^1.3.0",
+        "jasny/dotkey": "^1.0",
+        "jasny/router": "^1.1",
+        "jasny/http-message": "^1.3",
+        "jasny/php-functions" : "~3.3.0",
+        "jasny/validation-result" : "^1.0.0",
+        "jasny/error-handler": "^0.2.0",
+        "monolog/monolog": "1.*",
+        "symfony/yaml" : "^4.0",
+        "guzzlehttp/guzzle": "^6.3",
+        "legalthings/data-enricher": "^0.8.1",
+        "legalthings/lto-api": "dev-php7",
+        "legalthings/base58-compat": "^0.1.0",
+        "legalthings/mongodb-session-handler": "^2.0",
+        "improved/function": "dev-master",
+        "improved/type": "dev-master",
+        "improved/iterable": "dev-master",
+        "respect/validation": "^1.0",
+        "mtdowling/jmespath.php": "dev-master#8ec2d692c59e45184d16b4c9160e902397cfc659 as 2.4.0",
+        "mustache/mustache": "^2.10",
+        "php-http/guzzle6-adapter": "^1.1",
+        "ramsey/uuid": "^3.7",
+        "desarrolla2/cache": "^3.0"
+    },
+    "require-dev" : {
+        "jasny/php-code-quality" : "^2.0.0",
+        "codeception/codeception": "^2.5",
+        "jasny/codeception-module": "dev-master",
+        "mikey179/vfsStream": "~1.2",
+        "fzaninotto/faker": "^1.6",
+        "phpstan/phpstan": "^0.10.5",
+        "phpstan/phpstan-strict-rules": "^0.10.1",
+        "squizlabs/php_codesniffer": "^3.3",
+        "overtrue/phplint": "^1.1"
+    },
+    "autoload": {
+        "psr-0": {
+            "": ["lib/", "models/", "services/", "controllers/"]
+        },
+        "files": ["vendor/jasny/php-functions/global.php"]
+    },
+    "scripts": {
+        "test": [
+            "phplint",
+            "phpstan analyse",
+            "codecept run",
+            "phpcs -p controllers declarations lib models services"
+        ]
+    },
+    "config": {
+        "bin-dir": "bin"
+    }
+}

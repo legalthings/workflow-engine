@@ -1,0 +1,15 @@
+## Routes
+---
+# Api
+/:                                         { controller: default, action: info }
+
+/scenarios +GET:                           { controller: scenario, action: list }
+/scenarios +POST:                          { controller: scenario, action: add }
+/scenarios/* +GET:                         { controller: scenario, action: get, id: $2 }
+/scenarios/*/meta +POST:                   { controller: scenario, action: update-meta, id: $2 }
+
+/processes +GET:                           { controller: process, action: list }
+/processes +POST:                          { controller: process, action: start }
+/processes/*/done +POST:                   { controller: process, action: done, id: $2 }
+
+/responses +POST:                          { controller: responses, action: add }

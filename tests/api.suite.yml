@@ -1,0 +1,19 @@
+class_name: ApiTester
+modules:
+    enabled:
+        - REST:
+            depends: PhpBrowser
+            url: http://localhost:8080
+        - \Helper\General
+        - \Helper\Api
+        - \Helper\MockService
+        - MongoDb
+        - Asserts
+coverage:
+    enabled: true
+    remote: true
+    include:
+        - controllers/*
+groups:
+    authz: tests/_groups/authz
+    basic: tests/_groups/basic

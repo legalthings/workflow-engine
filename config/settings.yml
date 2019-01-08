@@ -1,0 +1,7 @@
+locale: en_US
+translate: true
+
+db:
+  default:
+    client: mongodb://localhost:27017
+    database: lto_workflow

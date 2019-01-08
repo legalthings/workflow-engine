@@ -74,11 +74,11 @@ POST /scenarios/             Create a new scenario
 GET  /scenarios/{id}         Get a specific scenario
 POST /scenarios/{id}/meta    Update the meta information of the scenario
 
-GET  /processes              List all processes (filterable)
-POST /processes              Create a process (explictly)
-POST /processes/{id}/invoke  Invoke a system action
+GET  /processes/             List all processes (filterable)
+POST /processes/             Create a process (explictly)
+POST /processes/{id}/done    Invoke a system action if possible
 
-/responses +POST:            Submit a response for a running or new process
+POST /responses/             Submit a response for a running or new process
 ```
 
 See the [Live Contract specification](https://docs.livecontracts.io/) for the JSON format or scenarios and processes.

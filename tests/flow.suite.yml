@@ -1,0 +1,9 @@
+class_name: FlowTester
+modules:
+    enabled:
+        - \Helper\General
+        - \Helper\Faker
+        - \Helper\Flow
+        - Asserts
+coverage:
+    enabled: false

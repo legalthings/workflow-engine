@@ -50,7 +50,8 @@
         "mustache/mustache": "^2.10",
         "php-http/guzzle6-adapter": "^1.1",
         "ramsey/uuid": "^3.7",
-        "desarrolla2/cache": "^3.0"
+        "desarrolla2/cache": "^3.0",
+        "jasny/event-dispatcher": "^0.1.0"
     },
     "require-dev" : {
         "jasny/php-code-quality" : "^2.0.0",
@@ -67,7 +68,10 @@
         "psr-0": {
             "": ["lib/", "models/", "services/", "controllers/"]
         },
-        "files": ["vendor/jasny/php-functions/global.php"]
+        "files": [
+            "vendor/jasny/php-functions/global.php",
+            "lib/functions.php"
+        ]
     },
     "scripts": {
         "test": [

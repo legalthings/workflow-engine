@@ -2,8 +2,7 @@
 
 use Jasny\DB\Mongo;
 use Jasny\DB\Entity\Enrichable;
-use Jasny\DB\Entity;
-use Jasny\DB\EntitySet;
+use function Jasny\object_get_properties;
 
 /**
  * Base class for Mongo Documents
@@ -194,5 +193,15 @@ abstract class MongoDocument extends Mongo\Document implements Enrichable
         }
         
         return $date;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toData(): array
+    {
+        $data = parent::toData();
+
+        return array_intersect_key($data, ['_id' => null] + object_get_properties($this, true));
     }
 }

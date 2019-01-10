@@ -17,7 +17,7 @@ class DataPatcher
      * @param mixed   $value
      * @param boolean $patch
      */
-    public static function set(&$input, $selector, $value, $patch = true)
+    public function set(&$input, $selector, $value, $patch = true)
     {
         $dotkey = DotKey::on($input);
 
@@ -41,7 +41,7 @@ class DataPatcher
      * @param string $selector
      * @param mixed  $value
      */
-    public static function patch(&$input, DotKey $dotkey, $selector, $value)
+    public function patch(&$input, DotKey $dotkey, $selector, $value)
     {
         $target = $selector === '$' ? $input : $dotkey->get($selector);
 
@@ -73,14 +73,14 @@ class DataPatcher
      * @param string         $selector
      * @param array|stdClass $value
      */
-    public static function patchEntitySet(EntitySet &$target, $selector, $value)
+    public function patchEntitySet(EntitySet &$target, $selector, $value)
     {
-        $autocreate = ($target->getFlags() & LinkedEntitySet::AUTOCREATE) !== 0;
+        $autoCreate = ($target instanceof AssocEntitySet) && ($target->getFlags() & AssocEntitySet::AUTOCREATE) !== 0;
 
         foreach ($value as $key => $input) {
             if (isset($target[$key])) {
                 $target[$key]->setValues($input);
-            } elseif ($autocreate) {
+            } elseif ($autoCreate) {
                 $target[$key] = $input;
             } else {
                 trigger_error("$selector.$key doesn't exist", E_USER_WARNING);
@@ -97,7 +97,7 @@ class DataPatcher
      * 
      * @return mixed
      */
-    public static function project($input, $jmespath = null)
+    public function project($input, $jmespath = null)
     {
         if (!isset($jmespath)) {
             return $input;

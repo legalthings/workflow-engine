@@ -63,10 +63,28 @@ function compare_assoc($first, $second)
  */
 function array_rename_key(array $array, string $from, string $to)
 {
-    if (isset($array[$from])) {
+    if (array_key_exists($from, $array)) {
         $array[$to] = $array[$from];
         unset($array[$from]);
     }
 
     return $array;
+}
+
+/**
+ * Rename the property of an object.
+ *
+ * @param object $object
+ * @param string $from
+ * @param string $to
+ * @return array
+ */
+function object_rename_key($object, string $from, string $to)
+{
+    if (property_exists($object, $from)) {
+        $object->$to = $object->$from;
+        unset($object->$from);
+    }
+
+    return $object;
 }

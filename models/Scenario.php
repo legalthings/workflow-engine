@@ -1,23 +1,23 @@
 <?php
 
-use Improved as i;
 use Jasny\DB\Entity\Dynamic;
 use Jasny\EventDispatcher\EventDispatcher;
+use Jasny\ValidationResult;
 
 /**
  * A scenario is the blueprint of a process.
  */
 class Scenario extends MongoDocument implements Dynamic
 {
+    use DeepClone;
+
     /**
      * @var string
-     * @required
      */
     public $schema;
     
     /**
      * @var string
-     * @required
      * @immutable
      */
     public $id;
@@ -127,19 +127,11 @@ class Scenario extends MongoDocument implements Dynamic
             $this->info = new JsonSchema(['type' => 'object', 'properties' => []]);
         }
 
+        $this->dispatcher->trigger('cast', $this);
+
         return $this;
     }
 
-    /**
-     * Get the LTRI
-     *
-     * @return string
-     */
-    public function getLTRI()
-    {
-        return "lt:/scenarios/" . (string)$this->getId();
-    }
-    
     /**
      * Get a specific action
      * 
@@ -188,16 +180,11 @@ class Scenario extends MongoDocument implements Dynamic
     /**
      * Validates the scenario.
      *
-     * @return Validation
+     * @return ValidationResult
      */
-    public function validate()
+    public function validate(): ValidationResult
     {
-        $validation = parent::validate();
-
-        $actorPrefix = $validation->translate("actor '%s'");
-        foreach ($this->actors as $key => $actor) {
-            $validation->add($actor->validate(), sprintf($actorPrefix, $key) . ':');
-        }
+        $validation = new ValidationResult();
 
         $actionPrefix = $validation->translate("action '%s'");
         foreach ($this->actions as $key => $action) {
@@ -225,7 +212,7 @@ class Scenario extends MongoDocument implements Dynamic
      * @param array $values
      * @return $this
      */
-    public function setValues($values)
+    public function setValues($values): self
     {
         $values = array_rename_key($values, '$schema', 'schema');
 
@@ -272,17 +259,22 @@ class Scenario extends MongoDocument implements Dynamic
      *
      * @return stdClass
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): stdClass
     {
-        $values = (array)parent::jsonSerialize();
-
-        array_rename_key($values, 'schema', '$schema');
+        $object = parent::jsonSerialize();
+        $object = object_rename_key($object, 'schema', '$schema');
 
         // Remove implicit states
-        $values['states'] = (object)array_filter(i\iterable_to_array($values['states']), function ($key) {
+        $object->states = (object)array_filter($object->states->jsonSerialize(), function ($key) {
             return !str_starts_with($key, ':') || $key === ':initial';
         }, ARRAY_FILTER_USE_KEY);
 
-        return (object)i\iterable_to_array(i\iterable_cleanup($values), true);
+        foreach ($object as $key => $value) {
+            if (!isset($value)) {
+                unset($object->$key);
+            }
+        }
+
+        return $object;
     }
 }

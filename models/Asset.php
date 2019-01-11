@@ -7,6 +7,8 @@ use Jasny\DB\Entity\Dynamic;
  */
 class Asset extends BasicEntity implements Dynamic
 {
+    use DeepClone;
+
     /**
      * Prepare json serialization
      *
@@ -17,7 +19,9 @@ class Asset extends BasicEntity implements Dynamic
         $object = parent::jsonSerialize();
 
         foreach ($object as $key => $value) {
-            if ($value === null) unset($object->$key);
+            if ($value === null) {
+                unset($object->$key);
+            }
         }
 
         return $object;

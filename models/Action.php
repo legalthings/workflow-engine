@@ -3,18 +3,15 @@
 use Jasny\DB\BasicEntity;
 use Jasny\DB\Entity\Validation;
 use Jasny\DB\Entity\Meta;
+use Jasny\ValidationResult;
 
 /**
  * Something to be performed by an Actor.
  */
 class Action extends BasicEntity implements Meta, Validation
 {
-    use Meta\Implementation {
-        cast as private metaCast;
-    }
-    use Validation\MetaImplementation {
-        validate as private metaValidate;
-    }
+    use DeepClone;
+    use Meta\Implementation;
 
     /**
      * @var string
@@ -47,7 +44,7 @@ class Action extends BasicEntity implements Meta, Validation
 
     /**
      * Responses on the action.
-     * @var Response[]|AssocEntitySet
+     * @var ActionResponse[]|AssocEntitySet
      */
     public $responses = [];
 
@@ -95,11 +92,11 @@ class Action extends BasicEntity implements Meta, Validation
     /**
      * Validates the action
      *
-     * @return Validation
+     * @return ValidationResult
      */
-    public function validate()
+    public function validate(): ValidationResult
     {
-        $validation = $this->metaValidate();
+        $validation = new ValidationResult();
 
         if ($this->default_response !== 'ok' && !isset($this->responses[$this->default_response])) {
             $validation->addError("Action doesn't have a '%s' response.", $this->default_response);
@@ -162,19 +159,5 @@ class Action extends BasicEntity implements Meta, Validation
         }
 
         return $this->responses[$key];
-    }
-
-
-    /**
-     * Prepare json serialization
-     *
-     * @return object
-     */
-    public function jsonSerialize()
-    {
-        $values = (array)parent::jsonSerialize();
-        $values = array_rename_key($values, 'schema', '$schema');
-
-        return (object)$values;
     }
 }

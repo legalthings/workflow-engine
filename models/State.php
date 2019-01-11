@@ -1,22 +1,27 @@
 <?php
 
 use Jasny\DB\Data;
-use Jasny\DB\Entity\Dynamic;
 use Jasny\DB\Entity\Validation;
 use Jasny\DB\Entity\Meta;
 use Jasny\DB\EntitySet;
 use Jasny\DB\Entity\Identifiable;
+use Jasny\ValidationResult;
 use function Jasny\object_get_properties;
 
 /**
- * Definition of state a process can be in
+ * Definition of state a process can be in.
  */
-class State extends BasicEntity implements Dynamic, Meta, Validation
+class State extends BasicEntity implements Meta, Validation
 {
+    use DeepClone;
     use Meta\Implementation {
         cast as private metaCast;
     }
-    use Validation\MetaImplementation;
+
+    /**
+     * @var string
+     */
+    public $schema;
 
     /**
      * Short title
@@ -61,11 +66,13 @@ class State extends BasicEntity implements Dynamic, Meta, Validation
     public $timeout;
 
     /**
-     * Flags whether the action should be displayed or not
-     * @var boolean
+     * Flags whether the state should be displayed or not
+     * @var string
+     * @options always,once,never
      */
-    public $display = true;
-    
+    public $display = 'always';
+
+
     /**
      * Class constructor
      */
@@ -116,29 +123,35 @@ class State extends BasicEntity implements Dynamic, Meta, Validation
      * 
      * @return $this
      */
-    public function cast()
+    public function cast(): self
     {
         if (is_array($this->transitions)) {
             $this->transitions = EntitySet::forClass(
                 StateTransition::class,
                 $this->transitions,
+                null,
                 EntitySet::ALLOW_DUPLICATES
             );
         }
 
-        $this->metaCast();
-
         return $this;
     }
 
-    
+    /**
+     * @return ValidationResult
+     */
+    public function validate(): ValidationResult
+    {
+        return ValidationResult::success();
+    }
+
     /**
      * Get the data to store in the DB
      *
      * @param array $opts
      * @return array
      */
-    public function toData(array $opts = [])
+    public function toData(array $opts = []): array
     {
         $data = object_get_properties($this);
         
@@ -155,26 +168,5 @@ class State extends BasicEntity implements Dynamic, Meta, Validation
         }
 
         return $data;
-    }
-    
-    
-    /**
-     * Prepare json serialization
-     *
-     * @return object
-     */
-    public function jsonSerialize()
-    {
-        $object = parent::jsonSerialize();
-
-        $baseProperties = array_keys(get_object_vars(get_class($this)));
-
-        foreach ($baseProperties as $key) {
-            if (!isset($object->$key)) {
-                unset($object->$key);
-            }
-        }
-                
-        return $object;
     }
 }

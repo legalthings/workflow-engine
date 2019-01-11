@@ -2,7 +2,7 @@
 
 use Codeception\TestCase\Test;
 use Jasny\ValidationResult;
-use Jasny\DB\EntitySet;
+use Jasny\EventDispatcher\EventDispatcher;
 
 /**
  * @covers Scenario
@@ -228,11 +228,186 @@ class ScenarioTest extends Test
         $this->assertCount(1, $scenario->assets);
     }
 
+    /**
+     * @dataProvider uncastedScenarioProvider
+     */
+    public function testCastEvent(Scenario $scenario)
+    {
+        $dispatcher = $this->createMock(EventDispatcher::class);
+        $dispatcher->expects($this->once())->method('trigger')
+            ->with('cast', $this->identicalTo($scenario));
+
+        $scenario->setDispatcher($dispatcher);
+
+        $scenario->cast();
+    }
+
+
+    protected function assertScenario(Scenario $scenario)
+    {
+        $this->assertAttributeEquals('7d7d0444-f6d7-473e-b715-f5cd8a3cc632', 'id', $scenario);
+        $this->assertAttributeEquals(
+            'http://specs.livecontracts.io/draft-01/01-core/schema.json#',
+            'schema',
+            $scenario
+        );
+        $this->assertAttributeEquals('A unit test case', 'title', $scenario);
+        $this->assertAttributeEquals('This scenario is for testing', 'description', $scenario);
+    }
+
+    protected function assertScenarioActions(Scenario $scenario)
+    {
+        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'actions', $scenario);
+        $this->assertEquals(Action::class, $scenario->actions->getEntityClass());
+
+        $this->assertArrayHasKey('foo', $scenario->actions->getArrayCopy());
+        $this->assertInstanceOf(Action::class, $scenario->actions['foo']);
+        $this->assertAttributeEquals('Foo', 'title', $scenario->actions['foo']);
+        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'responses', $scenario->actions['foo']);
+        $this->assertArrayHasKey('ok', $scenario->actions['foo']->responses->getArrayCopy());
+
+        $this->assertArrayHasKey('bar', $scenario->actions->getArrayCopy());
+        $this->assertInstanceOf(Action::class, $scenario->actions['bar']);
+        $this->assertAttributeEquals('Bar', 'title', $scenario->actions['bar']);
+        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'responses', $scenario->actions['bar']);
+        $this->assertArrayHasKey('ok', $scenario->actions['bar']->responses->getArrayCopy());
+        $this->assertAttributeEquals(':success', 'transition', $scenario->actions['bar']->responses['ok']);
+    }
+
+    protected function assertScenarioStates(Scenario $scenario)
+    {
+        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'states', $scenario);
+        $this->assertEquals(State::class, $scenario->states->getEntityClass());
+
+        $this->assertArrayHasKey(':initial', $scenario->states->getArrayCopy());
+        $this->assertInstanceOf(State::class, $scenario->states[':initial']);
+        $this->assertAttributeEquals('First', 'title', $scenario->states[':initial']);
+        $this->assertAttributeEquals(['foo'], 'actions', $scenario->states[':initial']);
+    }
+
+    protected function assertScenarioActors(Scenario $scenario)
+    {
+        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'actors', $scenario);
+        $this->assertEquals(JsonSchema::class, $scenario->actors->getEntityClass());
+
+        $this->assertArrayHasKey('manager', $scenario->actors->getArrayCopy());
+        $this->assertInstanceOf(JsonSchema::class, $scenario->actors['manager']);
+        $this->assertAttributeEquals('Operational manager', 'title', $scenario->actors['manager']);
+    }
+
+    protected function assertScenarioAssets(Scenario $scenario)
+    {
+        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'assets', $scenario);
+        $this->assertEquals(JsonSchema::class, $scenario->assets->getEntityClass());
+
+        $this->assertArrayHasKey('report', $scenario->assets->getArrayCopy());
+        $this->assertInstanceOf(JsonSchema::class, $scenario->assets['report']);
+        $this->assertAttributeEquals('http://json-schema.org/draft-07/schema#', 'schema', $scenario->assets['report']);
+        $this->assertAttributeEquals('object', 'type', $scenario->assets['report']);
+    }
+
+    protected function assertScenarioDefinitions(Scenario $scenario)
+    {
+        $this->assertAttributeInstanceOf(AssetSet::class, 'definitions', $scenario);
+        $this->assertEquals(Asset::class, $scenario->definitions->getEntityClass());
+
+        $this->assertArrayHasKey('dimensions', $scenario->definitions->getArrayCopy());
+        $this->assertInstanceOf(Asset::class, $scenario->definitions['dimensions']);
+        $this->assertAttributeEquals(10, 'height', $scenario->definitions['dimensions']);
+        $this->assertAttributeEquals(15, 'width', $scenario->definitions['dimensions']);
+    }    
+
+
+    public function valuesProvider()
+    {
+        $values = [
+            'id' => '7d7d0444-f6d7-473e-b715-f5cd8a3cc632',
+            '$schema' => 'http://specs.livecontracts.io/draft-01/01-core/schema.json#',
+            'title' => 'A unit test case',
+            'description' => 'This scenario is for testing',
+            'foo' => 'bar', // to be ignored
+            'actions' => [
+                'foo' => [
+                    'title' => 'Foo',
+                    'responses' => [
+                        'ok' => [
+                        ],
+                    ],
+                ],
+                'bar' => [
+                    'title' => 'Bar',
+                    'responses' => [
+                        'ok' => [
+                            'transition' => ':success',
+                        ],
+                    ],
+                ],
+            ],
+            'allow_actions' => ['bar'],
+            'states' => [
+                [
+                    'key' => ':initial',
+                    'title' => 'First',
+                    'actions' => ['foo'],
+                    'transitions' => [
+                        [
+                            'action' => 'foo',
+                            'response' => 'ok',
+                            'transition' => ':success',
+                        ],
+                    ],
+                ],
+            ],
+            'actors' => [
+                [
+                    'key' => 'manager',
+                    'title' => 'Operational manager',
+                ],
+            ],
+            'assets' => [
+                'report' => [
+                    '$schema' => 'http://json-schema.org/draft-07/schema#',
+                    'type' => 'object',
+                ],
+            ],
+            'definitions' => [
+                'dimensions' => [
+                    'height' => 10,
+                    'width' => 15,
+                ],
+            ],
+            'info' => [
+                '@schema' => 'http://json-schema.org/draft-07/schema#',
+                'type' => 'object',
+                'properties' => [],
+            ],
+        ];
+
+        return [
+            [$values],
+        ];
+    }
+
+    /**
+     * @dataProvider valuesProvider
+     */
+    public function testSetValues($values)
+    {
+        $scenario = new Scenario();
+        $scenario->setValues($values);
+
+        $this->assertScenario($scenario);
+        $this->assertScenarioActions($scenario);
+        $this->assertScenarioStates($scenario);
+        $this->assertScenarioActors($scenario);
+        $this->assertScenarioAssets($scenario);
+        $this->assertScenarioDefinitions($scenario);
+    }
+
 
     public function testValidation()
     {
         $scenario = new Scenario();
-        $scenario->start = null;
 
         $scenario->actions['foo'] = $this->createMock(Action::class);
         $scenario->actions['foo']
@@ -240,8 +415,8 @@ class ScenarioTest extends Test
             ->method('validate')
             ->willReturn(ValidationResult::error("'ok' response is required"));
 
-        $scenario->states['foo'] = $this->createMock(State::class);
-        $scenario->states['foo']
+        $scenario->states['one'] = $this->createMock(State::class);
+        $scenario->states['one']
             ->expects($this->once())
             ->method('validate')
             ->willReturn(ValidationResult::error("state is invalid"));
@@ -250,43 +425,17 @@ class ScenarioTest extends Test
         $errors = $validation->getErrors();
 
         $expected = [
-            "schema is required",
             "scenario must have an ':initial' state",
-            "id is required",
             "action 'foo': 'ok' response is required",
-            "state 'foo': state is invalid",
+            "state 'one': state is invalid",
         ];
 
         $this->assertEquals($expected, $errors, '', 0.0, 0, true);
     }
 
-    public function testToData()
+    public function storedDataProvider(): array
     {
-        $scenario = new Scenario();
-
-        $scenario->schema = "http://specs.livecontracts.io/draft-01/01-core/schema.json#";
-        $scenario->id = '7d7d0444-f6d7-473e-b715-f5cd8a3cc632';
-        $scenario->title = "A unit test case";
-        $scenario->description = "This scenario is for testing";
-        $scenario->allow_actions = ['bar'];
-
-        $scenario->actions['foo'] = $this->createMock(Action::class);
-        $scenario->actions['foo']->expects($this->atLeastOnce())->method('toData')
-            ->willReturn(['title' => "Foo", 'responses' => [['key' => 'ok', 'transition' => 'bar']]]);
-
-        $scenario->actions['bar'] = $this->createMock(Action::class);
-        $scenario->actions['bar']->expects($this->atLeastOnce())->method('toData')
-            ->willReturn(['title' => "Bar", 'responses' => [['key' => 'ok', 'transition' => ':success']]]);
-
-        $scenario->actors['manager'] = $this->createMock(JsonSchema::class);
-        $scenario->actors['manager']->expects($this->atLeastOnce())->method('toData')
-            ->willReturn(['title' => "Operational manager"]);
-
-        $scenario->states[':initial'] = $this->createMock(State::class);
-        $scenario->states[':initial']->expects($this->atLeastOnce())->method('toData')
-            ->willReturn(['title' => "First", 'actions' => ['foo']]);
-
-        $expected = [
+        $data = [
             '_id' => '7d7d0444-f6d7-473e-b715-f5cd8a3cc632',
             'schema' => 'http://specs.livecontracts.io/draft-01/01-core/schema.json#',
             'title' => 'A unit test case',
@@ -298,7 +447,6 @@ class ScenarioTest extends Test
                     'responses' => [
                         [
                             'key' => 'ok',
-                            'transition' => 'bar'
                         ]
                     ]
                 ],
@@ -318,6 +466,13 @@ class ScenarioTest extends Test
                     'key' => ':initial',
                     'title' => 'First',
                     'actions' => ['foo'],
+                    'transitions' => [
+                        [
+                            'action' => 'foo',
+                            'response' => 'ok',
+                            'transition' => ':success',
+                        ],
+                    ],
                 ],
             ],
             'actors' => [
@@ -330,9 +485,19 @@ class ScenarioTest extends Test
                 'bar'
             ],
             'assets' => [
-
+                [
+                    'key' => 'report',
+                    'schema' => 'http://json-schema.org/draft-07/schema#',
+                    'type' => 'object',
+                ]
             ],
-            'definitions' => [],
+            'definitions' => [
+                [
+                    'key' => 'dimensions',
+                    'height' => 10,
+                    'width' => 15,
+                ]
+            ],
             'info' => [
                 'schema' => 'http://json-schema.org/draft-07/schema#',
                 'type' => 'object',
@@ -341,48 +506,75 @@ class ScenarioTest extends Test
             'meta' => (object)[],
         ];
 
+        return [
+            [$data],
+        ];
+    }
+
+    /**
+     * @dataProvider storedDataProvider
+     */
+    public function testToData(array $expected)
+    {
+        $scenario = new Scenario();
+
+        $scenario->schema = "http://specs.livecontracts.io/draft-01/01-core/schema.json#";
+        $scenario->id = '7d7d0444-f6d7-473e-b715-f5cd8a3cc632';
+        $scenario->title = "A unit test case";
+        $scenario->description = "This scenario is for testing";
+        $scenario->allow_actions = ['bar'];
+
+        $scenario->actions['foo'] = $this->createMock(Action::class);
+        $scenario->actions['foo']->expects($this->atLeastOnce())->method('toData')
+            ->willReturn(['title' => "Foo", 'responses' => [['key' => 'ok']]]);
+
+        $scenario->actions['bar'] = $this->createMock(Action::class);
+        $scenario->actions['bar']->expects($this->atLeastOnce())->method('toData')
+            ->willReturn(['title' => "Bar", 'responses' => [['key' => 'ok', 'transition' => ':success']]]);
+
+        $scenario->states[':initial'] = $this->createMock(State::class);
+        $scenario->states[':initial']->expects($this->atLeastOnce())->method('toData')
+            ->willReturn([
+                'title' => "First",
+                'actions' => ['foo'],
+                'transitions' => [
+                    ['action' => 'foo', 'response' => 'ok', 'transition' => ':success'],
+                ],
+            ]);
+
+        $scenario->actors['manager'] = $this->createMock(JsonSchema::class);
+        $scenario->actors['manager']->expects($this->atLeastOnce())->method('toData')
+            ->willReturn(['title' => "Operational manager"]);
+
+        $scenario->assets['report'] = $this->createMock(JsonSchema::class);
+        $scenario->assets['report']->expects($this->atLeastOnce())->method('toData')
+            ->willReturn([
+                'schema' => 'http://json-schema.org/draft-07/schema#',
+                'type' => 'object',
+            ]);
+
+        $scenario->definitions['dimensions'] = $this->createMock(Asset::class);
+        $scenario->definitions['dimensions']->expects($this->atLeastOnce())->method('toData')
+            ->willReturn(['height' => 10, 'width' => 15]);
+
         $this->assertEquals($expected, $scenario->toData());
     }
 
     /**
-     * @todo improve this test
+     * @dataProvider storedDataProvider
      */
-    public function testFromData()
+    public function testFromData(array $data)
     {
-        $scenario = Scenario::fromData([
-            '_id' => 'foo-bar',
-            'actions' => [
-                [
-                    'key' => 'foo',
-                    'title' => 'Foo',
-                ],
-                [
-                    'key' => 'bar',
-                    'title' => 'Bar',
-                ]
-            ],
-            'states' => [
-                [
-                    'key' => ':initial',
-                    'title' => 'First',
-                    'actions' => ['foo']
-                ],
-                [
-                    'key' => 'bar',
-                    'title' => 'Second',
-                    'actions' => ['bar'],
-                ],
-            ],
-        ]);
+        $scenario = Scenario::fromData($data);
 
-        $this->assertAttributeEquals('foo-bar', 'id', $scenario);
-
-        $this->assertArrayHasKey('foo', $scenario->actions->getArrayCopy());
-        $this->assertInstanceOf(Action::class, $scenario->actions['foo']);
-        $this->assertAttributeEquals('Foo', 'title', $scenario->actions['foo']);
-
-        $this->assertArrayHasKey(':initial', $scenario->states->getArrayCopy());
+        $this->assertScenario($scenario);
+        $this->assertScenarioActions($scenario);
+        $this->assertScenarioStates($scenario);
+        $this->assertScenarioActors($scenario);
+        $this->assertScenarioAssets($scenario);
+        $this->assertScenarioDefinitions($scenario);
     }
+
 
     public function testJsonSerialize()
     {
@@ -390,6 +582,8 @@ class ScenarioTest extends Test
 
         $scenario->schema = 'http://specs.livecontracts.io/draft-01/01-core/schema.json#';
         $scenario->id = '7d7d0444-f6d7-473e-b715-f5cd8a3cc632';
+        $scenario->title = 'Foo Bar test';
+        $scenario->description = 'This scenario is for testing';
         $scenario->allow_actions = ['bar'];
 
         $scenario->actions['foo'] = $this->createMock(Action::class);
@@ -409,10 +603,22 @@ class ScenarioTest extends Test
             ->willReturn([
                 'title' => "First",
                 'actions' => ['foo'],
+                'instructions' => [],
                 'transitions' => [
                     ['transition' => ':success']
                 ]
             ]);
+
+        $scenario->assets['report'] = $this->createMock(JsonSchema::class);
+        $scenario->assets['report']->expects($this->atLeastOnce())->method('jsonSerialize')
+            ->willReturn([
+                '$schema' => 'http://json-schema.org/draft-07/schema#',
+                'type' => 'object',
+            ]);
+
+        $scenario->definitions['dimensions'] = $this->createMock(Asset::class);
+        $scenario->definitions['dimensions']->expects($this->atLeastOnce())->method('jsonSerialize')
+            ->willReturn(['height' => 10, 'width' => 15]);
 
         $expected = [
             '$schema' => 'http://specs.livecontracts.io/draft-01/01-core/schema.json#',
@@ -427,13 +633,13 @@ class ScenarioTest extends Test
                     'title' => 'Bar',
                 ]
             ],
-            'states' => (object)[
-                ':initial' => (object)[
+            'states' => [
+                ':initial' => [
                     'title' => 'First',
                     'actions' => ['foo'],
                     'instructions' => [],
                     'transitions' => [
-                        ['transition' => ':success']
+                        ['transition' => ':success'],
                     ],
                 ],
             ],
@@ -442,9 +648,46 @@ class ScenarioTest extends Test
                     'title' => 'Operational manager'
                 ]
             ],
+            'assets' => [
+                'report' => [
+                    '$schema' => 'http://json-schema.org/draft-07/schema#',
+                    'type' => 'object',
+                ]
+            ],
+            'definitions' => [
+                'dimensions' => [
+                    'height' => 10,
+                    'width' => 15,
+                ]
+            ],
+            'allow_actions' => ['bar'],
+            'info' => [
+                '$schema' => 'http://json-schema.org/draft-07/schema#',
+                'type' => 'object',
+            ],
+            'meta' => [],
+        ];
+
+        $serialized = json_encode($scenario);
+        $this->assertEquals($expected, json_decode($serialized, true));
+    }
+
+    public function testJsonSerializeBlank()
+    {
+        $scenario = new Scenario();
+
+        $expected = [
+            'actions' => [],
+            'states' => [],
+            'actors' => [],
             'assets' => [],
             'definitions' => [],
-            'info' => [],
+            'allow_actions' => [],
+            'info' => [
+                '$schema' => 'http://json-schema.org/draft-07/schema#',
+                'type' => 'object',
+            ],
+            'meta' => [],
         ];
 
         $serialized = json_encode($scenario);

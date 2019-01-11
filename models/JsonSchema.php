@@ -9,6 +9,8 @@ use function Jasny\object_get_properties;
  */
 class JsonSchema extends BasicEntity
 {
+    use DeepClone;
+
     /**
      * @var string
      */
@@ -176,6 +178,12 @@ class JsonSchema extends BasicEntity
                 $data['$' . $key] = $data[$key];
             }
             unset($data[$key]);
+        }
+
+        foreach ($data as $key => $value) {
+            if ($value === null) {
+                unset($data[$key]);
+            }
         }
 
         return (object)$data;

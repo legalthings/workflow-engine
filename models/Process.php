@@ -103,10 +103,23 @@ class Process extends MongoDocument
      *
      * @param EventDispatcher $dispatcher
      */
-    public function setDispatcher(EventDispatcher $dispatcher)
+    final public function setDispatcher(EventDispatcher $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
+
+    /**
+     * Dispatch an event for the process.
+     *
+     * @param string $event
+     * @param mixed  $payload
+     * @return mixed
+     */
+    final public function dispatch(string $event, $payload = null)
+    {
+        return $this->dispatcher->trigger($event, $this, $payload);
+    }
+
 
     /**
      * Cast properties

@@ -104,10 +104,23 @@ class Scenario extends MongoDocument implements Dynamic
      *
      * @param EventDispatcher $dispatcher
      */
-    public function setDispatcher(EventDispatcher $dispatcher)
+    final public function setDispatcher(EventDispatcher $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
+
+    /**
+     * Dispatch an event for the scenario.
+     *
+     * @param string $event
+     * @param mixed  $payload
+     * @return mixed
+     */
+    final public function dispatch(string $event, $payload = null)
+    {
+        return $this->dispatcher->trigger($event, $this, $payload);
+    }
+
 
     /**
      * Cast the properties of the Scenario object.

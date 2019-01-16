@@ -9,6 +9,11 @@ use Jasny\EventDispatcher\EventDispatcher;
 class ProcessInstantiator
 {
     /**
+     * @var ProcessGateway
+     */
+    protected $gateway;
+
+    /**
      * @var StateInstantiator
      */
     protected $stateInstantiator;
@@ -17,13 +22,13 @@ class ProcessInstantiator
     /**
      * Class constructor.
      *
+     * @param ProcessGateway    $gateway
      * @param StateInstantiator $stateInstantiator
-     * @param EventDispatcher   $dispatcher
      */
-    public function __construct(StateInstantiator $stateInstantiator, EventDispatcher $dispatcher)
+    public function __construct(ProcessGateway $gateway, StateInstantiator $stateInstantiator)
     {
+        $this->gateway = $gateway;
         $this->stateInstantiator = $stateInstantiator;
-        $this->dispatcher = $dispatcher;
     }
 
 
@@ -35,8 +40,7 @@ class ProcessInstantiator
      */
     public function instantiate(Scenario $scenario): Process
     {
-        $process = Process();
-        $process->setDispatcher($this->dispatcher);
+        $process = $this->gateway->create();
 
         $process->scenario = $scenario;
         $process->schema = str_replace('/scenario/', '/process/', $scenario->schema);
@@ -50,7 +54,7 @@ class ProcessInstantiator
         $initialState = $scenario->getState(':initial');
         $process->current = $this->stateInstantiator->instantiate($initialState, $process);
 
-        $this->dispatcher->trigger('instantiate', $process);
+        $process->dispatch('instantiate');
 
         return $process;
     }

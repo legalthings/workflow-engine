@@ -1,5 +1,7 @@
 <?php
 
+use Improved as i;
+use Improved\IteratorPipeline\Pipeline;
 use Jasny\DB\Entity\Dynamic;
 use Jasny\EventDispatcher\EventDispatcher;
 use Jasny\ValidationResult;
@@ -65,7 +67,7 @@ class Scenario extends MongoDocument implements Dynamic
      * @var Asset[]|AssetSet
      */
     public $definitions = [];
-    
+
     /**
      * Schema of the process information
      * @var JsonSchema
@@ -176,7 +178,28 @@ class Scenario extends MongoDocument implements Dynamic
         
         return $this->actors[$key];
     }
-    
+
+    /**
+     * Get the available actions for the given state.
+     *
+     * @param State|string $state
+     * @return AssocEntitySet&iterable<Action>
+     */
+    public function getActionsForState($state): AssocEntitySet
+    {
+        i\type_check($state, ['string', State::class]);
+        $state = is_string($state) ? $this->getState($state) : $state;
+
+        $actions = Pipeline::with(array_merge($state->actions, $this->allow_actions))
+            ->unique()
+            ->map(function($key) {
+                return $this->actions[$key] ?? null;
+            })
+            ->cleanup();
+
+        return AssocEntitySet::forClass(Action::class, $actions);
+    }
+
     /**
      * Validates the scenario.
      *

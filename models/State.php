@@ -66,7 +66,7 @@ class State extends BasicEntity implements Meta, Validation
     public $timeout;
 
     /**
-     * Flags whether the state should be displayed or not
+     * Flags whether the state should be displayed or not when showing the next states.
      * @var string
      * @options always,once,never
      */
@@ -74,21 +74,12 @@ class State extends BasicEntity implements Meta, Validation
 
 
     /**
-     * Class constructor
-     */
-    public function __construct()
-    {
-        $this->cast();
-    }
-    
-    
-    /**
      * Check whether the state has an allowed action with the given action key
      * 
      * @param string $key
-     * @return boolean
+     * @return bool
      */
-    public function hasAllowedAction($key)
+    public function hasAction($key): bool
     {
         return in_array($this->actions, $key, true);
     }
@@ -100,7 +91,7 @@ class State extends BasicEntity implements Meta, Validation
      * @param string $response
      * @return string|null
      */
-    public function getTransition(string $action, string $response)
+    public function getTransition(string $action, string $response): ?string
     {
         if (!isset($this->transitions) || empty($this->transitions) || $this->transitions->count() === 0) {
             return;

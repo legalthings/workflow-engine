@@ -10,6 +10,12 @@ class Asset extends BasicEntity implements Dynamic
     use DeepClone;
 
     /**
+     * @var string
+     */
+    public $schema;
+
+
+    /**
      * Prepare json serialization
      *
      * @return object

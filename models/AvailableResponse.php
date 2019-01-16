@@ -6,9 +6,9 @@ use Jasny\DB\EntitySet;
 use Jasny\ValidationResult;
 
 /**
- * A response of an action in a scenario.
+ * A response of an action as defined in the scenario.
  */
-class ActionResponse extends BasicEntity implements Meta, Validation
+class AvailableResponse extends BasicEntity implements Meta, Validation
 {
     use DeepClone;
     use Meta\Implementation;

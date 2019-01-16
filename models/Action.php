@@ -1,6 +1,7 @@
 <?php
 
 use Jasny\DB\BasicEntity;
+use Jasny\DB\Entity\Dynamic;
 use Jasny\DB\Entity\Validation;
 use Jasny\DB\Entity\Meta;
 use Jasny\ValidationResult;
@@ -8,7 +9,7 @@ use Jasny\ValidationResult;
 /**
  * Something to be performed by an Actor.
  */
-class Action extends BasicEntity implements Meta, Validation
+class Action extends BasicEntity implements Meta, Validation, Dynamic
 {
     use DeepClone;
     use Meta\Implementation;
@@ -19,32 +20,38 @@ class Action extends BasicEntity implements Meta, Validation
     public $schema;
 
     /**
-     * Action title
+     * Action title.
      * @var string|DataInstruction
      */
     public $title;
 
     /**
-     * Description that is seen by the current actor
+     * Description for choosing this action (typically displayed as a button).
      * @var string|DataInstruction
      */
     public $label;
 
     /**
-     * Description that is seen by anyone that is not the current actor
+     * Description of the current action.
      * @var string|DataInstruction
      */
     public $description;
 
     /**
-     * Key of the actor(s)
+     * Key of the actor(s).
      * @var string|string[]|null
      */
     public $actor;
 
     /**
-     * Responses on the action.
-     * @var ActionResponse[]|AssocEntitySet
+     * Condition that needs to be met to allow the action to be executed.
+     * @var bool|DataInstruction
+     */
+    public $condition = true;
+
+    /**
+     * Available responses on the action.
+     * @var AvailableResponse[]|AssocEntitySet
      */
     public $responses = [];
 
@@ -53,40 +60,6 @@ class Action extends BasicEntity implements Meta, Validation
      * @var string|DataInstruction|null
      */
     public $default_response = 'ok';
-
-    /**
-     * Flags whether the action should be displayed or not
-     * @var string
-     * @options always,once,never
-     */
-    public $display = 'always';
-
-
-    /**
-     * Class constructor
-     */
-    public function __construct()
-    {
-        $this->cast();
-    }
-
-    /**
-     * Set values
-     *
-     * @param array $values
-     * @return $this
-     */
-    public function setValues($values)
-    {
-        if (isset($values['$schema'])) {
-            $values['schema'] = $values['$schema'];
-            unset($values['$schema']);
-        }
-
-        parent::setValues($values);
-
-        return $this;
-    }
 
 
     /**
@@ -98,7 +71,19 @@ class Action extends BasicEntity implements Meta, Validation
     {
         $validation = new ValidationResult();
 
-        if ($this->default_response !== 'ok' && !isset($this->responses[$this->default_response])) {
+
+        return $validation;
+    }
+
+    protected function validateResponses(): ValidationResult
+    {
+        $validation = new ValidationResult();
+
+        if (count($this->responses) === 0 && ($this->default_response === 'ok' || $this->default_response === null)) {
+            return $validation;
+        }
+
+        if (!isset($this->responses[$this->default_response])) {
             $validation->addError("Action doesn't have a '%s' response.", $this->default_response);
         }
 
@@ -106,17 +91,15 @@ class Action extends BasicEntity implements Meta, Validation
         foreach ($this->responses as $key => $response) {
             $validation->add($response->validate(), sprintf($responsePrefix, $key));
         }
-
-        return $validation;
     }
 
     /**
      * Check if the action contains the response given
      *
      * @param string $key
-     * @return boolean
+     * @return bool
      */
-    public function isValidResponse(string $key)
+    public function isValidResponse(string $key): bool
     {
         return isset($this->responses[$key]);
     }
@@ -125,10 +108,10 @@ class Action extends BasicEntity implements Meta, Validation
      * Get the response specified by the key.
      *
      * @param string $key
-     * @return Response
+     * @return AvailableResponse
      * @throws OutOfBoundsException
      */
-    public function getResponse(string $key)
+    public function getResponse(string $key): AvailableResponse
     {
         if ($key === '') {
             throw new InvalidArgumentException("Key should not be empty");
@@ -142,22 +125,20 @@ class Action extends BasicEntity implements Meta, Validation
     }
 
     /**
-     * Get the default response of the action
+     * Get the default response of the action.
      *
-     * @return Response|null
+     * @return AvailableResponse
      */
-    public function getDefaultResponse()
+    public function getDefaultResponse(): ?AvailableResponse
     {
-        $key = $this->default_response;
+        if ($this->default_response === null) {
+            return null;
+        }
 
-        if (!isset($this->responses[$key])) {
-            if ($key !== 'ok') {
-                trigger_error("Action doesn't have a '$key' response.", E_USER_WARNING);
-            }
-
+        if (empty($this->responses) && $this->default_response === 'ok') {
             return new Response();
         }
 
-        return $this->responses[$key];
+        return $this->getResponse($this->default_response);
     }
 }

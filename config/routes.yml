@@ -10,6 +10,7 @@
 
 /processes +GET:                           { controller: process, action: list }
 /processes +POST:                          { controller: process, action: start }
+/processes +DELETE:                        { controller: process, action: delete, id: $2 }
 /processes/*/done +POST:                   { controller: process, action: done, id: $2 }
 
-/responses +POST:                          { controller: responses, action: add }
+/responses +POST:                          { controller: process, action: response }

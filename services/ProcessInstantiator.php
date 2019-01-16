@@ -13,11 +13,6 @@ class ProcessInstantiator
      */
     protected $stateInstantiator;
 
-    /**
-     * @var EventDispatcher
-     */
-    protected $dispatcher;
-
 
     /**
      * Class constructor.

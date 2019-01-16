@@ -98,7 +98,7 @@ class Process extends MongoDocument
     }
 
     /**
-     * Set the event dispatcher. Should only be called by the ScenarioGateway.
+     * Set the event dispatcher. Should only be called by the ProcessGateway.
      * @internal
      *
      * @param EventDispatcher $dispatcher

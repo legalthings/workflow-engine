@@ -14,6 +14,11 @@ class Asset extends BasicEntity implements Dynamic
      */
     public $schema;
 
+    /**
+     * @var string
+     */
+    public $key;
+
 
     /**
      * Prepare json serialization

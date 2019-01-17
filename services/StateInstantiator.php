@@ -9,11 +9,6 @@ use LegalThings\DataEnricher;
 class StateInstantiator
 {
     /**
-     * Instantiate the actions that can be executed in the state
-     */
-    const WITH_ACTIONS = 1;
-
-    /**
      * The data enricher evaluates data instructions.
      * @var DataEnricher
      */
@@ -22,7 +17,7 @@ class StateInstantiator
     /**
      * Class constructor.
      *
-     * @param DataEnricher $dataEnricher
+     * @param DataEnricher  $dataEnricher
      */
     public function __construct(DataEnricher $dataEnricher)
     {
@@ -37,22 +32,21 @@ class StateInstantiator
      * @return State
      * @throws RuntimeException
      */
-    public function instantiate(State $definition, Process $process, int $opts = 0): State
+    public function instantiate(State $definition, Process $process): CurrentState
     {
         try {
             $state = clone $definition;
             $this->dataEnricher->applyTo($state, $process);
+            $currentState = CurrentState::fromData($state->toData());
 
-            if (($opts & self::WITH_ACTIONS) != 0) {
-                $actionDefinitions = $process->scenario->getActionsForState($definition);
-                $state->actions = $this->instantiateActions($actionDefinitions, $process);
-            }
+            $actionDefinitions = $process->scenario->getActionsForState($definition);
+            $currentState->actions = $this->instantiateActions($actionDefinitions, $process);
         } catch (\Exception $e) {
             $err = "Failed to instantiate state" . (isset($definition->title) ? " '{$definition->title}'" : '');
             throw new \RuntimeException($err, 0, $e);
         }
 
-        return $state;
+        return $currentState;
     }
 
     /**

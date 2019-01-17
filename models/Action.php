@@ -20,6 +20,11 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
     public $schema;
 
     /**
+     * @var string
+     */
+    public $key;
+
+    /**
      * Action title.
      * @var string|DataInstruction
      */
@@ -70,11 +75,14 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
     public function validate(): ValidationResult
     {
         $validation = new ValidationResult();
-
+        $validation->add($this->validateResponses());
 
         return $validation;
     }
 
+    /**
+     * @return ValidationResult
+     */
     protected function validateResponses(): ValidationResult
     {
         $validation = new ValidationResult();

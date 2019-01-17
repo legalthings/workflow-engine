@@ -19,6 +19,11 @@ class Actor extends BasicEntity implements Meta, Validation, Dynamic
     public $schema;
 
     /**
+     * @var string
+     */
+    public $key;
+
+    /**
      * Title as defined in the scenario.
      * @var string
      */

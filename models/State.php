@@ -1,9 +1,7 @@
 <?php
 
-use Improved as i;
 use Jasny\DB\Data;
 use Jasny\DB\Entity\Validation;
-use Jasny\DB\Entity\Meta;
 use Jasny\DB\EntitySet;
 use Jasny\DB\Entity\Identifiable;
 use Jasny\ValidationResult;
@@ -20,6 +18,11 @@ class State extends BasicEntity implements Validation
      * @var string
      */
     public $schema;
+
+    /**
+     * @var string
+     */
+    public $key;
 
     /**
      * Short title
@@ -44,13 +47,7 @@ class State extends BasicEntity implements Validation
      * @var string[]
      */
     public $actions = [];
-    
-    /**
-     * Reference to the default action (golden flow)
-     * @var string|DataInstruction
-     */
-    public $default_action;
-    
+
     /**
      * Set of state transitions resulting from an action response
      * @var StateTransition[]|\Jasny\DB\EntitySet

@@ -14,6 +14,11 @@ class StateTransition extends BasicEntity implements Dynamic, Meta, Validation
     use Meta\Implementation;
 
     /**
+     * @var string
+     */
+    public $key;
+
+    /**
      * Action reference
      * @var string
      */

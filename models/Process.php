@@ -46,13 +46,13 @@ class Process extends MongoDocument
     public $previous = [];
 
     /**
-     * @var State
+     * @var CurrentState
      */
     public $current;
     
     /**
      * The next states in the process only considering the default actions and responses.
-     * @var State[]|\Jasny\DB\EntitySet
+     * @var NextState[]|\Jasny\DB\EntitySet
      */
     public $next = [];
 

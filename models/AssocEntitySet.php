@@ -1,6 +1,7 @@
 <?php
 
 use Improved\IteratorPipeline\Pipeline;
+use Jasny\DB\Entity;
 use Jasny\DB\EntitySet;
 
 /**
@@ -44,10 +45,8 @@ class AssocEntitySet extends EntitySet
             ->mapKeys(function($item, $key) {
                 return $item->key ?? $key;
             })
-            ->apply(function($item) {
-                if (isset($item->key)) {
-                    unset($item->key);
-                }
+            ->apply(function($item, $key) {
+                $item->key = $key;
             });
     }
     
@@ -83,6 +82,22 @@ class AssocEntitySet extends EntitySet
     }
 
     /**
+     * Replace the entity of a specific index
+     *
+     * @param string       $index
+     * @param Entity|array $entity  Entity or data representation of entity
+     */
+    public function offsetSet($index, $entity)
+    {
+        $this->assertEntity($entity);
+
+        $index = $index ?? $entity->key;
+        $entity->key = $index;
+
+        parent::offsetSet($index, $entity);
+    }
+
+    /**
      * Clone all entities
      */
     public function __clone()
@@ -90,21 +105,5 @@ class AssocEntitySet extends EntitySet
         foreach ($this->entities as &$entity) {
             $entity = clone $entity;
         }
-    }
-
-    /**
-     * Get data that needs stored in the DB
-     * 
-     * @return array
-     */
-    public function toData()
-    {
-        $data = [];
-        
-        foreach ($this->entities as $key => $entity) {
-            $data[] = ['key' => $key] + $entity->toData();
-        }
-        
-        return $data;
     }
 }

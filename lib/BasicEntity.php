@@ -1,13 +1,17 @@
 <?php
 
 use Jasny\DB\Entity;
+use Jasny\DB\Entity\Meta;
 
 /**
  * Basic entity the extends stdClass
  */
-class BasicEntity extends stdClass implements Entity
+class BasicEntity extends stdClass implements Entity, Meta
 {
-    use Entity\Implementation {
+    use Entity\Implementation,
+        Meta\Implementation
+    {
+        Meta\Implementation::jsonSerializeFilter insteadof Entity\Implementation;
         setValues as private _setValues;
     }
 

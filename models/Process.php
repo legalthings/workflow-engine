@@ -5,8 +5,7 @@ use Improved\IteratorPipeline\Pipeline;
 use Jasny\DB\EntitySet;
 use Jasny\ValidationResult;
 use Ramsey\Uuid\Uuid;
-use MongoDB\BSON\ObjectId as MongoId;
-use function Jasny\object_get_properties;
+use Jasny\EventDispatcher\EventDispatcher;
 
 /**
  * Representation of the current state of a running process.
@@ -37,7 +36,7 @@ class Process extends MongoDocument
     public $scenario;
 
     /**
-     * @var ActorSet|Actor[]
+     * @var Actor[]|AssocEntitySet
      */
     public $actors = [];
 
@@ -65,13 +64,13 @@ class Process extends MongoDocument
 
     /**
      * A list of process assets
-     * @var AssetSet|Asset[]
+     * @var Asset[]|AssocEntitySet
      */
     public $assets = [];
     
     /**
      * Constant values and predefined objects
-     * @var Asset[]|AssetSet
+     * @var Asset[]|AssocEntitySet
      */
     public $definitions = [];
 
@@ -128,10 +127,6 @@ class Process extends MongoDocument
      */
     public function cast(): self
     {
-        if (!$this->assets instanceof AssetSet) {
-            $this->assets = Pipeline::with((array)$this->assets)->cleanup()->toArray();
-        }
-
         if (!$this->next instanceof EntitySet) {
             $this->next = EntitySet::forClass(State::class, $this->next, EntitySet::ALLOW_DUPLICATES);
         }

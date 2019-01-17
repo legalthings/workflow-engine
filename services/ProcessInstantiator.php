@@ -63,14 +63,18 @@ class ProcessInstantiator
      * Instantiate the process actors.
      *
      * @param Scenario $scenario
-     * @return AssocEntitySet
+     * @return AssocEntitySet&iterable<Actor>
      */
     protected function instantiateActors(Scenario $scenario): AssocEntitySet
     {
         $actors = [];
 
         foreach ($scenario->actors as $key => $schema) {
-            $actors[$key] = $schema->build();
+            $actor = $schema->build();
+            $actor->title = $schema->title;
+            $actor->description = $schema->description;
+
+            $actors[$key] = $actor;
         }
 
         return AssocEntitySet::forClass(Actor::class, $actors);
@@ -80,16 +84,20 @@ class ProcessInstantiator
      * Instantiate the process assets.
      *
      * @param Scenario $scenario
-     * @return AssocEntitySet
+     * @return AssocEntitySet&iterable<Asset>
      */
-    protected function instantiateAssets(Scenario $scenario): AssetSet
+    protected function instantiateAssets(Scenario $scenario): AssocEntitySet
     {
         $assets = [];
 
         foreach ($scenario->assets as $key => $schema) {
-            $assets[$key] = $schema->build();
+            $asset = $schema->build();
+            $asset->title = $schema->title;
+            $asset->description = $schema->description;
+
+            $assets[$key] = $asset;
         }
 
-        return new AssetSet($assets);
+        return AssocEntitySet::forClass(Asset::class, $assets);
     }
 }

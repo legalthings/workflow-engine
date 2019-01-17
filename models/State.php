@@ -1,5 +1,6 @@
 <?php
 
+use Improved as i;
 use Jasny\DB\Data;
 use Jasny\DB\Entity\Validation;
 use Jasny\DB\Entity\Meta;
@@ -11,12 +12,9 @@ use function Jasny\object_get_properties;
 /**
  * Definition of state a process can be in.
  */
-class State extends BasicEntity implements Meta, Validation
+class State extends BasicEntity implements Validation
 {
     use DeepClone;
-    use Meta\Implementation {
-        cast as private metaCast;
-    }
 
     /**
      * @var string
@@ -85,31 +83,6 @@ class State extends BasicEntity implements Meta, Validation
     }
 
     /**
-     * Get the transition based on the given action and response
-     * 
-     * @param string $action
-     * @param string $response
-     * @return string|null
-     */
-    public function getTransition(string $action, string $response): ?string
-    {
-        if (!isset($this->transitions) || empty($this->transitions) || $this->transitions->count() === 0) {
-            return;
-        }
-        
-        foreach ($this->transitions as $transition) {
-            if ((isset($transition->action) && $transition->action !== $action) ||
-                (isset($transition->response) && $transition->response !== $response)) {
-                continue;
-            }
-            
-            if (!isset($transition->condition) || filter_var($transition->condition, FILTER_VALIDATE_BOOLEAN)) {
-                return $transition->transition;
-            }
-        }
-    }
-
-    /**
      * Cast entity properties
      * 
      * @return $this
@@ -125,7 +98,7 @@ class State extends BasicEntity implements Meta, Validation
             );
         }
 
-        return $this;
+        return parent::cast();
     }
 
     /**

@@ -64,7 +64,7 @@ class Scenario extends MongoDocument implements Dynamic
     
     /**
      * Constant values and predefined objects
-     * @var Asset[]|AssetSet
+     * @var Asset[]|AssocEntitySet
      */
     public $definitions = [];
 

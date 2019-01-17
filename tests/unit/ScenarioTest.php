@@ -1,13 +1,12 @@
 <?php
 
-use Codeception\TestCase\Test;
 use Jasny\ValidationResult;
 use Jasny\EventDispatcher\EventDispatcher;
 
 /**
  * @covers Scenario
  */
-class ScenarioTest extends Test
+class ScenarioTest extends \Codeception\Test\Unit
 {
     public function testConstruction()
     {

@@ -11,8 +11,15 @@ use Jasny\ValidationResult;
 class AvailableResponse extends BasicEntity implements Meta, Validation
 {
     use DeepClone;
-    use Meta\Implementation;
+    use Meta\Implementation {
+        cast as private metaCast;
+    }
 
+    /**
+     * @var string
+     */
+    public $key;
+    
     /**
      * The title that will be displayed in the process if the action is performed.
      * @var string|DataInstruction
@@ -25,14 +32,6 @@ class AvailableResponse extends BasicEntity implements Meta, Validation
      * @options never, once, always
      */
     public $display = 'always';
-
-    /**
-     * Hard-wired transition for an action response to a specific state. This can be used for actions that always
-     * transition to a specific state regardless of the state the process is now in.
-     *
-     * @var string|null
-     */
-    public $transition;
 
     /**
      * Update instruction or array of update instructions.
@@ -68,7 +67,7 @@ class AvailableResponse extends BasicEntity implements Meta, Validation
             }
         }
         
-        return $this->castUsingMeta();
+        return $this->metaCast();
     }
 
     /**

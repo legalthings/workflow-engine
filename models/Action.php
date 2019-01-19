@@ -1,6 +1,5 @@
 <?php
 
-use Jasny\DB\BasicEntity;
 use Jasny\DB\Entity\Dynamic;
 use Jasny\DB\Entity\Validation;
 use Jasny\DB\Entity\Meta;
@@ -37,16 +36,16 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
     public $label;
 
     /**
-     * Description of the current action.
+     * Description of the action.
      * @var string|DataInstruction
      */
     public $description;
 
     /**
-     * Key of the actor(s).
-     * @var string|string[]|null
+     * Key of the actor(s) that are allowed the perform the action.
+     * @var string[]
      */
-    public $actor;
+    public $actors;
 
     /**
      * Condition that needs to be met to allow the action to be executed.
@@ -58,14 +57,53 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
      * Available responses on the action.
      * @var AvailableResponse[]|AssocEntitySet
      */
-    public $responses = [];
+    public $responses;
 
     /**
      * Default response used for golden flow
-     * @var string|DataInstruction|null
+     * @var string|null
      */
     public $default_response = 'ok';
 
+    /**
+     * Action constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        if (!isset($this->responses)) {
+            $this->responses = AssocEntitySet::forClass(AvailableResponse::class);
+            $this->responses['ok'] = new AvailableResponse();
+        }
+    }
+
+    /**
+     * Set values
+     *
+     * @param array $values
+     * @return $this
+     */
+    public function setValues($values)
+    {
+        if (isset($values['actor'])) {
+            $values['actors'] = [$values['actor']];
+            unset($values['actor']);
+        }
+
+        $responseValues = array_only($values, ['display', 'update']);
+        $actionValues = array_without($values, ['display', 'update']);
+
+        parent::setValues($actionValues);
+
+        if ($responseValues !== []) {
+            foreach ($this->responses as $response) {
+                $response->setValues($responseValues);
+            }
+        }
+
+        return $this;
+    }
 
     /**
      * Validates the action
@@ -86,10 +124,6 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
     protected function validateResponses(): ValidationResult
     {
         $validation = new ValidationResult();
-
-        if (count($this->responses) === 0 && ($this->default_response === 'ok' || $this->default_response === null)) {
-            return $validation;
-        }
 
         if (!isset($this->responses[$this->default_response])) {
             $validation->addError("Action doesn't have a '%s' response.", $this->default_response);
@@ -130,23 +164,5 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
         }
 
         return $this->responses[$key];
-    }
-
-    /**
-     * Get the default response of the action.
-     *
-     * @return AvailableResponse
-     */
-    public function getDefaultResponse(): ?AvailableResponse
-    {
-        if ($this->default_response === null) {
-            return null;
-        }
-
-        if (empty($this->responses) && $this->default_response === 'ok') {
-            return new Response();
-        }
-
-        return $this->getResponse($this->default_response);
     }
 }

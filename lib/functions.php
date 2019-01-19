@@ -1,5 +1,7 @@
 <?php
 
+use function Jasny\object_get_properties;
+
 /**
  * Flatten an array, concatenating the keys
  * 
@@ -87,4 +89,29 @@ function object_rename_key($object, string $from, string $to)
     }
 
     return $object;
+}
+
+/**
+ * Copy all properties from one object to another.
+ * Clone property if it's an object.
+ *
+ * @param object $from
+ * @param object $to
+ * @return object $to
+ */
+function object_copy_properties($from, $to)
+{
+    $properties = array_keys(object_get_properties($to));
+
+    foreach ($properties as $property) {
+        $value = $from->$property ?? null;
+
+        if (is_object($value)) {
+            $value = clone $value;
+        }
+
+        $to->$property = $value;
+    }
+
+    return $to;
 }

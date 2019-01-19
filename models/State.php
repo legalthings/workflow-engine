@@ -17,11 +17,6 @@ class State extends BasicEntity implements Validation
     /**
      * @var string
      */
-    public $schema;
-
-    /**
-     * @var string
-     */
     public $key;
 
     /**
@@ -104,6 +99,16 @@ class State extends BasicEntity implements Validation
     public function validate(): ValidationResult
     {
         return ValidationResult::success();
+    }
+
+    /**
+     * Check if this is a final state.
+     *
+     * @return bool
+     */
+    public function isFinal(): bool
+    {
+        return count($this->transitions) === 0;
     }
 
     /**

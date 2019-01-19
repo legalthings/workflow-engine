@@ -128,7 +128,8 @@ class Process extends MongoDocument
     public function cast(): self
     {
         if (!$this->next instanceof EntitySet) {
-            $this->next = EntitySet::forClass(State::class, $this->next, EntitySet::ALLOW_DUPLICATES);
+            // Should not really contain duplicates, but entity is not identifiable.
+            $this->next = EntitySet::forClass(NextState::class, $this->next, EntitySet::ALLOW_DUPLICATES);
         }
 
         parent::cast();

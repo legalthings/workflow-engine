@@ -8,11 +8,6 @@ class NextState extends BasicEntity
     /**
      * @var string
      */
-    public $schema;
-
-    /**
-     * @var string
-     */
     public $key;
 
     /**
@@ -42,7 +37,7 @@ class NextState extends BasicEntity
 
     /**
      * Key of the actor(s) that should do the default action for this state.
-     * @var string|string[]|null
+     * @var string[]
      */
-    public $actor;
+    public $actors;
 }

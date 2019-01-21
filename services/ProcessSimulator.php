@@ -34,7 +34,6 @@ class ProcessSimulator
 
     /**
      * Walk over the process to get the next states.
-     * @todo Clean up this loop, it's hard to follow. Maybe use pipeline instead.
      *
      * @param Process $process
      * @return EntitySet&iterable<NextState>
@@ -46,36 +45,31 @@ class ProcessSimulator
 
         $scenario = $process->scenario;
         $state = $scenario->getState($process->current->key);
-        $nextAction = $this->getDefaultAction($state, $process);
+        $action = $this->getDefaultAction($state, $process);
 
         /** @var EntitySet&iterable<NextState> $next */
         $index = [];
         $next = EntitySet::forClass(NextState::class, [], null, EntitySet::ALLOW_DUPLICATES);
 
-        try {
-            while ($state !== null) {
-                // Determine next state
-                $action = $nextAction;
-                $transition = isset($action)
-                    ? $this->getTransition($state, $action->key, $action->default_response, $process)
-                    : null;
-                $state = isset($transition) ? $scenario->getState($transition->transition) : null;
+        while ($action !== null) {
+            $transition = isset($action) ? $this->getTransition($state, $action, $process) : null;
+            $state = isset($transition) ? $scenario->getState($transition->transition) : null;
 
-                // Looped back to already visited state
-                if ($state !== null && in_array($state->key, $index)) {
-                    break;
-                }
-
-                // Add next state
-                if ($state !== null) {
-                    $nextAction = $this->getDefaultAction($state, $process);
-
-                    $index[] = $state->key;
-                    $next[] = $this->instantiateNextState($state, $process, $nextAction->actors ?? []);
-                }
+            if ($state === null) {
+                break;
             }
-        } catch (RuntimeException $exception) {
-            trigger_error($exception->getMessage(), E_USER_WARNING);
+
+            $loopDetected = in_array($state->key, $index);
+
+            $action = $this->getDefaultAction($state, $process);
+
+            $index[] = $state->key;
+            $next[] = $this->instantiateNextState($state, $process, $action->actors ?? []);
+
+            if ($loopDetected) {
+                $next[] = $this->createLoopState();
+                $action = null;
+            }
         }
 
         return $next;
@@ -93,66 +87,95 @@ class ProcessSimulator
     {
         $scenario = $process->scenario;
 
-        return Pipeline::with($state->actions)
-            ->map(function(string $actionKey) use ($scenario) {
-                return $scenario->getAction($actionKey);
-            })
-            ->find(function(Action $action) use ($process) {
-                $condition = $action->condition;
+        try {
+            return Pipeline::with($state->actions)
+                ->map(function(string $actionKey) use ($scenario) {
+                    return $scenario->getAction($actionKey);
+                })
+                ->find(function(Action $action) use ($process) {
+                    if ($action->condition instanceof DataInstruction) {
+                        $action = clone $action;
+                        $this->dataEnricher->applyTo($action, $process);
+                    }
 
-                if ($action->condition instanceof DataInstruction) {
-                    $condition = clone $action->condition;
-                    $this->dataEnricher->applyTo($condition, $process);
-                }
+                    return (bool)$action->condition;
+                });
+        } catch (RuntimeException $exception) {
+            $msg = "Error while getting default action for state '%s' in process: '%s': %s";
+            trigger_error(sprintf($msg, $state->key, $process->id, $exception->getMessage()), E_USER_WARNING);
 
-                return (bool)$condition;
-            });
+            return null;
+        }
     }
 
     /**
      * Get the transition for the default response of the given action for a state.
      *
      * @param State   $state
-     * @param string  $action
-     * @param string  $response
+     * @param Action  $action
      * @param Process $process
      * @return StateTransition|null
      */
-    protected function getTransition(State $state, string $action, string $response, Process $process): ?StateTransition
+    protected function getTransition(State $state, Action $action, Process $process): ?StateTransition
     {
-        return Pipeline::with($state->transitions)
-            ->filter(function(StateTransition $transition) use ($action, $response) {
-                return
-                    ($transition->action === $action || $transition->action === null) &&
-                    ($transition->response === $response || $transition->response === null);
-            })
-            ->filter(function(StateTransition $transition) use ($process) {
-                $condition = $transition->condition;
+        try {
+            return Pipeline::with($state->transitions)
+                ->filter(function(StateTransition $transition) use ($action) {
+                    return
+                        ($transition->action === $action->key || $transition->action === null) &&
+                        ($transition->response === $action->default_response || $transition->response === null);
+                })
+                ->filter(function(StateTransition $transition) use ($process) {
+                    if ($transition->condition instanceof DataInstruction) {
+                        $transition = clone $transition;
+                        $this->dataEnricher->applyTo($transition, $process);
+                    }
 
-                if ($transition->condition instanceof DataInstruction) {
-                    $condition = clone $transition->condition;
-                    $this->dataEnricher->applyTo($condition, $process);
-                }
+                    return (bool)$transition->condition;
+                })
+                ->first();
+        } catch (RuntimeException $exception) {
+            $msg = "Error while getting transition for state '%s' in process: '%s': %s";
+            trigger_error(sprintf($msg, $state->key, $process->id, $exception->getMessage()), E_USER_WARNING);
 
-                return (bool)$condition;
-            })
-            ->first();
+            return null;
+        }
     }
 
     /**
      * Instantiate a scenario state as next state.
      *
-     * @param State    $state
-     * @param Process  $process
-     * @param string[] $actor
+     * @param State                    $state
+     * @param Process                  $process
+     * @param string[]|DataInstruction $actor
      * @return NextState
      */
-    protected function instantiateNextState(State $state, Process $process, array $actors = []): NextState
+    protected function instantiateNextState(State $state, Process $process, $actors = []): NextState
     {
         $nextState = object_copy_properties($state, new NextState());
-
-        $this->dataEnricher->applyTo($nextState, $process);
         $nextState->actors = $actors;
+
+        try {
+            $this->dataEnricher->applyTo($nextState, $process);
+        } catch (RuntimeException $exception) {
+            $msg = "Error while creating simulated state '%s' in process: '%s': %s";
+            trigger_error(sprintf($msg, $state->key, $process->id, $exception->getMessage()), E_USER_WARNING);
+        }
+
+        return $nextState;
+    }
+
+    /**
+     * Create a next state that indicates a loop.
+     *
+     * @return NextState
+     */
+    protected function createLoopState(): NextState
+    {
+        $nextState = new NextState();
+
+        $nextState->key = ':loop';
+        $nextState->title = '...';
 
         return $nextState;
     }

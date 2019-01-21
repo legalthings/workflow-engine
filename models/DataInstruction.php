@@ -1,8 +1,10 @@
 <?php
 
+use Jasny\DB\Entity\Dynamic;
+
 /**
  * Data instruction
  */
-class DataInstruction extends stdClass
+class DataInstruction extends BasicEntity implements Dynamic
 {
 }

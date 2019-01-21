@@ -43,7 +43,7 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
 
     /**
      * Key of the actor(s) that are allowed the perform the action.
-     * @var string[]
+     * @var string[]|DataInstruction
      */
     public $actors;
 

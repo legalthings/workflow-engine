@@ -13,3 +13,4 @@ coverage:
     include:
         - lib/*
         - models/*
+        - services/*

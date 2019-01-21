@@ -8,6 +8,8 @@ use Jasny\DB\EntitySet;
  */
 class ProcessSimulatorTest extends \Codeception\Test\Unit
 {
+    use Jasny\TestHelper;
+
     protected function createScenario(): Scenario
     {
         $scenario = new Scenario();
@@ -78,6 +80,8 @@ class ProcessSimulatorTest extends \Codeception\Test\Unit
     protected function createProcess(): Process
     {
         $process = new Process();
+        $process->id = '00000000-0000-0000-0000-000000000000';
+
         $process->scenario = $this->createScenario();
 
         $process->actors['manager'] = new Actor();
@@ -94,9 +98,8 @@ class ProcessSimulatorTest extends \Codeception\Test\Unit
         $process = $this->createProcess();
 
         $dataEnricher = $this->createMock(DataEnricher::class);
-        $dataEnricher->expects($this->any())->method('applyTo')
-            ->with($this->isInstanceOf(NextState::class), $this->isInstanceOf(Process::class))
-            ->willReturnArgument(0);
+        $dataEnricher->expects($this->exactly(2))->method('applyTo')
+            ->with($this->isInstanceOf(NextState::class), $this->isInstanceOf(Process::class));
 
         $simulator = new ProcessSimulator($dataEnricher);
 
@@ -135,14 +138,206 @@ class ProcessSimulatorTest extends \Codeception\Test\Unit
         $process->scenario->actions['alt']->default_response = $defaultResponse;
 
         $dataEnricher = $this->createMock(DataEnricher::class);
-        $dataEnricher->expects($this->any())->method('applyTo')
-            ->with($this->isInstanceOf(NextState::class), $this->isInstanceOf(Process::class))
-            ->willReturnArgument(0);
+        $dataEnricher->expects($this->exactly(count($expected)))->method('applyTo')
+            ->with($this->isInstanceOf(NextState::class), $this->isInstanceOf(Process::class));
 
         $simulator = new ProcessSimulator($dataEnricher);
 
         $next = $simulator->getNextStates($process);
 
         $this->assertEquals($expected, $next->key);
+    }
+
+    /**
+     * Add condition for 'alt' action in 'alt_step' state and remove response.
+     */
+    protected function modifyScenarioSetTransactionConditions(Scenario $scenario)
+    {
+        $altTransitions = $scenario->states['alt_step']->transitions;
+
+        $altTransitions[0]->response = null;
+        $altTransitions[0]->condition = DataInstruction::fromData(['<eval>' => 'false']);
+
+        $altTransitions[1]->response = null;
+        $altTransitions[1]->condition = DataInstruction::fromData(['<eval>' => 'true']);
+    }
+
+    public function testWithTransactionCondition()
+    {
+        $process = $this->createProcess();
+        $process->current->key = 'alt_step';
+
+        $this->modifyScenarioSetTransactionConditions($process->scenario);
+
+        $dataEnricher = $this->createMock(DataEnricher::class);
+        $dataEnricher->expects($this->any())->method('applyTo')
+            ->willReturnCallback(function($subject) {
+                if ($subject instanceof StateTransition && $subject->condition instanceof DataInstruction) {
+                    $subject->condition = ($subject->condition->getValues() === ['<eval>' => 'true']);
+                }
+
+                return $subject;
+            });
+
+        $simulator = new ProcessSimulator($dataEnricher);
+
+        $next = $simulator->getNextStates($process);
+
+        $this->assertEquals(['basic_step', ':success'], $next->key);
+    }
+
+    public function actionConditionProvider()
+    {
+        return [
+            ['true', [':cancelled']],
+            ['false', [':success']],
+        ];
+    }
+
+    /**
+     * @dataProvider actionConditionProvider
+     */
+    public function testWithActionCondition(string $condition, array $expected)
+    {
+        $process = $this->createProcess();
+        $process->current->key = 'alt_step';
+
+        $process->scenario->actions['alt']->default_response = 'cancel';
+        $process->scenario->actions['alt']->condition = DataInstruction::fromData(['<eval>' => $condition]);
+
+        $dataEnricher = $this->createMock(DataEnricher::class);
+        $dataEnricher->expects($this->any())->method('applyTo')
+            ->willReturnCallback(function($subject) {
+                if ($subject instanceof Action && $subject->condition instanceof DataInstruction) {
+                    $subject->condition = ($subject->condition->getValues() === ['<eval>' => 'true']);
+                }
+
+                return $subject;
+            });
+
+        $simulator = new ProcessSimulator($dataEnricher);
+
+        $next = $simulator->getNextStates($process);
+
+        $this->assertEquals($expected, $next->key);
+    }
+
+    public function testWithLoop()
+    {
+        $process = $this->createProcess();
+        $process->current->key = 'basic_step';
+
+        // Alt action is the only available. Default alt is to retry.
+        $process->scenario->actions['second']->condition = false;
+        $process->scenario->actions['alt']->default_response = 'retry';
+
+        $dataEnricher = $this->createMock(DataEnricher::class);
+        $dataEnricher->expects($this->any())->method('applyTo')
+            ->with($this->isInstanceOf(NextState::class), $this->isInstanceOf(Process::class));
+
+        $simulator = new ProcessSimulator($dataEnricher);
+
+        $next = $simulator->getNextStates($process);
+
+        $this->assertEquals(['alt_step', 'basic_step', 'alt_step', ':loop'], $next->key);
+    }
+
+    public function testInvoke()
+    {
+        $process = $this->createProcess();
+
+        $dataEnricher = $this->createMock(DataEnricher::class);
+        $dataEnricher->expects($this->exactly(2))->method('applyTo')
+            ->with($this->isInstanceOf(NextState::class), $this->isInstanceOf(Process::class));
+
+        $simulator = new ProcessSimulator($dataEnricher);
+
+        // Golden flow, but invoke simulator rather than calling 'getNextStates'.
+        $next = $simulator($process);
+        $this->assertInstanceOf(EntitySet::class, $next);
+
+        $this->assertEquals(['basic_step', ':success'], $next->key);
+    }
+
+    public function testActionRuntimeException()
+    {
+        $process = $this->createProcess();
+
+        // Emulate an invalid data instruction
+        $process->scenario->actions['second']->condition = DataInstruction::fromData(['<eval>' => '99x']);
+
+        $dataEnricher = $this->createMock(DataEnricher::class);
+        $dataEnricher->expects($this->any())->method('applyTo')
+            ->willReturnCallback(function($subject) {
+                if ($subject instanceof Action && $subject->condition instanceof DataInstruction) {
+                    throw new RuntimeException("Invalid data instruction");
+                }
+
+                return $subject;
+            });
+
+        $simulator = new ProcessSimulator($dataEnricher);
+
+        $next = @$simulator->getNextStates($process);
+
+        $this->assertLastError(E_USER_WARNING, "Error while getting default action for state " .
+            "'basic_step' in process: '00000000-0000-0000-0000-000000000000': Invalid data instruction");
+
+        $this->assertEquals(['basic_step'], $next->key);
+    }
+
+    public function testTransitionRuntimeException()
+    {
+        $process = $this->createProcess();
+
+        // Emulate an invalid data instruction
+        $transition = $process->scenario->states['basic_step']->transitions[0];
+        $transition->condition = DataInstruction::fromData(['<eval>' => '99x']);
+
+        $dataEnricher = $this->createMock(DataEnricher::class);
+        $dataEnricher->expects($this->any())->method('applyTo')
+            ->willReturnCallback(function($subject) {
+                if ($subject instanceof StateTransition && $subject->condition instanceof DataInstruction) {
+                    throw new RuntimeException("Invalid data instruction");
+                }
+
+                return $subject;
+            });
+
+        $simulator = new ProcessSimulator($dataEnricher);
+
+        $next = @$simulator->getNextStates($process);
+
+        $this->assertLastError(E_USER_WARNING, "Error while getting transition for state " .
+            "'basic_step' in process: '00000000-0000-0000-0000-000000000000': Invalid data instruction");
+
+        $this->assertEquals(['basic_step'], $next->key);
+    }
+
+    public function testNextStateRuntimeException()
+    {
+        $process = $this->createProcess();
+
+        // Emulate an invalid data instruction
+        $process->scenario->actions['second']->actors = DataInstruction::fromData(['<eval>' => '99x']);
+
+        $dataEnricher = $this->createMock(DataEnricher::class);
+        $dataEnricher->expects($this->atLeastOnce())->method('applyTo')
+            ->willReturnCallback(function($subject) {
+                if ($subject instanceof NextState && $subject->actors instanceof DataInstruction) {
+                    throw new RuntimeException("Invalid data instruction");
+                }
+
+                return $subject;
+            });
+
+        $simulator = new ProcessSimulator($dataEnricher);
+
+        $next = @$simulator->getNextStates($process);
+
+        $this->assertLastError(E_USER_WARNING, "Error while creating simulated state " .
+            "'basic_step' in process: '00000000-0000-0000-0000-000000000000': Invalid data instruction");
+
+        $this->assertEquals(['basic_step', ':success'], $next->key);
     }
 }

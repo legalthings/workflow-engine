@@ -106,4 +106,19 @@ class AssocEntitySet extends EntitySet
             $entity = clone $entity;
         }
     }
+
+    /**
+     * Get data representation for saving to DB.
+     *
+     * @return array
+     */
+    public function toData(): array
+    {
+        return Pipeline::with($this->entities)
+            ->map(function(Entity $entity, string $key) {
+                return ['key' => $key] + $entity->toData();
+            })
+            ->values()
+            ->toArray();
+    }
 }

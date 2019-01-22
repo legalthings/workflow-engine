@@ -18,7 +18,7 @@ class ScenarioTest extends \Codeception\Test\Unit
         $this->assertAttributeInstanceOf(AssocEntitySet::class, 'assets', $scenario);
         $this->assertSame(JsonSchema::class, $scenario->assets->getEntityClass());
 
-        $this->assertAttributeInstanceOf(AssetSet::class, 'definitions', $scenario);
+        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'definitions', $scenario);
         $this->assertSame(Asset::class, $scenario->definitions->getEntityClass());
 
         $this->assertAttributeInstanceOf(AssocEntitySet::class, 'actions', $scenario);
@@ -270,7 +270,6 @@ class ScenarioTest extends \Codeception\Test\Unit
         $this->assertAttributeEquals('Bar', 'title', $scenario->actions['bar']);
         $this->assertAttributeInstanceOf(AssocEntitySet::class, 'responses', $scenario->actions['bar']);
         $this->assertArrayHasKey('ok', $scenario->actions['bar']->responses->getArrayCopy());
-        $this->assertAttributeEquals(':success', 'transition', $scenario->actions['bar']->responses['ok']);
     }
 
     protected function assertScenarioStates(Scenario $scenario)
@@ -307,7 +306,7 @@ class ScenarioTest extends \Codeception\Test\Unit
 
     protected function assertScenarioDefinitions(Scenario $scenario)
     {
-        $this->assertAttributeInstanceOf(AssetSet::class, 'definitions', $scenario);
+        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'definitions', $scenario);
         $this->assertEquals(Asset::class, $scenario->definitions->getEntityClass());
 
         $this->assertArrayHasKey('dimensions', $scenario->definitions->getArrayCopy());
@@ -462,6 +461,27 @@ class ScenarioTest extends \Codeception\Test\Unit
             ],
             'states' => [
                 [
+                    'key' => ':success',
+                    'actions' => [],
+                    'transitions' => [],
+                    'instructions' => [],
+                    'display' => 'always',
+                ],
+                [
+                    'key' => ':failed',
+                    'actions' => [],
+                    'transitions' => [],
+                    'instructions' => [],
+                    'display' => 'always',
+                ],
+                [
+                    'key' => ':cancelled',
+                    'actions' => [],
+                    'transitions' => [],
+                    'instructions' => [],
+                    'display' => 'always',
+                ],
+                [
                     'key' => ':initial',
                     'title' => 'First',
                     'actions' => ['foo'],
@@ -472,6 +492,10 @@ class ScenarioTest extends \Codeception\Test\Unit
                             'transition' => ':success',
                         ],
                     ],
+                    'instructions' => [
+                        'manager' => 'Do something',
+                    ],
+                    'display' => 'always',
                 ],
             ],
             'actors' => [
@@ -539,6 +563,10 @@ class ScenarioTest extends \Codeception\Test\Unit
                 'transitions' => [
                     ['action' => 'foo', 'response' => 'ok', 'transition' => ':success'],
                 ],
+                'instructions' => [
+                    'manager' => 'Do something',
+                ],
+                'display' => 'always',
             ]);
 
         $scenario->actors['manager'] = $this->createMock(JsonSchema::class);

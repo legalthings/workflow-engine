@@ -34,10 +34,10 @@ class AvailableResponse extends BasicEntity implements Meta, Validation
     public $display = 'always';
 
     /**
-     * Update instruction or array of update instructions.
-     * @var UpdateInstruction|UpdateInstruction[]|EntitySet
+     * Update instructions.
+     * @var UpdateInstruction[]|EntitySet
      */
-    public $update;
+    public $update = [];
 
     /**
      * Cast the entity
@@ -46,25 +46,17 @@ class AvailableResponse extends BasicEntity implements Meta, Validation
      */
     public function cast(): self
     {
-        if (
-            isset($this->update) &&
-            !$this->update instanceof UpdateInstruction &&
-            !$this->update instanceof EntitySet
-        ) {
+        if (isset($this->update) && !$this->update instanceof EntitySet) {
             // check if update is multidimensional, then make an entity set out of it
             $isMulti = is_array($this->update) && (!in_array(false, array_map('is_object', $this->update)) ||
                     !in_array(false, array_map('is_array', $this->update)));
 
-            if ($isMulti) {
-                $this->update = EntitySet::forClass(
-                    UpdateInstruction::class,
-                    $this->update,
-                    null,
-                    EntitySet::ALLOW_DUPLICATES
-                );
-            } else {
-                $this->update = UpdateInstruction::fromData($this->update);
-            }
+            $this->update = EntitySet::forClass(
+                UpdateInstruction::class,
+                $isMulti ? $this->update : [$this->update],
+                null,
+                EntitySet::ALLOW_DUPLICATES
+            );
         }
         
         return $this->metaCast();

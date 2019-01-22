@@ -52,9 +52,9 @@ class Process extends MongoDocument
     
     /**
      * The next states in the process only considering the default actions and responses.
-     * @var NextState[]|\Jasny\DB\EntitySet
+     * @var NextState[]|\Jasny\DB\EntitySet|null
      */
-    public $next = [];
+    public $next;
 
     /**
      * Process info

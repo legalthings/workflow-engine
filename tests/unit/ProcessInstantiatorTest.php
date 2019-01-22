@@ -86,7 +86,7 @@ class ProcessInstantiatorTest extends \Codeception\Test\Unit
         $processGateway = $this->createMock(ProcessGateway::class);
         $processGateway->expects($this->once())->method('create')->willReturn($process);
 
-        $currentState = $this->createMock(State::class);
+        $currentState = $this->createMock(CurrentState::class);
         $stateInstatiator = $this->createMock(StateInstantiator::class);
         $stateInstatiator->expects($this->once())->method('instantiate')
             ->with($scenario->states[':initial'])->willReturn($currentState);

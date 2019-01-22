@@ -272,25 +272,6 @@ class Scenario extends MongoDocument implements Dynamic
     }
     
     /**
-     * Get the data to store in the DB
-     *
-     * @param array $opts
-     * @return array
-     */
-    public function toData(array $opts = []): array
-    {
-        $data = parent::toData();
-        $data = array_rename_key($data, '$schema', 'schema');
-
-        // Remove implicit states
-        $data['states'] = array_values(array_filter($data['states'], function ($state) {
-            return !str_starts_with($state['key'], ':') || $state['key'] === ':initial';
-        }));
-
-        return $data;
-    }
-
-    /**
      * Prepare json serialization
      *
      * @return stdClass

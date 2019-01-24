@@ -65,7 +65,7 @@ class CurrentState extends State
      */
     public function getDefaultAction(): ?Action
     {
-        return i\iterable_find($this->actions, function (Action $action, $key): bool {
+        return i\iterable_find($this->actions, function (Action $action): bool {
             return is_scalar($action->condition) && (bool)$action->condition;
         });
     }

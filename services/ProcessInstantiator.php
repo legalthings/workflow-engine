@@ -46,7 +46,6 @@ class ProcessInstantiator
         $process->schema = str_replace('/scenario/', '/process/', $scenario->schema);
         $process->title = $scenario->title;
 
-        $process->info = Asset::fromData($scenario->info->build());
         $process->actors = $this->instantiateActors($scenario);
         $process->assets = $this->instantiateAssets($scenario);
         $process->definitions = clone $scenario->definitions;

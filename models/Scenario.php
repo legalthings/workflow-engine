@@ -69,12 +69,6 @@ class Scenario extends MongoDocument implements Dynamic
     public $definitions = [];
 
     /**
-     * Schema of the process information
-     * @var JsonSchema
-     */
-    public $info;
-
-    /**
      * Meta information. Can be specified by each node and isn't shared.
      * @var object
      */

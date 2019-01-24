@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
-use Improved as i;
+use Jasny\ValidationResult;
+use Jasny\DB\EntitySet;
 
 /**
  * Update a process that has a response for the current state.
@@ -22,9 +23,9 @@ class ProcessUpdater
      * Get next states for a process. You can use a stub function is your implementation doesn't need to determine the
      * (golden) flow after each state change. Simulation can be heavy on performance.
      *
-     * @var ProcessSimulator|callable
+     * @var ProcessSimulator
      */
-    protected $simulate;
+    protected $simulator;
 
 
     /**
@@ -32,38 +33,83 @@ class ProcessUpdater
      *
      * @param StateInstantiator $stateInstantiator
      * @param DataPatcher       $pather
-     * $param ProcessSimulator  $simulate
+     * @param ProcessSimulator  $simulator
      */
-    public function __construct(StateInstantiator $stateInstantiator, DataPatcher $patcher, callable $simulate)
+    public function __construct(StateInstantiator $stateInstantiator, DataPatcher $patcher, ProcessSimulator $simulator)
     {
         $this->stateInstantiator = $stateInstantiator;
         $this->patcher = $patcher;
-        $this->simulate = $simulate;
+        $this->simulator = $simulator;
     }
 
     /**
      * Update the state of a process.
      *
      * @param Process $process
+     * @return ValidationResult
      */
-    public function update(Process $process): void
+    public function update(Process $process): ValidationResult
     {
         if (!isset($process->current->response)) {
             $msg = "Can't update process '%s' in state '%s' without a response";
             throw new InvalidArgumentException(sprintf($msg, $process->id, $process->current->key));
         }
 
-        $response = $process->current->response;
-        $action = $process->action;
-        $data = $response->data;
+        $process->next = null;
 
-        foreach ($process->current->actions[$action->key]->responses[$response->key]->update as $updateInstruction) {
-            $this->applyUpdateInstruction($process, $updateInstruction, $data);
+        $responseData = $process->current->response->data;
+
+        foreach ($this->getUpdateInstructions($process) as $updateInstruction) {
+            $this->applyUpdateInstruction($process, $updateInstruction, $responseData);
+        }
+        $process->cast();
+
+        $validation = $process->validate();
+
+        if ($validation->failed()) {
+            return $validation;
         }
 
         $this->changeCurrentState($process);
 
-        $process->next = i\function_call($this->simulate, $process);
+        $process->next = $this->simulator->getNextStates($process);
+
+        return ValidationResult::success();
+    }
+
+    /**
+     * Get the update instructions for the current state
+     *
+     * @param Process $process
+     * @return EntitySet&iterable<UpdateInstruction>
+     */
+    protected function getUpdateInstructions(Process $process): EntitySet
+    {
+        $response = $process->current->response;
+        $action = $response->action;
+
+        return $process->current->actions[$action->key]->responses[$response->key]->update
+            ?? EntitySet::forClass(UpdateInstruction::class);
+    }
+
+    /**
+     * Apply an update instruction to a process.
+     *
+     * @param Process           $process
+     * @param UpdateInstruction $updateInstructions
+     * @param mixed             $respData
+     * @throws RuntimeException
+     */
+    protected function applyUpdateInstruction(Process $process, UpdateInstruction $update, $responseData): void
+    {
+        $select = $update->select;
+        $data = $update->data ?? $responseData;
+
+        if ($update->projection !== null) {
+            $data = $this->patcher->project($data, $update->projection);
+        }
+
+        $this->patcher->set($process, $select, $data, $update->patch);
     }
 
     /**
@@ -72,34 +118,25 @@ class ProcessUpdater
      * @param Process $process
      * @throws RuntimeException
      */
-    public function changeCurrentState(Process $process): void
+    protected function changeCurrentState(Process $process): void
     {
         $response = $process->current->response;
-        $action = $process->action;
+        $action = $response->action;
         $scenario = $process->scenario;
 
         // Re-instantiate current state for data instructions in transition conditions
         $oldState = $this->stateInstantiator->instantiate($scenario->getState($process->current->key), $process);
 
         $transition = $oldState->getTransition($action->key, $response->key);
+
+        // No state transition in this state for given action and response
+        if ($transition === null) {
+            $process->current = $oldState;
+            return;
+        }
+
+        // Instantiate new state
         $scenarioState = $scenario->getState($transition->transition);
-
         $process->current = $this->stateInstantiator->instantiate($scenarioState, $process);
-    }
-
-    /**
-     * Apply an update instruction to a process.
-     *
-     * @param Process           $process
-     * @param UpdateInstruction $updateInstructions
-     * @param mixed             $data
-     * @throws RuntimeException
-     */
-    protected function applyUpdateInstruction(Process $process, UpdateInstruction $updateInstruction, $data): void
-    {
-        $select = $updateInstruction->select;
-        $projection = $this->patcher->project($updateInstruction->data ?? $data, $updateInstruction->projection);
-
-        $this->patcher->set($process, $select, $projection, $updateInstruction->patch);
     }
 }

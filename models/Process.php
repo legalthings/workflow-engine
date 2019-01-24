@@ -57,12 +57,6 @@ class Process extends MongoDocument
     public $next;
 
     /**
-     * Process info
-     * @var Asset
-     */
-    public $info = [];
-
-    /**
      * A list of process assets
      * @var Asset[]|AssocEntitySet
      */
@@ -127,7 +121,7 @@ class Process extends MongoDocument
      */
     public function cast(): self
     {
-        if (!$this->next instanceof EntitySet) {
+        if ($this->next !== null && !$this->next instanceof EntitySet) {
             // Should not really contain duplicates, but entity is not identifiable.
             $this->next = EntitySet::forClass(NextState::class, $this->next, EntitySet::ALLOW_DUPLICATES);
         }

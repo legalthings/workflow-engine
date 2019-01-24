@@ -29,13 +29,13 @@ class AvailableResponse extends BasicEntity implements Meta, Validation
     /**
      * Show the response
      * @var string
-     * @options never, once, always
+     * @options never,once,always
      */
     public $display = 'always';
 
     /**
      * Update instructions.
-     * @var UpdateInstruction[]|EntitySet
+     * @var UpdateInstruction[]|\Jasny\DB\EntitySet
      */
     public $update = [];
 

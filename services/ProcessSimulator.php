@@ -38,7 +38,7 @@ class ProcessSimulator
      * @param Process $process
      * @return EntitySet&iterable<NextState>
      */
-    public function getNextStates(Process $process)
+    public function getNextStates(Process $process): EntitySet
     {
         $process = clone $process;
         $process->simulated = 1;
@@ -178,16 +178,5 @@ class ProcessSimulator
         $nextState->title = '...';
 
         return $nextState;
-    }
-
-    /**
-     * Alias of `getNextStates()`.
-     *
-     * @param Process $process
-     * @return EntitySet&iterable<NextState>
-     */
-    final public function __invoke(Process $process): EntitySet
-    {
-        return $this->getNextStates($process);
     }
 }

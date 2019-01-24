@@ -242,23 +242,6 @@ class ProcessSimulatorTest extends \Codeception\Test\Unit
         $this->assertEquals(['alt_step', 'basic_step', 'alt_step', ':loop'], $next->key);
     }
 
-    public function testInvoke()
-    {
-        $process = $this->createProcess();
-
-        $dataEnricher = $this->createMock(DataEnricher::class);
-        $dataEnricher->expects($this->exactly(2))->method('applyTo')
-            ->with($this->isInstanceOf(NextState::class), $this->isInstanceOf(Process::class));
-
-        $simulator = new ProcessSimulator($dataEnricher);
-
-        // Golden flow, but invoke simulator rather than calling 'getNextStates'.
-        $next = $simulator($process);
-        $this->assertInstanceOf(EntitySet::class, $next);
-
-        $this->assertEquals(['basic_step', ':success'], $next->key);
-    }
-
     public function testActionRuntimeException()
     {
         $process = $this->createProcess();

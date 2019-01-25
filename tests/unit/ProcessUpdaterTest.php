@@ -1,5 +1,6 @@
 <?php
 
+use Improved as i;
 use PHPUnit\Framework\MockObject\MockObject;
 use Jasny\ValidationResult;
 use Jasny\DB\EntitySet;
@@ -102,7 +103,7 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         return $process;
     }
 
-    protected function createCurrentState(Scenario $scenario, string $key)
+    protected function createCurrentState(Scenario $scenario, string $key): CurrentState
     {
         $state = new CurrentState();
         $state->key = $key;
@@ -116,6 +117,67 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         return $state;
     }
 
+    protected function setResponse(CurrentState $current, string $actionKey, string $responseKey, $data = null): void
+    {
+        $current->response = new Response();
+        $current->response->key = $responseKey;
+        $current->response->action = clone $current->actions[$actionKey];
+        $current->response->data = $data;
+    }
+
+    /**
+     * @return StateInstantiator&MockObject
+     */
+    protected function createStateInstantiatorMock(
+        Process $process,
+        ?string $stateKey = null,
+        ?CurrentState $processState = null
+    ): StateInstantiator {
+        $stateInstantiator = $this->createMock(StateInstantiator::class);
+
+        if ($stateKey === null) {
+            $stateInstantiator->expects($this->never())->method('instantiate');
+        } else {
+            $stateInstantiator->expects($this->once())->method('instantiate')
+                ->with($this->identicalTo($process->scenario->states[$stateKey]))
+                ->willReturn($processState);
+        }
+
+        $stateInstantiator->expects($this->once())->method('recalcActions')->with($process);
+        $stateInstantiator->expects($this->once())->method('recalcTransitions')->with($process);
+
+        return $stateInstantiator;
+    }
+
+    /**
+     * @return DataPatcher&MockObject
+     */
+    protected function createDataPatcherMock(): DataPatcher
+    {
+        $patcher = $this->createMock(DataPatcher::class);
+        $patcher->expects($this->never())->method('project');
+        $patcher->expects($this->never())->method('set');
+
+        return $patcher;
+    }
+
+    /**
+     * @return ProcessSimulator&MockObject
+     */
+    protected function createProcessSimulatorMock(Process $process, ?EntitySet $next = null): ProcessSimulator
+    {
+        $simulator = $this->createMock(ProcessSimulator::class);
+
+        if ($next === null) {
+            $simulator->expects($this->never())->method('getNextStates');
+        } else {
+            $simulator->expects($this->once())->method('getNextStates')
+                ->with($this->identicalTo($process))
+                ->willReturn($next);
+        }
+
+        return $simulator;
+    }
 
     public function testUpdate()
     {
@@ -123,32 +185,16 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         $process->expects($this->atLeastOnce())->method('validate')->willReturn(ValidationResult::success());
         $scenario = $process->scenario;
 
-        $oldState = clone $process->current;
         $basicStepState = $this->createCurrentState($scenario, 'basic_step');
         $next = new EntitySet();
 
-        $process->current->response = new Response();
-        $process->current->response->key = 'ok';
-        $process->current->response->action = clone $process->current->actions['first'];
+        $this->setResponse($process->current,'first', 'ok');
 
-        $stateInstantiator = $this->createMock(StateInstantiator::class);
-        $stateInstantiator->expects($this->exactly(2))->method('instantiate')
-            ->withConsecutive(
-                [$this->identicalTo($scenario->states[':initial'])],
-                [$this->identicalTo($scenario->states['basic_step'])]
-            )
-            ->willReturnOnConsecutiveCalls($oldState, $basicStepState);
+        $stateInstantiator = $this->createStateInstantiatorMock($process, 'basic_step', $basicStepState);
+        $patcher = $this->createDataPatcherMock();
+        $simulator = $this->createProcessSimulatorMock($process, $next);
 
-        $patcher = $this->createMock(DataPatcher::class);
-        $patcher->expects($this->never())->method('project');
-        $patcher->expects($this->never())->method('set');
-
-        $simulate = $this->createMock(ProcessSimulator::class);
-        $simulate->expects($this->once())->method('getNextStates')
-            ->with($this->identicalTo($process))
-            ->willReturn($next);
-
-        $updater = new ProcessUpdater($stateInstantiator, $patcher, $simulate);
+        $updater = new ProcessUpdater($stateInstantiator, $patcher, $simulator);
 
         $validation = $updater->update($process);
 
@@ -164,35 +210,20 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
      */
     public function testUpdateNoStateChange(Process $process)
     {
-        $scenario = $process->scenario;
-
-        $oldState = clone $process->current;
         $next = new EntitySet();
 
-        $process->current->response = new Response();
-        $process->current->response->key = 'nop'; // Unknown response
-        $process->current->response->action = clone $process->current->actions['second'];
+        $this->setResponse($process->current,'second', 'nop');
 
-        $stateInstantiator = $this->createMock(StateInstantiator::class);
-        $stateInstantiator->expects($this->once())->method('instantiate')
-            ->with($this->identicalTo($scenario->states['basic_step']))
-            ->willReturn($oldState);
+        $stateInstantiator = $this->createStateInstantiatorMock($process);
+        $patcher = $this->createDataPatcherMock();
+        $simulator = $this->createProcessSimulatorMock($process, $next);
 
-        $patcher = $this->createMock(DataPatcher::class);
-        $patcher->expects($this->never())->method('project');
-        $patcher->expects($this->never())->method('set');
-
-        $simulate = $this->createMock(ProcessSimulator::class);
-        $simulate->expects($this->once())->method('getNextStates')
-            ->with($this->identicalTo($process))
-            ->willReturn($next);
-
-        $updater = new ProcessUpdater($stateInstantiator, $patcher, $simulate);
+        $updater = new ProcessUpdater($stateInstantiator, $patcher, $simulator);
 
         $validation = $updater->update($process);
 
         $this->assertEquals(ValidationResult::success(), $validation);
-        $this->assertSame($oldState, $process->current);
+        $this->assertEquals('basic_step', $process->current->key);
         $this->assertSame($next, $process->next);
     }
 
@@ -203,37 +234,21 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
     {
         $scenario = $process->scenario;
 
-        $oldState = clone $process->current;
-        $altStateStep = $this->createCurrentState($scenario, 'alt_step');
+        $altStepState = $this->createCurrentState($scenario, 'alt_step');
         $next = new EntitySet();
 
-        $process->current->response = new Response();
-        $process->current->response->key = 'ok';
-        $process->current->response->action = clone $process->current->actions['alt'];
+        $this->setResponse($process->current,'alt', 'nop');
 
-        $stateInstantiator = $this->createMock(StateInstantiator::class);
-        $stateInstantiator->expects($this->exactly(2))->method('instantiate')
-            ->withConsecutive(
-                [$this->identicalTo($scenario->states['basic_step'])],
-                [$this->identicalTo($scenario->states['alt_step'])]
-            )
-            ->willReturnOnConsecutiveCalls($oldState, $altStateStep);
+        $stateInstantiator = $this->createStateInstantiatorMock($process, 'alt_step', $altStepState);
+        $patcher = $this->createDataPatcherMock();
+        $simulator = $this->createProcessSimulatorMock($process, $next);
 
-        $patcher = $this->createMock(DataPatcher::class);
-        $patcher->expects($this->never())->method('project');
-        $patcher->expects($this->never())->method('set');
-
-        $simulate = $this->createMock(ProcessSimulator::class);
-        $simulate->expects($this->once())->method('getNextStates')
-            ->with($this->identicalTo($process))
-            ->willReturn($next);
-
-        $updater = new ProcessUpdater($stateInstantiator, $patcher, $simulate);
+        $updater = new ProcessUpdater($stateInstantiator, $patcher, $simulator);
 
         $validation = $updater->update($process);
 
         $this->assertEquals(ValidationResult::success(), $validation);
-        $this->assertSame($altStateStep, $process->current);
+        $this->assertSame($altStepState, $process->current);
         $this->assertSame($next, $process->next);
 
         return $process;
@@ -246,37 +261,122 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
     {
         $scenario = $process->scenario;
 
-        $oldState = clone $process->current;
-        $cancelledState = CurrentState::fromData(['cancelled' => true]);
+        $cancelledState = $this->createCurrentState($scenario, ':cancelled');
         $next = new EntitySet();
 
-        $process->current->response = new Response();
-        $process->current->response->key = 'cancel';
-        $process->current->response->action = clone $process->current->actions['alt'];
+        $this->setResponse($process->current,'alt', 'cancel');
 
-        $stateInstantiator = $this->createMock(StateInstantiator::class);
-        $stateInstantiator->expects($this->exactly(2))->method('instantiate')
-            ->withConsecutive(
-                [$this->identicalTo($scenario->states['alt_step'])],
-                [$this->identicalTo($scenario->states[':cancelled'])]
-            )
-            ->willReturnOnConsecutiveCalls($oldState, $cancelledState);
+        $stateInstantiator = $this->createStateInstantiatorMock($process, ':cancelled', $cancelledState);
+        $patcher = $this->createDataPatcherMock();
+        $simulator = $this->createProcessSimulatorMock($process, $next);
 
-        $patcher = $this->createMock(DataPatcher::class);
-        $patcher->expects($this->never())->method('project');
-        $patcher->expects($this->never())->method('set');
-
-        $simulate = $this->createMock(ProcessSimulator::class);
-        $simulate->expects($this->once())->method('getNextStates')
-            ->with($this->identicalTo($process))
-            ->willReturn($next);
-
-        $updater = new ProcessUpdater($stateInstantiator, $patcher, $simulate);
+        $updater = new ProcessUpdater($stateInstantiator, $patcher, $simulator);
 
         $validation = $updater->update($process);
 
         $this->assertEquals(ValidationResult::success(), $validation);
         $this->assertSame($cancelledState, $process->current);
         $this->assertSame($next, $process->next);
+    }
+
+    public function testUpdateWithUpdateInstructions()
+    {
+        $process = $this->createProcess();
+        $process->expects($this->once())->method('validate')->willReturn(ValidationResult::success());
+        $scenario = $process->scenario;
+
+        $currentResponse = $process->current->actions['first']->responses['ok'];
+        $currentResponse->update = EntitySet::forClass(
+            UpdateInstruction::class,
+            [
+                UpdateInstruction::fromData(['select' => 'assets.data']),
+                UpdateInstruction::fromData([
+                    'select' => 'actors.manager.name',
+                    'projection' => 'name',
+                    'patch' => true,
+                ]),
+                UpdateInstruction::fromData([
+                    'select' => 'actors.client.name',
+                    'projection' => 'first_name',
+                    'data' => ['first_name' => 'John'],
+                    'patch' => true,
+                ]),
+            ],
+            0,
+            EntitySet::ALLOW_DUPLICATES
+        );
+
+        $basicStepState = $this->createCurrentState($scenario, 'basic_step');
+        $next = new EntitySet();
+
+        $this->setResponse($process->current,'first', 'ok', ['name' => 'Jane', 'age' => 42]);
+
+        $stateInstantiator = $this->createStateInstantiatorMock($process, 'basic_step', $basicStepState);
+        $simulator = $this->createProcessSimulatorMock($process, $next);
+
+        $patcher = $this->createMock(DataPatcher::class);
+        $patcher->expects($this->exactly(2))->method('project')
+            ->withConsecutive(
+                [['name' => 'Jane', 'age' => 42], 'name'],
+                [['first_name' => 'John'], 'first_name']
+            )
+            ->willReturnOnConsecutiveCalls('Jane', 'John');
+        $patcher->expects($this->exactly(3))->method('set')
+            ->withConsecutive(
+                [$this->identicalTo($process), 'assets.data', ['name' => 'Jane', 'age' => 42], false],
+                [$this->identicalTo($process), 'actors.manager.name', 'Jane', true],
+                [$this->identicalTo($process), 'actors.client.name', 'John', true]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->callback(function(Process $process, $select, $data) {
+                    $process->assets['data'] = $data;
+                }),
+                $this->callback(function(Process $process, $select, $data) {
+                    $process->actors['manager']->name = $data;
+                }),
+                $this->callback(function(Process $process, $select, $data) {
+                    $process->assets['client']->name = $data;
+                })
+            );
+
+        $updater = new ProcessUpdater($stateInstantiator, $patcher, $simulator);
+
+        $validation = $updater->update($process);
+
+        $this->assertEquals(ValidationResult::success(), $validation);
+        $this->assertSame($basicStepState, $process->current);
+        $this->assertSame($next, $process->next);
+
+        return $process;
+    }
+
+    public function testUpdateValidationFailed()
+    {
+        $process = $this->createProcess();
+        $process->expects($this->atLeastOnce())->method('validate')
+            ->willReturn(ValidationResult::error('some error'));
+        $scenario = $process->scenario;
+
+        $basicStepState = $this->createCurrentState($scenario, 'basic_step');
+
+        $this->setResponse($process->current,'first', 'ok');
+
+        $stateInstantiator = $this->createMock(StateInstantiator::class);
+        $stateInstantiator->expects($this->never())->method('instantiate');
+        $stateInstantiator->expects($this->once())->method('recalcActions')->with($process);
+        $stateInstantiator->expects($this->never())->method('recalcTransitions');
+
+        $patcher = $this->createDataPatcherMock();
+        $simulator = $this->createProcessSimulatorMock($process);
+
+        $updater = new ProcessUpdater($stateInstantiator, $patcher, $simulator);
+
+        $validation = $updater->update($process);
+
+        $this->assertEquals(ValidationResult::error('some error'), $validation);
+        $this->assertNotSame($basicStepState, $process->current);
+        $this->assertEquals(':initial', $process->current->key);
+
+        return $process;
     }
 }

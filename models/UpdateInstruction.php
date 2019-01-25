@@ -44,7 +44,7 @@ class UpdateInstruction extends BasicEntity implements Meta, Validation
      * 
      * @var string
      */
-    public $jmespath;
+    public $projection;
     
     
     /**

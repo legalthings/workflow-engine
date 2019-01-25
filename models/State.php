@@ -108,7 +108,7 @@ class State extends BasicEntity implements Validation
      */
     public function isFinal(): bool
     {
-        return count($this->transitions) === 0;
+        return count($this->actions) === 0;
     }
 
     /**

@@ -55,15 +55,7 @@ class ProcessUpdater
             throw new InvalidArgumentException(sprintf($msg, $process->id, $process->current->key));
         }
 
-        $process->next = null;
-
-        $responseData = $process->current->response->data;
-
-        foreach ($this->getUpdateInstructions($process) as $updateInstruction) {
-            $this->applyUpdateInstruction($process, $updateInstruction, $responseData);
-        }
-        $process->cast();
-
+        $this->applyCurrentUpdateInstructions($process);
         $validation = $process->validate();
 
         if ($validation->failed()) {
@@ -75,6 +67,30 @@ class ProcessUpdater
         $process->next = $this->simulator->getNextStates($process);
 
         return ValidationResult::success();
+    }
+
+    /**
+     * Apply update instructions from the current state.
+     *
+     * @param Process $process
+     * @throws RuntimeException
+     */
+    protected function applyCurrentUpdateInstructions(Process $process): void
+    {
+        $this->stateInstantiator->recalcActions($process);
+        $updateInstructions = $this->getUpdateInstructions($process);
+
+        if (count($updateInstructions) === 0) {
+            return;
+        }
+
+        $responseData = $process->current->response->data;
+
+        foreach ($updateInstructions as $updateInstruction) {
+            $this->applyUpdateInstruction($process, $updateInstruction, $responseData);
+        }
+
+        $process->cast();
     }
 
     /**
@@ -102,14 +118,13 @@ class ProcessUpdater
      */
     protected function applyUpdateInstruction(Process $process, UpdateInstruction $update, $responseData): void
     {
-        $select = $update->select;
         $data = $update->data ?? $responseData;
 
         if ($update->projection !== null) {
             $data = $this->patcher->project($data, $update->projection);
         }
 
-        $this->patcher->set($process, $select, $data, $update->patch);
+        $this->patcher->set($process, $update->select, $data, $update->patch);
     }
 
     /**
@@ -124,14 +139,11 @@ class ProcessUpdater
         $action = $response->action;
         $scenario = $process->scenario;
 
-        // Re-instantiate current state for data instructions in transition conditions
-        $oldState = $this->stateInstantiator->instantiate($scenario->getState($process->current->key), $process);
+        $this->stateInstantiator->recalcTransitions($process);
+        $transition = $process->current->getTransition($action->key, $response->key);
 
-        $transition = $oldState->getTransition($action->key, $response->key);
-
-        // No state transition in this state for given action and response
+        // No state transition in this state for given action and response.
         if ($transition === null) {
-            $process->current = $oldState;
             return;
         }
 

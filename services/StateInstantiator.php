@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 use LegalThings\DataEnricher;
+use Jasny\DB\EntitySet;
 
 /**
  * Instantiate an state from the state definition in the scenario.
@@ -25,11 +26,11 @@ class StateInstantiator
     }
 
     /**
-     * Instantiate an state from the state definition.
+     * Instantiate a process state from a scenario state.
      *
      * @param State   $definition
      * @param Process $process
-     * @return State
+     * @return CurrentState
      * @throws RuntimeException
      */
     public function instantiate(State $definition, Process $process): CurrentState
@@ -47,6 +48,35 @@ class StateInstantiator
         }
 
         return $currentState;
+    }
+
+    /**
+     * Recalculate (the data instructions of) the actions of the current state.
+     *
+     * @param Process $process
+     */
+    public function recalcActions(Process $process): void
+    {
+        $actionDefinitions = $process->scenario->getActionsForState($process->current->key);
+        $process->current->actions = $this->instantiateActions($actionDefinitions, $process);
+    }
+
+    /**
+     * Recalculate (the data instructions of) the transitions of the current state.
+     *
+     * @param Process $process
+     */
+    public function recalcTransitions(Process $process): void
+    {
+        $process->current->transitions = EntitySet::forClass(StateTransition::class);
+        $transitionDefinitions = $process->scenario->getState($process->current->key)->transitions;
+
+        foreach ($transitionDefinitions as $definition) {
+            $transition = clone $definition;
+            $this->dataEnricher->applyTo($transition, $process);
+
+            $process->current->transitions[] = $transition;
+        }
     }
 
     /**

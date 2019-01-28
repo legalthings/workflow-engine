@@ -2,6 +2,7 @@
 
 use Jasny\ValidationResult;
 use Jasny\DB\EntitySet;
+use Jasny\EventDispatcher\EventDispatcher;
 
 /**
  * Update a process that has a response for the current state.
@@ -61,6 +62,8 @@ class ProcessUpdater
         if ($validation->failed()) {
             return $validation;
         }
+
+        $process->dispatch('update');
 
         $this->changeCurrentState($process);
 

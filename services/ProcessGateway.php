@@ -25,7 +25,19 @@ class ProcessGateway implements Gateway
      */
     public function __construct(EventDispatcher $dispatcher)
     {
-        $this->dispatcher  = $dispatcher;
+        $this->dispatcher = $dispatcher
+            ->on('update', [$this, 'autosave'])
+            ->on('step', [$this, 'autosave']);
+    }
+
+    /**
+     * Disable saving the process on update and step events.
+     */
+    public function disableAutosave(): void
+    {
+        $this->dispatcher = $this->dispatcher
+            ->off('update', [$this, 'autosave'])
+            ->off('step', [$this, 'autosave']);
     }
 
     /**
@@ -133,5 +145,14 @@ class ProcessGateway implements Gateway
         i\type_check($entity, Process::class);
 
         $entity->delete($opts);
+    }
+
+    /**
+     * @internal
+     * @param Process $process
+     */
+    public function autosave(Process $process): void
+    {
+        $this->save($process);
     }
 }

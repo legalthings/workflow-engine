@@ -203,7 +203,7 @@ class Process extends MongoDocument
     /**
      * Get the actions in the current state that can be executed by the given actor.
      *
-     * @param string|Actor $actor  May be null if anyone may access the action
+     * @param Actor|string $actor  May be null if anyone may access the action
      * @return EntitySet&iterable<Action>
      */
     public function getAvailableActions($actor = null): iterable
@@ -211,8 +211,6 @@ class Process extends MongoDocument
         if ($actor === null) {
             return $this->current->actions;
         }
-
-        $actor = is_string($actor) ? $this->getActor($actor) : $actor;
 
         $actions = i\iterable_filter($this->current->action, function ($action) use ($actor) {
             $action->isAllowedBy($actor);

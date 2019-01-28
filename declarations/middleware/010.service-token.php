@@ -1,7 +1,5 @@
 <?php declare(strict_types=1);
 
-use Jasny\DB;
-
 return [
     'service-token' => function(RouterInterface $router, ContainerInterface $cont) {
         $token =
@@ -12,4 +10,3 @@ return [
         return new ServiceTokenMiddleware($token);
     }
 ];
-

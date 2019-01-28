@@ -15,11 +15,7 @@ use Jasny\HttpMessage\Emitter;
  */
 class App
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected static $container;
-
+    use ServiceLocator;
 
     /**
      * This is a static class, it should not be instantiated.
@@ -29,80 +25,28 @@ class App
     }
 
     /**
-     * Get the app configuration.
-     * @deprecated
-     *
-     * @return stdClass
+     * Run the application
      */
-    public static function config(): \stdClass
+    public static function run(): void
     {
-        return self::getContainer()->get('config');
-    }
+        $container = self::init();
 
-    /**
-     * Get application environment.
-     * @deprecated
-     *
-     * @param string  $check         Only return if env matches
-     * @return string|false
-     */
-    public static function env($check = null)
-    {
-        $env = self::getContainer()->get(ApplicationEnv::class);
-
-        return $check === null || $env->is($check) ? (string)$env : false;
-    }
-
-    /**
-     * Get application reference
-     * This is the application name without the vendor namespace
-     * @deprecated
-     *
-     * @return string  Example foo instead of legalthings/foo
-     */
-    public static function reference()
-    {
-        $name = self::getContainer()->get('config')->app->name ?? null;
-
-        return str_replace('legalthings/', '', $name);
-    }
-
-    /**
-     * Get the app container.
-     * @deprecated
-     *
-     * @return ContainerInterface
-     * @throws LogicException if the container is not set yet
-     */
-    public static function getContainer(): ContainerInterface
-    {
-        if (self::$container === null) {
-            throw new LogicException("This container is not set");
-        }
-
-        return self::$container;
-    }
-
-    /**
-     * Set the container.
-     * @deprecated
-     *
-     * @param ContainerInterface $container
-     */
-    public static function setContainer(ContainerInterface $container): void
-    {
-        self::$container = $container;
+        self::handleRequest($container);
     }
 
     /**
      * Initialize the application
+     *
+     * @return ContainerInterface
      */
-    public static function init(): void
+    public static function init(): ContainerInterface
     {
         $container = new Container(self::getContainerEntries());
         self::setContainer($container);
 
         self::initGlobal($container);
+
+        return $container;
     }
 
     /**
@@ -134,21 +78,12 @@ class App
     }
 
     /**
-     * Run the application
-     */
-    public static function run(): void
-    {
-        self::init();
-        self::handleRequest();
-    }
-
-    /**
      * Use the router to handle the current HTTP request.
+     *
+     * @param ContainerInterface $container
      */
-    protected static function handleRequest(): void
+    protected static function handleRequest(ContainerInterface $container): void
     {
-        $container = self::getContainer();
-
         /* @var RouterInterface $router */
         $router = $container->get(RouterInterface::class);
 

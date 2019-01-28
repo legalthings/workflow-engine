@@ -17,7 +17,7 @@ class Response extends BasicEntity implements Meta
 
     /**
      * The title that will be displayed in the process if the action is performed.
-     * @var mixed
+     * @var string
      */
     public $title;
 
@@ -57,4 +57,23 @@ class Response extends BasicEntity implements Meta
      * @var stdClass
      */
     public $receipt;
+
+
+    /**
+     * Cast all properties.
+     *
+     * @return $this
+     */
+    public function cast()
+    {
+        if (is_string($this->action)) {
+            $this->action = (new Action)->setValues(['key' => $this->action]);
+        }
+
+        if (is_string($this->actor)) {
+            $this->actor = (new Actor)->setValues(['key' => $this->actor]);
+        }
+
+        return parent::cast();
+    }
 }

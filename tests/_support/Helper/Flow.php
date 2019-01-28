@@ -10,6 +10,10 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Jasny\DotKey;
 use PHPUnit\Framework\Assert;
+use ProcessInstantiator;
+use ProcessStepper;
+use ProcessTrigger;
+use RangeException;
 use SessionManager;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Handler\MockHandler as HttpMockHandler;
@@ -23,16 +27,32 @@ use Jasny\Container\Loader\EntryLoader;
 
 class Flow extends \Codeception\Module
 {
+    /**
+     * General services that should be loaded.
+     */
     private static $loadDeclarations = [
         'autowire',
         'config',
         'env',
-        'global-data',
         'json-schema',
-        'legalthings-services',
         'lto-accounts',
         'reflection',
     ];
+
+    /**
+     * @var ProcessInstantiator
+     */
+    protected $processInstantiator;
+
+    /**
+     * @var ProcessStepper
+     */
+    protected $processStepper;
+
+    /**
+     * @var ProcessTrigger
+     */
+    protected $processTrigger;
 
     /**
      * @var string
@@ -101,17 +121,13 @@ class Flow extends \Codeception\Module
         $basicEntries = i\iterable_to_array($this->getContainerEntries(), true);
 
         $httpClient = $this->createHttpMock();
+        $httpEntry = [
+            HttpClient::class => static function () use ($httpClient) {
+                return $httpClient;
+            },
+        ];
 
-        $entries = $basicEntries + [
-                HttpClient::class => static function () use ($httpClient) {
-                    return $httpClient;
-                },
-                SessionManager::class => static function () {
-                    return (new SessionManager)->asMock();
-                }
-            ];
-
-        App::setContainer(new Container($entries));
+        return new Container($basicEntries + $httpEntry);
     }
 
     /**
@@ -124,7 +140,13 @@ class Flow extends \Codeception\Module
         $this->testDir = dirname($test->getMetadata()->getFilename());
 
         $this->httpTriggerHistory = [];
-        $this->initContainer();
+
+        $container = $this->initContainer();
+        App::setContainer($container); // Deprecated
+
+        $this->processInstantiator = $container->get(ProcessInstantiator::class);
+        $this->processStepper = $container->get(ProcessStepper::class);
+        $this->processTrigger = $container->get(ProcessTrigger::class);
     }
 
     /**
@@ -167,9 +189,8 @@ class Flow extends \Codeception\Module
             throw new ParseException("Failed to parse scenario JSON: " . json_last_error_msg());
         }
 
-        $scenario = \Scenario::fromData($scenarioSource);
-
-        $this->process = $scenario->instantiate();
+        $scenario = (new Scenario)->setValues($scenarioSource);
+        $this->process = $this->processInstantiator->instantiate($scenario);
 
         return $this->process;
     }
@@ -182,57 +203,6 @@ class Flow extends \Codeception\Module
     public function useProcess(\Process $process): void
     {
         $this->process = $process;
-    }
-
-
-    /**
-     * Set session user info.
-     *
-     * @param array|/stdClass $user
-     */
-    public function haveSessionUser($user)
-    {
-        /** @var SessionManager $sessionManager */
-        $sessionManager = App::getContainer()->get(SessionManager::class);
-
-        $sessionManager->setMockData('1', ['user' => (object)$user]);
-    }
-
-    /**
-     * Unset session user info.
-     */
-    public function haveNoSessionUser()
-    {
-        /** @var SessionManager $sessionManager */
-        $sessionManager = App::getContainer()->get(SessionManager::class);
-
-        $sessionManager->setMockData('1', []);
-    }
-
-    /**
-     * Get the session id.
-     *
-     * @return string
-     */
-    public function grabSessionId(): string
-    {
-        /** @var SessionManager $sessionManager */
-        $sessionManager = App::getContainer()->get(SessionManager::class);
-
-        return $sessionManager->getSessionId();
-    }
-
-    /**
-     * Get the session user.
-     *
-     * @return array|null
-     */
-    public function grabSessionUser(): array
-    {
-        /** @var SessionManager $sessionManager */
-        $sessionManager = App::getContainer()->get(SessionManager::class);
-
-        return $sessionManager->getSession()['user'] ?? null;
     }
 
 
@@ -266,7 +236,7 @@ class Flow extends \Codeception\Module
             return;
         }
 
-        Assert::assertEquals($key, $this->process->current->getKey());
+        Assert::assertEquals($key, $this->process->current->key);
     }
 
     /**
@@ -284,11 +254,11 @@ class Flow extends \Codeception\Module
         $action = $this->process->current->getDefaultAction();
 
         if ($action === null) {
-            $this->fail(sprintf("State '%s' doesn't have a default action", $this->process->current->getKey()));
+            $this->fail(sprintf("State '%s' doesn't have a default action", $this->process->current->key));
             return;
         }
 
-        Assert::assertEquals($key, $action->getKey());
+        Assert::assertEquals($key, $action->key);
     }
 
     /**
@@ -306,7 +276,7 @@ class Flow extends \Codeception\Module
         $action = $this->process->getCurrentAllowedAction($key, $this->actor);
 
         if ($action === null) {
-            $state = $this->process->current->getKey();
+            $state = $this->process->current->key;
             $msg = $this->process->getCurrentAllowedAction($key)
                 ? sprintf("Action '%s' is not allowed in state '%s'", $key, $state)
                 : sprintf("Actor '%s' is not allowed to do '%s' in state '%s'", $this->actor, $key, $state);
@@ -332,7 +302,7 @@ class Flow extends \Codeception\Module
         $action = $this->process->current->getDefaultAction();
 
         if ($action === null) {
-            $this->fail(sprintf("State '%s' doesn't have a default action", $this->process->current->getKey()));
+            $this->fail(sprintf("State '%s' doesn't have a default action", $this->process->current->key));
             return;
         }
 
@@ -358,7 +328,7 @@ class Flow extends \Codeception\Module
         $action = $this->process->getCurrentAllowedAction($key);
 
         if ($action === null) {
-            $this->fail(sprintf("Action '%s' is not allowed in state '%s'", $key, $this->process->current->getKey()));
+            $this->fail(sprintf("Action '%s' is not allowed in state '%s'", $key, $this->process->current->key));
             return;
         }
 
@@ -381,7 +351,7 @@ class Flow extends \Codeception\Module
 
         $previous = Pipeline::with($this->process->previous)
             ->map(function(\Response $response) {
-                return sprintf('%s.%s', $response->action, $response->getKey());
+                return sprintf('%s.%s', $response->action, $response->key);
             })
             ->toArray();
 
@@ -427,7 +397,7 @@ class Flow extends \Codeception\Module
 
         $next = Pipeline::with($this->process->getNext())
             ->map(function(\State $state) {
-                return $state->getKey();
+                return $state->key;
             })
             ->toArray();
 
@@ -497,8 +467,6 @@ class Flow extends \Codeception\Module
             return;
         }
 
-        $expected->link($this->process, $key);
-
         Assert::assertEquals($expected, $this->process->actors[$key]);
     }
 
@@ -532,16 +500,16 @@ class Flow extends \Codeception\Module
      *
      * @param string        $action    The action key
      * @param string|null   $response  The response key
-     * @param mixed         $result
+     * @param mixed         $data
      */
-    public function doAction(string $action, ?string $response = null, $result = null): void
+    public function doAction(string $action, ?string $response = null, $data = null): void
     {
         if ($this->process === null) {
             $this->fail("No process is running");
             return;
         }
 
-        $this->process->step($response, $result, $action, $this->actor);
+        $this->processStepper->step($response, $data, $action, $this->actor);
     }
 
     /**
@@ -556,16 +524,16 @@ class Flow extends \Codeception\Module
             return;
         }
 
-        $response = $this->process->invokeTrigger($action, $this->actor);
+        $response = $this->processTrigger->invoke($this->process, $action);
 
         if ($response === null) {
-            $state = $this->process->current->getKey();
+            $state = $this->process->current->key;
             $this->fail("Failed to trigger '$action'" . ($this->actor !== null ? " by '$this->actor'" : '')
                 . " in state '$state'");
             return;
         }
 
-        $this->process->step($response->response, $response->data, $action, $this->actor);
+        $this->processStepper->step($response->response, $response->data, $action, $this->actor);
     }
 
     /**
@@ -607,30 +575,28 @@ class Flow extends \Codeception\Module
      *
      * @param int $count  Call number
      */
-    public function seeTheNumberOfHttpRequestWere($count): void
+    public function seeTheNumberOfHttpRequestWere(int $count): void
     {
-        \PHPUnit\Framework\Assert::assertCount(
-            $count,
-            $this->httpTriggerHistory,
-            "Expected $count HTTP requests"
-        );
+        Assert::assertCount($count, $this->httpTriggerHistory, "Expected $count HTTP requests");
     }
 
     /**
      * Get a http trigger request from history.
      *
-     * @param int $i  Call number. Omit to get latest
+     * @param int $i  Call number, omit to get latest.
      * @return Request
      */
     public function grabHttpRequest($i = -1): Request
     {
-        $module = $this->getJasnyModule();
-        $history = $module->container->get('httpHistory');
-
         if ($i < 0) {
-            $i = count($history) + $i;
+            $i = count($this->httpTriggerHistory) + $i;
         }
 
-        return isset($history[$i]) ? $history[$i]['request'] : null;
+        if (!$this->httpTriggerHistory[$i]) {
+            $count = count($this->httpTriggerHistory);
+            throw new RangeException("HTTP history contains only {$count} requests");
+        }
+
+        return $this->httpTriggerHistory[$i]['request'];
     }
 }

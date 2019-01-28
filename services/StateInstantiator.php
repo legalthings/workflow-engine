@@ -2,6 +2,7 @@
 
 use LegalThings\DataEnricher;
 use Jasny\DB\EntitySet;
+use Carbon\CarbonImmutable;
 
 /**
  * Instantiate an state from the state definition in the scenario.
@@ -38,12 +39,15 @@ class StateInstantiator
         try {
             $state = clone $definition;
             $this->dataEnricher->applyTo($state, $process);
+
             $currentState = CurrentState::fromData($state->toData());
+            $currentState->due_date = $this->calcDueDate($state);
 
             $actionDefinitions = $process->scenario->getActionsForState($definition);
             $currentState->actions = $this->instantiateActions($actionDefinitions, $process);
-        } catch (\Exception $e) {
-            $err = "Failed to instantiate state" . (isset($definition->title) ? " '{$definition->title}'" : '');
+        } catch (RuntimeException $e) {
+            $msg = "Failed to instantiate state '%s' for process '%s': %s";
+            $err = sprintf($msg, $definition->title ?: $definition->key, $process->id, $e->getMessage());
             throw new \RuntimeException($err, 0, $e);
         }
 
@@ -68,7 +72,9 @@ class StateInstantiator
      */
     public function recalcTransitions(Process $process): void
     {
-        $process->current->transitions = EntitySet::forClass(StateTransition::class);
+        $process->current->transitions = [];
+        $process->current->cast();
+
         $transitionDefinitions = $process->scenario->getState($process->current->key)->transitions;
 
         foreach ($transitionDefinitions as $definition) {
@@ -98,5 +104,19 @@ class StateInstantiator
         }
 
         return $actions;
+    }
+
+    /**
+     * Get the due date for the given state timeout.
+     *
+     * @param State $state
+     * @return DateTimeImmutable|null
+     * @throws Exception when the interval_spec cannot be parsed as an interval.
+     */
+    protected function calcDueDate(State $state): ?DateTimeImmutable
+    {
+        return $state->timeout !== null
+            ? CarbonImmutable::now('UTC')->add(new DateInterval($state->timeout))
+            : null;
     }
 }

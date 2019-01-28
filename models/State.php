@@ -50,7 +50,10 @@ class State extends BasicEntity implements Validation
     public $transitions = [];
     
     /**
-     * State timeout as date period
+     * State timeout as ISO 8601 date duration.
+     * @see http://en.wikipedia.org/wiki/Iso8601#Durations
+     *
+     * @pattern ^P(\d+Y)?(\d+M)?(\d+D)?(T(\d+H)?(\d+M)?(\d+S)?)?$
      * @var string|DataInstruction
      */
     public $timeout;
@@ -79,7 +82,7 @@ class State extends BasicEntity implements Validation
      * 
      * @return $this
      */
-    public function cast(): self
+    public function cast()
     {
         if (is_array($this->transitions)) {
             $this->transitions = EntitySet::forClass(

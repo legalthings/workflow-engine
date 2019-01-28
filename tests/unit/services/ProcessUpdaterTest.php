@@ -1,6 +1,5 @@
 <?php
 
-use Improved as i;
 use PHPUnit\Framework\MockObject\MockObject;
 use Jasny\ValidationResult;
 use Jasny\DB\EntitySet;
@@ -378,5 +377,22 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         $this->assertEquals(':initial', $process->current->key);
 
         return $process;
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Can't update process '00000000-0000-0000-0000-000000000000' in state ':initial' without a response
+     */
+    public function testUpdateNoResponse()
+    {
+        $process = $this->createProcess();
+
+        $stateInstantiator = $this->createMock(StateInstantiator::class);
+        $patcher = $this->createMock(DataPatcher::class);
+        $simulator = $this->createMock(ProcessSimulator::class);
+
+        $updater = new ProcessUpdater($stateInstantiator, $patcher, $simulator);
+
+        $updater->update($process);
     }
 }

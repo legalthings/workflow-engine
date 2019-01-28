@@ -113,7 +113,7 @@ class ProcessUpdater
      *
      * @param Process           $process
      * @param UpdateInstruction $updateInstructions
-     * @param mixed             $respData
+     * @param mixed             $responseData
      * @throws RuntimeException
      */
     protected function applyUpdateInstruction(Process $process, UpdateInstruction $update, $responseData): void

@@ -1,12 +1,27 @@
 <?php declare(strict_types=1);
 
+use LegalEvents;
+
 /**
- * Step through a process by handling an event from legalevents.
- * Will only handle a single event.
- * Must be invoked to execute the next trigger.
+ * Convert the trigger response into an event and send it to LegalEvents.
  */
-class EventProcessStepper implements ProcessStepper
+class ProcessEventBridge
 {
+    /**
+     * @var LegalEvents
+     */
+    protected $legalEvents;
+
+    /**
+     * Class constructor.
+     *
+     * @param LegalEvents $legalEvents
+     */
+    public function __construct(LegalEvents $legalEvents)
+    {
+        $this->legalEvents = $legalEvents;
+    }
+
     /**
      * Execute the current trigger if possible
      * Sends the response to the event service.
@@ -43,15 +58,12 @@ class EventProcessStepper implements ProcessStepper
         $responseEvent = new LTO\Event($res);
         $chain->add($responseEvent)->signWith($account);
 
-        $legalEvent = App::getContainer()->get(LegalEvent::class);
-
-        $request = $legalEvent->createRequest($chain);
+        $request = $this->legalEvents->createRequest($chain);
         $httpSignature = new \LTO\HTTPSignature($request, ['(request-target)', 'date']);
         $signedRequest = $httpSignature->signWith($account);
 
-        $legalEvent->send($signedRequest);
+        $this->legalEvent->send($signedRequest);
 
         return $this;
     }
-
 }

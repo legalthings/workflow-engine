@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 use Improved as i;
+use Jasny\DB\EntitySet;
 
 /**
  * The current state a process is in.
@@ -38,10 +39,10 @@ class CurrentState extends State
     public $transitions = [];
 
     /**
-     * State timeout as date period
-     * @var string
+     * State timeout
+     * @var DateTime
      */
-    public $timeout;
+    public $due_date;
 
     /**
      * Flags whether the state should be displayed or not
@@ -57,6 +58,26 @@ class CurrentState extends State
      */
     public $response;
 
+
+    /**
+     * Cast properties
+     *
+     * @return $this
+     */
+    public function cast()
+    {
+        if ($this->transitions !== null && !$this->transitions instanceof EntitySet) {
+            // Should not really contain duplicates, but entity is not identifiable.
+            $this->transitions = EntitySet::forClass(
+                StateTransition::class,
+                $this->transitions,
+                0,
+                EntitySet::ALLOW_DUPLICATES
+            );
+        }
+
+        return parent::cast();
+    }
 
     /**
      * Get the default action for this state.

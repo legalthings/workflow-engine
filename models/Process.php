@@ -123,7 +123,7 @@ class Process extends MongoDocument
     {
         if ($this->next !== null && !$this->next instanceof EntitySet) {
             // Should not really contain duplicates, but entity is not identifiable.
-            $this->next = EntitySet::forClass(NextState::class, $this->next, EntitySet::ALLOW_DUPLICATES);
+            $this->next = EntitySet::forClass(NextState::class, $this->next, 0, EntitySet::ALLOW_DUPLICATES);
         }
 
         parent::cast();

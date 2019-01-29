@@ -1,110 +1,71 @@
 <?php
 
 use Jasny\DotKey;
-use Jasny\DB\Entity;
-use Jasny\DB\EntitySet;
+use Jasny\DB\Entity\Dynamic;
+use function JmesPath\search as jmespath_search;
+use function Jasny\object_set_properties;
 
 /**
- * Patch data
+ * Patch data.
  */
 class DataPatcher
 {
     /**
-     * Set value(s) by selector
+     * Set value(s) by selector.
      *
-     * @param mixed   $input
-     * @param string  $selector
-     * @param mixed   $value
-     * @param boolean $patch
+     * @param array|object $input
+     * @param string       $selector
+     * @param mixed        $value
+     * @param bool         $patch
      */
-    public function set(&$input, $selector, $value, $patch = true)
+    public function set(&$input, string $selector, $value, bool $patch = true): void
     {
         $dotkey = DotKey::on($input);
 
-        if (substr($selector, 0, 2) === '$.') {
-            $selector = substr($selector, 2);
+        if ($patch && (is_array($value) || is_object($value))) {
+            $target = $dotkey->get($selector);
+
+            if (is_object($target) && !$target instanceof ArrayAccess) {
+                $dynamic = $target instanceof stdClass || $target instanceof Entity\Dynamic;
+                object_set_properties($target, $value, $dynamic);
+                return;
+            }
+
+            if (is_array($target) || $target instanceof ArrayAccess) {
+                $value = $this->patchArray($target, $value);
+            }
         }
 
-        if ($patch) {
-            self::patch($input, $dotkey, $selector, $value);
-        } elseif ($selector === '$') {
-            throw new RuntimeException("Unable to update object with '$' selector without patch option");
-        } else {
-            $dotkey->put($selector, $value);
-        }
+        $input = $dotkey->put($selector, $value);
     }
     
     /**
-     * Set value by selector using patch
-     * 
-     * @param DotKey $dotkey
-     * @param string $selector
-     * @param mixed  $value
+     * Set value by selector using patch.
+     *
+     * @param array|ArrayAccess $target
+     * @param array|object      $value
+     * @return array|ArrayAccess
      */
-    public function patch(&$input, DotKey $dotkey, $selector, $value)
+    protected function patchArray($array, $value)
     {
-        $target = $selector === '$' ? $input : $dotkey->get($selector);
-
-        if ($target instanceof Entity) {
-            $target->setValues($value);
-            return;
+        foreach ($value as $key => $item) {
+            $array[$key] = $item;
         }
 
-        if ($target instanceof EntitySet && (is_array($value) || $value instanceof stdClass)) {
-            self::patchEntitySet($target, $selector, $value);
-            return;
-        }
-
-        if (is_array($value) || $value instanceof stdClass) {
-            if (is_array($target)) {
-                $value = array_merge($target, $value);
-            } elseif ($target instanceof stdClass) {
-                $value = (object)array_merge((array)$target, (array)$value);
-            }
-        }
-        
-        $dotkey->put($selector, $value);
+        return $array;
     }
 
-    /**
-     * Patch entity set by selector
-     * 
-     * @param EntitySet      $input
-     * @param string         $selector
-     * @param array|stdClass $value
-     */
-    public function patchEntitySet(EntitySet &$target, $selector, $value)
-    {
-        $autoCreate = ($target instanceof AssocEntitySet) && ($target->getFlags() & AssocEntitySet::AUTOCREATE) !== 0;
-
-        foreach ($value as $key => $input) {
-            if (isset($target[$key])) {
-                $target[$key]->setValues($input);
-            } elseif ($autoCreate) {
-                $target[$key] = $input;
-            } else {
-                trigger_error("$selector.$key doesn't exist", E_USER_WARNING);
-                continue;
-            }
-        }
-    }
-    
     /**
      * Project the input based on jmespath
      * 
      * @param object|array $input
-     * @param string|null  $jmespath
-     * 
+     * @param string       $jmespath
      * @return mixed
      */
-    public function project($input, $jmespath = null)
+    public function project($input, string $jmespath)
     {
-        if (!isset($jmespath)) {
-            return $input;
-        }
-        
         try {
-            return JmesPath\search($jmespath, (array)$input);
+            return jmespath_search($jmespath, (array)$input);
         } catch (JmesPath\SyntaxErrorException $e) {
             throw new RuntimeException("JMESPath projection failed: " . $e->getMessage(), 0, $e);
         }

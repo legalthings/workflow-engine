@@ -704,6 +704,7 @@ class ScenarioTest extends \Codeception\Test\Unit
         $scenario = new Scenario();
 
         $expected = [
+            '$schema' => 'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#',
             'actions' => [],
             'states' => [],
             'actors' => [],

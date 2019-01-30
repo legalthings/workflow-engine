@@ -13,11 +13,6 @@ class UpdateInstruction extends BasicEntity implements Meta, Validation
     use Meta\Implementation;
 
     /**
-     * @var string
-     */
-    public $schema = 'https://specs.livecontracts.io/v1.0.0/action/schema.json#update';
-
-    /**
      * A reference to the data in the process that should be updated.
      * Uses dot notation.
      * 
@@ -63,7 +58,7 @@ class UpdateInstruction extends BasicEntity implements Meta, Validation
     public function validate(): ValidationResult
     {
         $validation = new ValidationResult();
-        
+
         if (isset($this->projection)) {
             try {
                 $parser = new JmesPath\Parser();

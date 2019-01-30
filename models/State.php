@@ -17,11 +17,6 @@ class State extends BasicEntity implements Validation
     /**
      * @var string
      */
-    public $schema = 'https://specs.livecontracts.io/v1.0.0/state/schema.json#';
-
-    /**
-     * @var string
-     */
     public $key;
 
     /**

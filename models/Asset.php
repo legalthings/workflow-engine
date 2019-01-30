@@ -12,7 +12,7 @@ class Asset extends BasicEntity implements Dynamic
     /**
      * @var string
      */
-    public $schema;
+    public $schema = 'https://specs.livecontracts.io/v1.0.0/asset/schema.json#';
 
     /**
      * @var string

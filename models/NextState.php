@@ -8,6 +8,11 @@ class NextState extends BasicEntity
     /**
      * @var string
      */
+    public $schema = 'https://specs.livecontracts.io/v1.0.0/process/schema.json#next_state';
+
+    /**
+     * @var string
+     */
     public $key;
 
     /**

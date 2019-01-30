@@ -9,6 +9,11 @@ use Jasny\DB\EntitySet;
 class CurrentState extends State
 {
     /**
+     * @var string
+     */
+    public $schema = 'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#response';
+
+    /**
      * Short title
      * @var string
      */

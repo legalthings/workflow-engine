@@ -16,7 +16,7 @@ class Scenario extends MongoDocument implements Dynamic
     /**
      * @var string
      */
-    public $schema;
+    public $schema = 'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#';
     
     /**
      * @var string

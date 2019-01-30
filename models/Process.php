@@ -1,7 +1,6 @@
 <?php
 
 use Improved as i;
-use Improved\IteratorPipeline\Pipeline;
 use Jasny\DB\EntitySet;
 use Jasny\ValidationResult;
 use Ramsey\Uuid\Uuid;
@@ -15,7 +14,7 @@ class Process extends MongoDocument
     /**
      * @var string
      */
-    public $schema;
+    public $schema = 'https://specs.livecontracts.io/v1.0.0/process/schema.json#';
 
     /**
      * @var string

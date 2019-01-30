@@ -15,7 +15,7 @@ class UpdateInstruction extends BasicEntity implements Meta, Validation
     /**
      * @var string
      */
-    public $schema;
+    public $schema = 'https://specs.livecontracts.io/v1.0.0/action/schema.json#update';
 
     /**
      * A reference to the data in the process that should be updated.
@@ -64,12 +64,12 @@ class UpdateInstruction extends BasicEntity implements Meta, Validation
     {
         $validation = new ValidationResult();
         
-        if (isset($this->jmespath)) {
+        if (isset($this->projection)) {
             try {
                 $parser = new JmesPath\Parser();
-                $parser->parse($this->jmespath);
+                $parser->parse($this->projection);
             } catch (JmesPath\SyntaxErrorException $e) {
-                $validation->addError("jmespath has a syntax error");
+                $validation->addError("jmespath projection has a syntax error: " . $e->getMessage());
             }
         }
         

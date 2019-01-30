@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Client as HttpClient;

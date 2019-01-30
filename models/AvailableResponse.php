@@ -18,6 +18,11 @@ class AvailableResponse extends BasicEntity implements Meta, Validation
     /**
      * @var string
      */
+    public $schema = 'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#response';
+
+    /**
+     * @var string
+     */
     public $key;
     
     /**

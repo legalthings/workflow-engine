@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "acf5f79b6bece870a2ab0f18b5380a4e",
+    "content-hash": "082fa7ff15408c2597516c02ebdd423f",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -2573,12 +2573,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/legalthings/jmespath.php.git",
-                "reference": "8ec2d692c59e45184d16b4c9160e902397cfc659"
+                "reference": "a132511a1e05539af8f755ae110d2924d245bf40"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/legalthings/jmespath.php/zipball/8ec2d692c59e45184d16b4c9160e902397cfc659",
-                "reference": "8ec2d692c59e45184d16b4c9160e902397cfc659",
+                "url": "https://api.github.com/repos/legalthings/jmespath.php/zipball/a132511a1e05539af8f755ae110d2924d245bf40",
+                "reference": "a132511a1e05539af8f755ae110d2924d245bf40",
                 "shasum": ""
             },
             "require": {
@@ -2622,7 +2622,7 @@
             "support": {
                 "source": "https://github.com/legalthings/jmespath.php/tree/master"
             },
-            "time": "2018-03-22T23:36:38+00:00"
+            "time": "2019-01-30T09:40:43+00:00"
         },
         {
             "name": "mustache/mustache",
@@ -2672,22 +2672,22 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "2.10.1",
+            "version": "2.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "39a8ebfffc2a75de9d2ade3f0e12c7e11669f7ce"
+                "reference": "48d211435ecb3671a2237614dc19fc2be185acb6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/39a8ebfffc2a75de9d2ade3f0e12c7e11669f7ce",
-                "reference": "39a8ebfffc2a75de9d2ade3f0e12c7e11669f7ce",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/48d211435ecb3671a2237614dc19fc2be185acb6",
+                "reference": "48d211435ecb3671a2237614dc19fc2be185acb6",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "php": "^7.1.8",
-                "symfony/translation": "^4.0"
+                "symfony/translation": "^3.4 || ^4.0"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^2.14 || ^3.0",
@@ -2727,7 +2727,7 @@
                 "datetime",
                 "time"
             ],
-            "time": "2019-01-14T09:25:45+00:00"
+            "time": "2019-01-29T16:35:35+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -4341,16 +4341,16 @@
         },
         {
             "name": "composer/xdebug-handler",
-            "version": "1.3.1",
+            "version": "1.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/xdebug-handler.git",
-                "reference": "dc523135366eb68f22268d069ea7749486458562"
+                "reference": "d17708133b6c276d6e42ef887a877866b909d892"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/xdebug-handler/zipball/dc523135366eb68f22268d069ea7749486458562",
-                "reference": "dc523135366eb68f22268d069ea7749486458562",
+                "url": "https://api.github.com/repos/composer/xdebug-handler/zipball/d17708133b6c276d6e42ef887a877866b909d892",
+                "reference": "d17708133b6c276d6e42ef887a877866b909d892",
                 "shasum": ""
             },
             "require": {
@@ -4381,7 +4381,7 @@
                 "Xdebug",
                 "performance"
             ],
-            "time": "2018-11-29T10:59:02+00:00"
+            "time": "2019-01-28T20:25:53+00:00"
         },
         {
             "name": "doctrine/instantiator",

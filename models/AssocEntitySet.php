@@ -89,6 +89,10 @@ class AssocEntitySet extends EntitySet
      */
     public function offsetSet($index, $entity)
     {
+        if (is_array($entity)) {
+            $entity = $this->castEntity($entity);
+        }
+
         $this->assertEntity($entity);
 
         $index = $index ?? $entity->key;

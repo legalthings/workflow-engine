@@ -14,6 +14,11 @@ class StateTransition extends BasicEntity implements Dynamic, Meta, Validation
     use Meta\Implementation;
 
     /**
+     * @var string
+     */
+    public $schema = 'https://specs.livecontracts.io/v1.0.0/state/schema.json#transition';
+
+    /**
      * Action reference
      * @var string
      */

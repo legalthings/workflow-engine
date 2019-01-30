@@ -46,7 +46,7 @@
         "improved/type": "dev-master",
         "improved/iterable": "dev-master",
         "respect/validation": "^1.0",
-        "mtdowling/jmespath.php": "dev-master#8ec2d692c59e45184d16b4c9160e902397cfc659 as 2.4.0",
+        "mtdowling/jmespath.php": "dev-master#a132511a1e05539af8f755ae110d2924d245bf40 as 2.4.0",
         "mustache/mustache": "^2.10",
         "php-http/guzzle6-adapter": "^1.1",
         "ramsey/uuid": "^3.7",

@@ -374,11 +374,6 @@ class ScenarioTest extends \Codeception\Test\Unit
                     'width' => 15,
                 ],
             ],
-            'info' => [
-                '@schema' => 'http://json-schema.org/draft-07/schema#',
-                'type' => 'object',
-                'properties' => [],
-            ],
         ];
 
         return [
@@ -520,11 +515,6 @@ class ScenarioTest extends \Codeception\Test\Unit
                     'height' => 10,
                     'width' => 15,
                 ]
-            ],
-            'info' => [
-                'schema' => 'http://json-schema.org/draft-07/schema#',
-                'type' => 'object',
-                'properties' => []
             ],
             'meta' => (object)[],
         ];
@@ -688,10 +678,6 @@ class ScenarioTest extends \Codeception\Test\Unit
                 ]
             ],
             'allow_actions' => ['bar'],
-            'info' => [
-                '$schema' => 'http://json-schema.org/draft-07/schema#',
-                'type' => 'object',
-            ],
             'meta' => [],
         ];
 
@@ -711,10 +697,6 @@ class ScenarioTest extends \Codeception\Test\Unit
             'assets' => [],
             'definitions' => [],
             'allow_actions' => [],
-            'info' => [
-                '$schema' => 'http://json-schema.org/draft-07/schema#',
-                'type' => 'object',
-            ],
             'meta' => [],
         ];
 

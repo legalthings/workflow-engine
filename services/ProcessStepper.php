@@ -58,23 +58,33 @@ class ProcessStepper
         }
 
         if (!isset($process->current->actions[$actionKey])) {
-            $msg = "Action '%s' isn't allowed in state '%s'";
-            return ValidationResult::error($msg, $actionKey, $process->current->title ?? $process->current->key);
+            return ValidationResult::error(
+                "Action '%s' isn't allowed in state '%s'",
+                $actionKey,
+                $process->current->title ?? $process->current->key
+            );
         }
 
+        if (!isset($process->actors[$response->actor->key])) {
+            return ValidationResult::error("Unknown actor '%s'", $response->actor->key);
+        }
+
+        $validation = new ValidationResult();
         $currentAction = $process->current->actions[$actionKey];
 
-        if (!$currentAction->isAllowedBy($response->actor)) {
-            $msg = "Actor '%s' isn't allowed to perform action '%s'";
-            return ValidationResult::error($msg, $process->getActor($response->actor)->title, $actionKey);
-        }
-
         if (!$currentAction->isValidResponse($responseKey)) {
-            $msg = "Invalid response '%s' for action '%s'";
-            return ValidationResult::error($msg, $response, $actionKey);
+            $validation->addError("Invalid response '%s' for action '%s'", $responseKey, $actionKey);
         }
 
-        return ValidationResult::success();
+        if (!$currentAction->isAllowedBy($response->actor)) {
+            $validation->addError(
+                "%s isn't allowed to perform action '%s'",
+                $process->getActor($response->actor)->title,
+                $actionKey
+            );
+        }
+
+        return $validation;
     }
 
     /**

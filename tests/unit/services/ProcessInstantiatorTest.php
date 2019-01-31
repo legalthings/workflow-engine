@@ -63,15 +63,6 @@ class ProcessInstantiatorTest extends \Codeception\Test\Unit
         $scenario->definitions['d1'] = Asset::fromData(['I' => 'one', 'II' => 'two']);
         $scenario->definitions['d2'] = Asset::fromData(['A' => 'alpha', 'B' => 'Beta']);
 
-        $scenario->info = new JsonSchema([
-            '$schema' => 'http://json-schema.org/draft-07/schema#',
-            'type' => 'object',
-            'properties' => [
-                'amount' => ['type' => 'number'],
-                'type' => ['type' => 'string', 'default' => 'standard'],
-            ],
-        ]);
-
         return $scenario;
     }
 

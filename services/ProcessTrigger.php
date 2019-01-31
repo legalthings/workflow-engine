@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 use Jasny\EventDispatcher\EventDispatcher;
+use Jasny\ValidationException;
 
 /**
  * Service to trigger automated action(s) for the process.
@@ -13,11 +14,11 @@ class ProcessTrigger
      *
      * @param EventDispatcher $dispatcher
      * @param ?string         $schema      Only trigger if action matches this schema.
-     * @param callable        $trigger
+     * @param callable $trigger
      */
     public function add(EventDispatcher $dispatcher, ?string $schema, callable $trigger): void
     {
-        $handler = function(string $event, Process $process, $payload) use ($trigger, $schema) {
+        $handler = function (string $event, Process $process, $payload) use ($trigger, $schema) {
             if (!$payload instanceof Action) {
                 return $payload; // Already handled
             }
@@ -26,7 +27,15 @@ class ProcessTrigger
                 return $payload;
             }
 
-            return $trigger($event, $process, $payload);
+            $action = clone $payload;
+
+            try {
+                $response = $trigger($event, $process, $action);
+            } catch (RuntimeException $exception) {
+                $response = $this->createErrorResponse($exception);
+            }
+
+            return $response;
         };
 
         $dispatcher->on('trigger', $handler);
@@ -35,8 +44,8 @@ class ProcessTrigger
     /**
      * Invoke the trigger(s).
      *
-     * @param Process     $process
-     * @param string|null $action   Key of the action that is triggered, null for default action.
+     * @param Process $process
+     * @param string|null $action Key of the action that is triggered, null for default action.
      * @return Response|null
      * @throws UnexpectedValueException
      */
@@ -52,5 +61,28 @@ class ProcessTrigger
         $response = $this->process->dispatch('trigger', $action !== null ? $current->actions[$action] : null);
 
         return $response instanceof Response ? $response : null;
+    }
+
+    /**
+     * Create an error response for a caught exception.
+     *
+     * @param RuntimeException $exception
+     * @param Action           $action
+     * @return Response
+     */
+    public function createErrorResponse(RuntimeException $exception, Action $action): Response
+    {
+        $response = new Response();
+
+        $response->key = ':error';
+        $response->action = $action;
+        $response->title = 'An error occured';
+        $response->data = (object)['message' => $exception->getMessage()];
+
+        if ($exception instanceof ValidationException) {
+            $response->data->errors = $exception->getErrors();
+        }
+
+        return $response;
     }
 }

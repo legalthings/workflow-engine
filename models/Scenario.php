@@ -132,10 +132,6 @@ class Scenario extends MongoDocument implements Dynamic
             }
         }
 
-        if (!isset($this->info)) {
-            $this->info = new JsonSchema(['type' => 'object', 'properties' => []]);
-        }
-
         $this->dispatcher->trigger('cast', $this);
 
         return $this;

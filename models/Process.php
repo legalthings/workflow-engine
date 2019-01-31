@@ -139,11 +139,9 @@ class Process extends MongoDocument
      * @return Actor
      * @throws OutOfBoundsException
      */
-    public function getActor($key): Actor
+    public function getActor($actor): Actor
     {
-        if ($key instanceof Actor) {
-            $key = $key->getKey();
-        }
+        $key = $actor instanceof Actor ? $actor->key : $actor;
 
         if (!isset($this->actors[$key])) {
             throw new OutOfBoundsException("process doesn't have a '$key' actor");
@@ -159,7 +157,7 @@ class Process extends MongoDocument
      */
     public function isFinished(): bool
     {
-        return in_array($this->current->getKey(), Process::getFinishedStates(), true);
+        return in_array($this->current->key, Process::getFinishedStates(), true);
     }
 
 

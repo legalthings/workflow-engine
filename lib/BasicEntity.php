@@ -31,9 +31,10 @@ class BasicEntity extends stdClass implements Entity, Meta
      */
     public function setValues($values)
     {
-        $values = array_rename_key($values, '$schema', 'schema');
+        $this->_setValues(array_rename_key($values, '$schema', 'schema'));
+        $this->cast();
 
-        return $this->_setValues($values);
+        return $this;
     }
 
     /**

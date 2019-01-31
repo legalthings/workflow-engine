@@ -21,11 +21,6 @@ class LegalEvents
      */
     protected $baseUri;
 
-    /**
-     * @var SessionManager
-     */
-    protected $sessionManager;
-
 
     /**
      * Class constructor
@@ -35,7 +30,7 @@ class LegalEvents
      * @param SessionManager $sessionManager
      * @throws ConfigException
      */
-    public function __construct(HttpClient $client, string $url, SessionManager $sessionManager)
+    public function __construct(HttpClient $client, string $url)
     {
         if (!in_array(parse_url($url, PHP_URL_SCHEME), ['http', 'https'], true)) {
             throw new ConfigException("Invalid LegalEvent url '$url'");
@@ -43,7 +38,6 @@ class LegalEvents
 
         $this->client = $client;
         $this->baseUri = substr($url, -1) !== '/' ? "$url/" : $url;
-        $this->sessionManager = $sessionManager;
     }
 
     /**
@@ -56,8 +50,7 @@ class LegalEvents
     {        
         $request = new Request('POST', 'event-chains');
         $request->withHeader('Content-Type', 'application/json');
-        $request->withHeader('X-Session', $this->sessionManager->getSessionId());
-     
+
         $body = stream_for(json_encode($chain));
         $request = $request->withBody($body);
         
@@ -74,7 +67,7 @@ class LegalEvents
         try {
             $this->client->send($request, ['base_uri' => $this->baseUri]);
         } catch (ClientException $exception) {
-            throw new Exception("Failed to send message to legalevent service.", $exception);
+            throw new Exception("Failed to send message to legalevents service", $exception);
         }
     }
 }

@@ -12,7 +12,7 @@ use Jasny\DotKey;
 use PHPUnit\Framework\Assert;
 use ProcessInstantiator;
 use ProcessStepper;
-use ProcessTrigger;
+use TriggerManager;
 use RangeException;
 use SessionManager;
 use GuzzleHttp\Client as HttpClient;
@@ -50,7 +50,7 @@ class Flow extends \Codeception\Module
     protected $processStepper;
 
     /**
-     * @var ProcessTrigger
+     * @var TriggerManager
      */
     protected $processTrigger;
 
@@ -146,7 +146,7 @@ class Flow extends \Codeception\Module
 
         $this->processInstantiator = $container->get(ProcessInstantiator::class);
         $this->processStepper = $container->get(ProcessStepper::class);
-        $this->processTrigger = $container->get(ProcessTrigger::class);
+        $this->processTrigger = $container->get(TriggerManager::class);
     }
 
     /**

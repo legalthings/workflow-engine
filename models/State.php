@@ -67,17 +67,6 @@ class State extends BasicEntity implements Validation
 
 
     /**
-     * Check whether the state has an allowed action with the given action key
-     * 
-     * @param string $key
-     * @return bool
-     */
-    public function hasAction($key): bool
-    {
-        return in_array($this->actions, $key, true);
-    }
-
-    /**
      * Cast entity properties
      * 
      * @return $this

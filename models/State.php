@@ -65,7 +65,6 @@ class State extends BasicEntity implements Validation
      */
     public $display = 'always';
 
-
     /**
      * Cast entity properties
      * 
@@ -73,6 +72,8 @@ class State extends BasicEntity implements Validation
      */
     public function cast()
     {
+        object_rename_key($this, 'action', 'actions');
+
         if (is_array($this->transitions)) {
             $this->transitions = EntitySet::forClass(
                 StateTransition::class,

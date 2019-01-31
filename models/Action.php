@@ -79,30 +79,15 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
     }
 
     /**
-     * Set values
+     * Cast entity properties.
      *
-     * @param array $values
      * @return $this
      */
-    public function setValues($values)
+    public function cast()
     {
-        if (isset($values['actor'])) {
-            $values['actors'] = [$values['actor']];
-            unset($values['actor']);
-        }
+        object_rename_key($this, 'actor', 'actors');
 
-        $responseValues = array_only($values, ['display', 'update']);
-        $actionValues = array_without($values, ['display', 'update']);
-
-        parent::setValues($actionValues);
-
-        if ($responseValues !== []) {
-            foreach ($this->responses as $response) {
-                $response->setValues($responseValues);
-            }
-        }
-
-        return $this;
+        return parent::cast();
     }
 
     /**
@@ -177,5 +162,28 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
         }
 
         return $this->responses[$key];
+    }
+
+    /**
+     * Convert loaded values to an entity.
+     * Calls the construtor *after* setting the properties.
+     *
+     * @param array|stdClass $values
+     * @return static
+     */
+    public static function fromData($values)
+    {
+        $values = arrayify($values);
+
+        $responseValues = array_only($values, ['display', 'update']);
+        $values = array_without($values, ['display', 'update']);
+
+        if ($responseValues !== [] && isset($values['responses'])) {
+            foreach ($values['responses'] as &$response) {
+                $response += $responseValues;
+            }
+        }
+
+        return parent::fromData($values);
     }
 }

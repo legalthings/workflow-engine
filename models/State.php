@@ -72,8 +72,6 @@ class State extends BasicEntity implements Validation
      */
     public function cast()
     {
-        object_rename_key($this, 'action', 'actions');
-
         if (is_array($this->transitions)) {
             $this->transitions = EntitySet::forClass(
                 StateTransition::class,
@@ -113,7 +111,7 @@ class State extends BasicEntity implements Validation
     public function toData(array $opts = []): array
     {
         $data = object_get_properties($this);
-        
+
         foreach ($data as $key => &$item) {
             if ($item instanceof Identifiable) {
                 $item = $item->getId();
@@ -127,5 +125,16 @@ class State extends BasicEntity implements Validation
         }
 
         return $data;
+    }
+
+    /**
+     * @param array|object $values
+     * @return State
+     */
+    public static function fromData($values)
+    {
+        $values = array_rename_key((array)$values, 'action', 'actions');
+
+        return parent::fromData($values);
     }
 }

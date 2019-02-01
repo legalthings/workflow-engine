@@ -246,7 +246,7 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $this->assertAttributeEquals('7d7d0444-f6d7-473e-b715-f5cd8a3cc632', 'id', $scenario);
         $this->assertAttributeEquals(
-            'http://specs.livecontracts.io/draft-01/01-core/schema.json#',
+            'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#',
             'schema',
             $scenario
         );
@@ -313,14 +313,14 @@ class ScenarioTest extends \Codeception\Test\Unit
         $this->assertInstanceOf(Asset::class, $scenario->definitions['dimensions']);
         $this->assertAttributeEquals(10, 'height', $scenario->definitions['dimensions']);
         $this->assertAttributeEquals(15, 'width', $scenario->definitions['dimensions']);
-    }    
+    }
 
 
     public function valuesProvider()
     {
-        $values = [
+        $fullScenario = [
             'id' => '7d7d0444-f6d7-473e-b715-f5cd8a3cc632',
-            '$schema' => 'http://specs.livecontracts.io/draft-01/01-core/schema.json#',
+            '$schema' => 'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#',
             'title' => 'A unit test case',
             'description' => 'This scenario is for testing',
             'foo' => 'bar', // to be ignored
@@ -336,21 +336,33 @@ class ScenarioTest extends \Codeception\Test\Unit
                     'title' => 'Bar',
                     'responses' => [
                         'ok' => [
-                            'transition' => ':success',
+                            'display' => 'once',
+                            'update' => [
+                                'select' => 'assets.report.name',
+                                'data' => 'Bar report',
+                            ],
                         ],
                     ],
                 ],
             ],
             'allow_actions' => ['bar'],
             'states' => [
-                [
-                    'key' => ':initial',
+                ':initial' => [
                     'title' => 'First',
                     'actions' => ['foo'],
                     'transitions' => [
                         [
                             'action' => 'foo',
                             'response' => 'ok',
+                            'transition' => 'second',
+                        ],
+                    ],
+                ],
+                'second' => [
+                    'title' => 'Second',
+                    'actions' => ['bar'],
+                    'transitions' => [
+                        [
                             'transition' => ':success',
                         ],
                     ],
@@ -376,8 +388,69 @@ class ScenarioTest extends \Codeception\Test\Unit
             ],
         ];
 
+        $compactScenario = [
+            'id' => '7d7d0444-f6d7-473e-b715-f5cd8a3cc632',
+            '$schema' => 'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#',
+            'title' => 'A unit test case',
+            'description' => 'This scenario is for testing',
+            'foo' => 'bar', // to be ignored
+            'actions' => [
+                'foo' => [
+                    'title' => 'Foo',
+                ],
+                'bar' => [
+                    'title' => 'Bar',
+                    'display' => 'once',
+                    'update' => [
+                        'select' => 'assets.report.name',
+                        'data' => 'Bar report',
+                    ],
+                ],
+            ],
+            'allow_actions' => ['bar'],
+            'states' => [
+                [
+                    'key' => ':initial',
+                    'title' => 'First',
+                    'action' => 'foo',
+                    'transitions' => [
+                        [
+                            'action' => 'foo',
+                            'response' => 'ok',
+                            'transitions' => 'second',
+                        ],
+                    ],
+                    [
+                        'key' => 'second',
+                        'title' => 'Second',
+                        'action' => 'bar',
+                        'transition' => ':success',
+                    ],
+                ],
+            ],
+            'actors' => [
+                [
+                    'key' => 'manager',
+                    'title' => 'Operational manager',
+                ],
+            ],
+            'assets' => [
+                'report' => [
+                    '$schema' => 'http://json-schema.org/draft-07/schema#',
+                    'type' => 'object',
+                ],
+            ],
+            'definitions' => [
+                'dimensions' => [
+                    'height' => 10,
+                    'width' => 15,
+                ],
+            ],
+        ];
+
         return [
-            [$values],
+            [$fullScenario],
+            [$compactScenario],
         ];
     }
 
@@ -430,7 +503,7 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $data = [
             '_id' => '7d7d0444-f6d7-473e-b715-f5cd8a3cc632',
-            'schema' => 'http://specs.livecontracts.io/draft-01/01-core/schema.json#',
+            'schema' => 'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#',
             'title' => 'A unit test case',
             'description' => 'This scenario is for testing',
             'actions' => [
@@ -531,7 +604,7 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $scenario = new Scenario();
 
-        $scenario->schema = "http://specs.livecontracts.io/draft-01/01-core/schema.json#";
+        $scenario->schema = "https://specs.livecontracts.io/v1.0.0/scenario/schema.json#";
         $scenario->id = '7d7d0444-f6d7-473e-b715-f5cd8a3cc632';
         $scenario->title = "A unit test case";
         $scenario->description = "This scenario is for testing";
@@ -597,7 +670,7 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $scenario = new Scenario();
 
-        $scenario->schema = 'http://specs.livecontracts.io/draft-01/01-core/schema.json#';
+        $scenario->schema = 'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#';
         $scenario->id = '7d7d0444-f6d7-473e-b715-f5cd8a3cc632';
         $scenario->title = 'Foo Bar test';
         $scenario->description = 'This scenario is for testing';
@@ -638,7 +711,7 @@ class ScenarioTest extends \Codeception\Test\Unit
             ->willReturn(['height' => 10, 'width' => 15]);
 
         $expected = [
-            '$schema' => 'http://specs.livecontracts.io/draft-01/01-core/schema.json#',
+            '$schema' => 'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#',
             'id' => '7d7d0444-f6d7-473e-b715-f5cd8a3cc632',
             'title' => 'Foo Bar test',
             'description' => 'This scenario is for testing',

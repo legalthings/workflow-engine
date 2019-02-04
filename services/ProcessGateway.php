@@ -1,6 +1,6 @@
 <?php
 
-use Jasny\DB\Mongo\DB;
+use Improved as i;
 use Jasny\DB\Entity;
 use Jasny\DB\EntitySet;
 use Jasny\EventDispatcher\EventDispatcher;
@@ -21,7 +21,7 @@ class ProcessGateway implements Gateway
     /**
      * Class constructor
      *
-     * @param EventDispatcher $dispatcher
+     * @param EventDispatcher $dispatcher  "process_events"
      */
     public function __construct(EventDispatcher $dispatcher)
     {

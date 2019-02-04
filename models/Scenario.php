@@ -125,6 +125,9 @@ class Scenario extends MongoDocument implements Dynamic
     {
         parent::cast();
 
+        $this->castJsonSchemas($this->actors);
+        $this->castJsonSchemas($this->assets);
+
         // Add implicit states
         foreach ([':success', ':failed', ':cancelled'] as $key) {
             if (!isset($this->states[$key])) {
@@ -135,6 +138,21 @@ class Scenario extends MongoDocument implements Dynamic
         $this->dispatcher->trigger('cast', $this);
 
         return $this;
+    }
+
+    /**
+     * Make sure the type is set for each JSON Schema.
+     *
+     * @param iterable $set
+     */
+    protected function castJsonSchemas(iterable $set): void
+    {
+        foreach ($set as $jsonSchema) {
+            if ($jsonSchema->type === null) {
+                $jsonSchema->type = 'object';
+                $jsonSchema->additionalProperties = true;
+            };
+        }
     }
 
     /**
@@ -240,7 +258,7 @@ class Scenario extends MongoDocument implements Dynamic
      */
     public function setValues($values): self
     {
-        $values = array_rename_key($values, '$schema', 'schema');
+        $values = array_rename_key((array)$values, '$schema', 'schema');
 
         $values = $this->dispatcher->trigger('setValues', $this, $values);
 

@@ -116,12 +116,15 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         return $state;
     }
 
-    protected function setResponse(CurrentState $current, string $actionKey, string $responseKey, $data = null): void
+    protected function createResponse(CurrentState $current, string $actionKey, string $responseKey, $data = null)
     {
-        $current->response = new Response();
-        $current->response->key = $responseKey;
-        $current->response->action = clone $current->actions[$actionKey];
-        $current->response->data = $data;
+        $response = new Response();
+
+        $response->key = $responseKey;
+        $response->action = clone $current->actions[$actionKey];
+        $response->data = $data;
+
+        return $response;
     }
 
     /**
@@ -178,6 +181,9 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         return $simulator;
     }
 
+    /**
+     * All methods that depend on `testUpdate` work in sequence, stepping through the same process.
+     */
     public function testUpdate()
     {
         $process = $this->createProcess();
@@ -187,7 +193,8 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         $basicStepState = $this->createCurrentState($scenario, 'basic_step');
         $next = new EntitySet();
 
-        $this->setResponse($process->current,'first', 'ok');
+        $response = $this->createResponse($process->current,'first', 'ok');
+        $process->current->response = $response;
 
         $stateInstantiator = $this->createStateInstantiatorMock($process, 'basic_step', $basicStepState);
         $patcher = $this->createDataPatcherMock();
@@ -201,6 +208,9 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         $this->assertSame($basicStepState, $process->current);
         $this->assertSame($next, $process->next);
 
+        $this->assertCount(1, $process->previous);
+        $this->assertEquals($response, $process->previous[0]);
+
         return $process;
     }
 
@@ -211,7 +221,8 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
     {
         $next = new EntitySet();
 
-        $this->setResponse($process->current,'second', 'nop');
+        $response = $this->createResponse($process->current,'second', 'nop');
+        $process->current->response = $response;
 
         $stateInstantiator = $this->createStateInstantiatorMock($process);
         $patcher = $this->createDataPatcherMock();
@@ -224,6 +235,10 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         $this->assertEquals(ValidationResult::success(), $validation);
         $this->assertEquals('basic_step', $process->current->key);
         $this->assertSame($next, $process->next);
+
+        $this->assertCount(2, $process->previous);
+        $this->assertEquals('first.ok', $process->previous[0]->getRef());
+        $this->assertEquals($response, $process->previous[1]);
     }
 
     /**
@@ -236,7 +251,8 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         $altStepState = $this->createCurrentState($scenario, 'alt_step');
         $next = new EntitySet();
 
-        $this->setResponse($process->current,'alt', 'nop');
+        $response = $this->createResponse($process->current,'alt', 'ok');
+        $process->current->response = $response;
 
         $stateInstantiator = $this->createStateInstantiatorMock($process, 'alt_step', $altStepState);
         $patcher = $this->createDataPatcherMock();
@@ -250,11 +266,14 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         $this->assertSame($altStepState, $process->current);
         $this->assertSame($next, $process->next);
 
-        return $process;
+        $this->assertCount(3, $process->previous);
+        $this->assertEquals('first.ok', $process->previous[0]->getRef());
+        $this->assertEquals('second.nop', $process->previous[1]->getRef());
+        $this->assertEquals($response, $process->previous[2]);
     }
 
     /**
-     * @depends testUpdateAlt
+     * @depends testUpdate
      */
     public function testUpdateCancel(Process $process)
     {
@@ -263,7 +282,8 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         $cancelledState = $this->createCurrentState($scenario, ':cancelled');
         $next = new EntitySet();
 
-        $this->setResponse($process->current,'alt', 'cancel');
+        $response = $this->createResponse($process->current,'alt', 'cancel');
+        $process->current->response = $response;
 
         $stateInstantiator = $this->createStateInstantiatorMock($process, ':cancelled', $cancelledState);
         $patcher = $this->createDataPatcherMock();
@@ -276,7 +296,14 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         $this->assertEquals(ValidationResult::success(), $validation);
         $this->assertSame($cancelledState, $process->current);
         $this->assertSame($next, $process->next);
+
+        $this->assertCount(4, $process->previous);
+        $this->assertEquals('first.ok', $process->previous[0]->getRef());
+        $this->assertEquals('second.nop', $process->previous[1]->getRef());
+        $this->assertEquals('alt.ok', $process->previous[2]->getRef());
+        $this->assertEquals($response, $process->previous[3]);
     }
+
 
     public function testUpdateWithUpdateInstructions()
     {
@@ -308,7 +335,8 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         $basicStepState = $this->createCurrentState($scenario, 'basic_step');
         $next = new EntitySet();
 
-        $this->setResponse($process->current,'first', 'ok', ['name' => 'Jane', 'age' => 42]);
+        $response = $this->createResponse($process->current,'first', 'ok', ['name' => 'Jane', 'age' => 42]);
+        $process->current->response = $response;
 
         $stateInstantiator = $this->createStateInstantiatorMock($process, 'basic_step', $basicStepState);
         $simulator = $this->createProcessSimulatorMock($process, $next);
@@ -358,7 +386,7 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
 
         $basicStepState = $this->createCurrentState($scenario, 'basic_step');
 
-        $this->setResponse($process->current,'first', 'ok');
+        $process->current->response = $this->createResponse($process->current,'first', 'ok');
 
         $stateInstantiator = $this->createMock(StateInstantiator::class);
         $stateInstantiator->expects($this->never())->method('instantiate');

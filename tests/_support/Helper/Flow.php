@@ -6,15 +6,11 @@ use App;
 use Codeception\Exception\ContentNotFound;
 use Codeception\Exception\ParseException;
 use Codeception\TestInterface;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Request as HttpRequest;
+use GuzzleHttp\Psr7\Response as HttpResponse;
 use Jasny\DotKey;
 use PHPUnit\Framework\Assert;
-use ProcessInstantiator;
-use ProcessStepper;
-use TriggerManager;
 use RangeException;
-use SessionManager;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Handler\MockHandler as HttpMockHandler;
 use Improved as i;
@@ -33,6 +29,8 @@ class Flow extends \Codeception\Module
     private static $loadDeclarations = [
         'autowire',
         'config',
+        'data-enricher',
+        'data-patcher',
         'env',
         'json-schema',
         'lto-accounts',
@@ -40,19 +38,24 @@ class Flow extends \Codeception\Module
     ];
 
     /**
-     * @var ProcessInstantiator
+     * @var \ProcessInstantiator
      */
     protected $processInstantiator;
 
     /**
-     * @var ProcessStepper
+     * @var \ProcessStepper
      */
     protected $processStepper;
 
     /**
-     * @var TriggerManager
+     * @var \TriggerManager
      */
-    protected $processTrigger;
+    protected $triggerManager;
+
+    /**
+     * @var \ProcessSimulator
+     */
+    protected $processSimulator;
 
     /**
      * @var string
@@ -103,7 +106,7 @@ class Flow extends \Codeception\Module
      *
      * @return HttpClient
      */
-    public function createHttpMock(): HttpClient
+    protected function createHttpMock(): HttpClient
     {
         $this->httpMock = new HttpMockHandler([]);
 
@@ -113,21 +116,22 @@ class Flow extends \Codeception\Module
         return new HttpClient(['handler' => $handler]);
     }
 
+
     /**
      * Initialize the global application container.
      */
-    protected function initContainer(): void
+    protected function initContainer(): Container
     {
         $basicEntries = i\iterable_to_array($this->getContainerEntries(), true);
 
         $httpClient = $this->createHttpMock();
-        $httpEntry = [
+        $extraEntries = [
             HttpClient::class => static function () use ($httpClient) {
                 return $httpClient;
             },
         ];
 
-        return new Container($basicEntries + $httpEntry);
+        return new Container(i\iterable_to_array($basicEntries, true) + $extraEntries);
     }
 
     /**
@@ -144,9 +148,12 @@ class Flow extends \Codeception\Module
         $container = $this->initContainer();
         App::setContainer($container); // Deprecated
 
-        $this->processInstantiator = $container->get(ProcessInstantiator::class);
-        $this->processStepper = $container->get(ProcessStepper::class);
-        $this->processTrigger = $container->get(TriggerManager::class);
+        $container->get(\ProcessGateway::class)->disableAutosave();
+
+        $this->processInstantiator = $container->get(\ProcessInstantiator::class);
+        $this->processStepper = $container->get(\ProcessStepper::class);
+        $this->processSimulator = $container->get(\ProcessSimulator::class);
+        $this->triggerManager = $container->get(\TriggerManager::class);
     }
 
     /**
@@ -189,7 +196,7 @@ class Flow extends \Codeception\Module
             throw new ParseException("Failed to parse scenario JSON: " . json_last_error_msg());
         }
 
-        $scenario = (new Scenario)->setValues($scenarioSource);
+        $scenario = (new \Scenario)->setValues($scenarioSource);
         $this->process = $this->processInstantiator->instantiate($scenario);
 
         return $this->process;
@@ -351,7 +358,7 @@ class Flow extends \Codeception\Module
 
         $previous = Pipeline::with($this->process->previous)
             ->map(function(\Response $response) {
-                return sprintf('%s.%s', $response->action, $response->key);
+                return $response->getRef();
             })
             ->toArray();
 
@@ -395,11 +402,8 @@ class Flow extends \Codeception\Module
             return;
         }
 
-        $next = Pipeline::with($this->process->getNext())
-            ->map(function(\State $state) {
-                return $state->key;
-            })
-            ->toArray();
+        $states = $this->processSimulator->getNextStates($this->process);
+        $next = Pipeline::with($states)->column('key')->toArray();
 
         Assert::assertEquals($keys, $next);
     }
@@ -509,7 +513,14 @@ class Flow extends \Codeception\Module
             return;
         }
 
-        $this->processStepper->step($response, $data, $action, $this->actor);
+        $inputResponse = (new \Response)->setValues([
+            'action' => $action,
+            'key' => $response,
+            'data' => $data,
+            'actor' => $this->actor,
+        ]);
+
+        $this->processStepper->step($this->process, $inputResponse);
     }
 
     /**
@@ -524,7 +535,7 @@ class Flow extends \Codeception\Module
             return;
         }
 
-        $response = $this->processTrigger->invoke($this->process, $action);
+        $response = $this->triggerManager->invoke($this->process, $action);
 
         if ($response === null) {
             $state = $this->process->current->key;
@@ -555,7 +566,7 @@ class Flow extends \Codeception\Module
     /**
      * Set responses for Guzzle mock.
      *
-     * @param callable|Response ...$responses
+     * @param callable|HttpResponse ...$responses
      */
     public function expectHttpRequest(...$responses): void
     {
@@ -584,9 +595,9 @@ class Flow extends \Codeception\Module
      * Get a http trigger request from history.
      *
      * @param int $i  Call number, omit to get latest.
-     * @return Request
+     * @return HttpRequest
      */
-    public function grabHttpRequest($i = -1): Request
+    public function grabHttpRequest($i = -1): HttpRequest
     {
         if ($i < 0) {
             $i = count($this->httpTriggerHistory) + $i;

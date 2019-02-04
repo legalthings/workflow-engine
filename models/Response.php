@@ -76,4 +76,14 @@ class Response extends BasicEntity implements Meta
 
         return parent::cast();
     }
+
+    /**
+     * Get response reference; action and response key.
+     *
+     * @return string
+     */
+    public function getRef(): string
+    {
+        return $this->action->key . ($this->key !== null ? '.' . $this->key : '');
+    }
 }

@@ -3,7 +3,7 @@
 class BasicUserCest
 {
     /**
-     * @example { "scenario": "scenario-v1.0json" }
+     * @example { "scenario": "scenario-v1.0.json" }
      */
     public function stepOk(\FlowTester $I, \Codeception\Example $example)
     {
@@ -22,15 +22,14 @@ class BasicUserCest
         $I->doAction('step1', 'ok', 'the users says hi');
 
         $I->comment('verify the process after stepping');
-        $I->seePreviousResponsesWere(['step1.ok']);
         $I->seeCurrentStateIs(':success');
+        $I->seePreviousResponsesWere(['step1.ok']);
         $I->seePreviousResponseHas('data', 'the users says hi');
-        $I->seeProcessHas('previous_response', 'the users says hi');
         $I->seeNextStatesAre([]);
     }
 
     /**
-     * @example { "scenario": "scenario-v1.0json" }
+     * @example { "scenario": "scenario-v1.0.json" }
      */
     public function stepCancel(\FlowTester $I, \Codeception\Example $example)
     {
@@ -49,10 +48,9 @@ class BasicUserCest
         $I->doAction('step1', 'cancel', 'the users says no');
 
         $I->comment('verify the process after stepping');
-        $I->seePreviousResponsesWere(['step1.cancel']);
         $I->seeCurrentStateIs(':failed');
+        $I->seePreviousResponsesWere(['step1.cancel']);
         $I->seePreviousResponseHas('data', 'the users says no');
-        $I->seeProcessHas('previous_response', 'the users says no');
         $I->seeNextStatesAre([]);
     }
 }

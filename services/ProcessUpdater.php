@@ -142,6 +142,8 @@ class ProcessUpdater
         $action = $response->action;
         $scenario = $process->scenario;
 
+        $process->previous[] = $response;
+
         $this->stateInstantiator->recalcTransitions($process);
         $transition = $process->current->getTransition($action->key, $response->key);
 
@@ -150,7 +152,6 @@ class ProcessUpdater
             return;
         }
 
-        // Instantiate new state
         $scenarioState = $scenario->getState($transition->transition);
         $process->current = $this->stateInstantiator->instantiate($scenarioState, $process);
     }

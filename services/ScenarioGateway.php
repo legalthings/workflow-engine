@@ -20,7 +20,7 @@ class ScenarioGateway implements Gateway
     /**
      * Class constructor
      *
-     * @param EventDispatcher $dispatcher
+     * @param EventDispatcher $dispatcher  "scenario_events"
      */
     public function __construct(EventDispatcher $dispatcher)
     {

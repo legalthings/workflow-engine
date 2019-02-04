@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-use Jasny\EventDispatcher\EventDispatcher;
+use Improved as i;
 
 /**
  * Instantiate a process from a scenario.
@@ -69,7 +69,12 @@ class ProcessInstantiator
         $actors = [];
 
         foreach ($scenario->actors as $key => $schema) {
-            $actor = $schema->build();
+            $actor = i\type_check(
+                $schema->build(),
+                'object',
+                new InvalidArgumentException("Invalid JSON Schema for actor '$key'; got %s. ")
+            );
+
             $actor->title = $schema->title;
             $actor->description = $schema->description;
 

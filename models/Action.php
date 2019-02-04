@@ -85,7 +85,9 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
      */
     public function cast()
     {
-        object_rename_key($this, 'actor', 'actors');
+        if (is_string($this->actors)) {
+            $this->actors = [$this->actors];
+        }
 
         return parent::cast();
     }
@@ -174,6 +176,7 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
     public static function fromData($values)
     {
         $values = arrayify($values);
+        $values = array_rename_key($values, 'actor', 'actors');
 
         $responseValues = array_only($values, ['display', 'update']);
         $values = array_without($values, ['display', 'update']);

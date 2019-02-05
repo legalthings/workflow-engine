@@ -106,32 +106,29 @@ class TriggerManagerTest extends \Codeception\Test\Unit
      */
     public function test(?string $actionKey)
     {
-        $trigger = new TriggerManager();
-        $dispatcher = new EventDispatcher();
+        $manager = new TriggerManager();
 
         $process = $this->createProcess();
         $action = $process->current->actions[$actionKey ?? 'foo'];
 
         $alwaysHandler = $this->createHandlerMock(1, $process, $action, $action);
-        $trigger->add($dispatcher, null, $alwaysHandler);
+        $manager = $manager->with(null, $alwaysHandler);
 
         $fooResponse = new Response();
         $fooHandler = $this->createHandlerMock($action->key === 'foo', $process, $action, $fooResponse);
-        $trigger->add($dispatcher, 'https://example.com/foo', $fooHandler);
+        $manager = $manager->with('https://example.com/foo', $fooHandler);
 
         $barHandler = $this->createHandlerMock();
-        $trigger->add($dispatcher, 'https://example.com/bar', $barHandler);
+        $manager = $manager->with('https://example.com/bar', $barHandler);
 
         $queueHandler = $this->createHandlerMock($action->key === 'queue', $process, $action, null);
-        $trigger->add($dispatcher, 'https://example.com/queue', $queueHandler);
+        $manager = $manager->with('https://example.com/queue', $queueHandler);
 
         $defaultResponse = new Response();
         $defaultHandler = $this->createHandlerMock($action->key === 'qux', $process, $action, $defaultResponse);
-        $trigger->add($dispatcher, null, $defaultHandler);
+        $manager = $manager->with(null, $defaultHandler);
 
-        $process->setDispatcher($dispatcher);
-
-        $response = $trigger->invoke($process, $actionKey, 'client');
+        $response = $manager->invoke($process, $actionKey, 'client');
 
         $expected =
             ($action->key === 'foo' ? $fooResponse : null) ??
@@ -146,18 +143,14 @@ class TriggerManagerTest extends \Codeception\Test\Unit
      */
     public function testActionNotAllowedInState()
     {
-        $trigger = new TriggerManager();
-        $dispatcher = new EventDispatcher();
-
+        $manager = new TriggerManager();
         $process = $this->createProcess();
 
         $handler = $this->getMockBuilder(\stdClass::class)->setMethods(['__invoke'])->getMock();
         $handler->expects($this->never())->method('__invoke');
-        $trigger->add($dispatcher, null, $handler);
+        $manager = $manager->with(null, $handler);
 
-        $process->setDispatcher($dispatcher);
-
-        $response = $trigger->invoke($process, 'other', 'client');
+        $response = $manager->invoke($process, 'other', 'client');
 
         $this->assertNull($response);
     }
@@ -168,54 +161,42 @@ class TriggerManagerTest extends \Codeception\Test\Unit
      */
     public function testActionNotAllowedByActor()
     {
-        $trigger = new TriggerManager();
-        $dispatcher = new EventDispatcher();
-
+        $manager = new TriggerManager();
         $process = $this->createProcess();
 
         $handler = $this->getMockBuilder(\stdClass::class)->setMethods(['__invoke'])->getMock();
         $handler->expects($this->never())->method('__invoke');
-        $trigger->add($dispatcher, null, $handler);
+        $manager = $manager->with(null, $handler);
 
-        $process->setDispatcher($dispatcher);
-
-        $response = $trigger->invoke($process, 'foo', 'manager');
+        $response = $manager->invoke($process, 'foo', 'manager');
 
         $this->assertNull($response);
     }
 
     public function testDefaultActionNotAllowedByActor()
     {
-        $trigger = new TriggerManager();
-        $dispatcher = new EventDispatcher();
-
+        $manager = new TriggerManager();
         $process = $this->createProcess();
 
         $handler = $this->getMockBuilder(\stdClass::class)->setMethods(['__invoke'])->getMock();
         $handler->expects($this->never())->method('__invoke');
-        $trigger->add($dispatcher, null, $handler);
+        $manager = $manager->with(null, $handler);
 
-        $process->setDispatcher($dispatcher);
-
-        $response = $trigger->invoke($process, null, 'manager');
+        $response = $manager->invoke($process, null, 'manager');
 
         $this->assertNull($response);
     }
 
     public function testErrorResponse()
     {
-        $trigger = new TriggerManager();
-        $dispatcher = new EventDispatcher();
-
+        $manager = new TriggerManager();
         $process = $this->createProcess();
 
         $handler = $this->getMockBuilder(\stdClass::class)->setMethods(['__invoke'])->getMock();
         $handler->expects($this->once())->method('__invoke')->willThrowException(new RuntimeException('Some error'));
-        $trigger->add($dispatcher, null, $handler);
+        $manager = $manager->with(null, $handler);
 
-        $process->setDispatcher($dispatcher);
-
-        $response = $trigger->invoke($process, 'foo', 'client');
+        $response = $manager->invoke($process, 'foo', 'client');
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertAttributeEquals('error', 'key', $response);
@@ -230,19 +211,15 @@ class TriggerManagerTest extends \Codeception\Test\Unit
 
     public function testValidationErrorResponse()
     {
-        $trigger = new TriggerManager();
-        $dispatcher = new EventDispatcher();
-
+        $manager = new TriggerManager();
         $process = $this->createProcess();
 
         $handler = $this->getMockBuilder(\stdClass::class)->setMethods(['__invoke'])->getMock();
         $handler->expects($this->once())->method('__invoke')
             ->willThrowException(new ValidationException(ValidationResult::error('Some error')));
-        $trigger->add($dispatcher, null, $handler);
+        $manager = $manager->with(null, $handler);
 
-        $process->setDispatcher($dispatcher);
-
-        $response = $trigger->invoke($process, 'foo', 'client');
+        $response = $manager->invoke($process, 'foo', 'client');
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertAttributeEquals('error', 'key', $response);
@@ -256,5 +233,30 @@ class TriggerManagerTest extends \Codeception\Test\Unit
         $this->assertAttributeEquals('foo', 'key', $response->action);
         $this->assertAttributeEquals('Foo', 'title', $response->action);
         $this->assertAttributeEquals($process->getActor('client'), 'actor', $response->action);
+    }
+
+    public function testDispatcher()
+    {
+        $manager = new TriggerManager();
+        $process = $this->createProcess();
+
+        $handlerResponse = new Response();
+        $dispatcherResponse = new Response();
+
+        $dispatcher = $this->createMock(EventDispatcher::class);
+        $dispatcher->expects($this->once())->method('trigger')
+            ->with('trigger', $this->identicalTo($process), $this->identicalTo($handlerResponse))
+            ->willReturn($dispatcherResponse);
+
+        $process->setDispatcher($dispatcher);
+
+        $action = $process->current->actions['foo'];
+
+        $handler = $this->createHandlerMock(true, $process, $action, $handlerResponse);
+        $manager = $manager->with(null, $handler);
+
+        $response = $manager->invoke($process, 'foo', 'client');
+
+        $this->assertSame($dispatcherResponse, $response);
     }
 }

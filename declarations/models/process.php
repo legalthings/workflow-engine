@@ -13,9 +13,6 @@ return [
     ProcessStepper::class => function(AutowireContainerInterface $container) {
         return $container->autowire(ProcessStepper::class);
     },
-    TriggerManager::class => function(AutowireContainerInterface $container) {
-        return $container->autowire(TriggerManager::class);
-    },
     ProcessSimulator::class => function(AutowireContainerInterface $container) {
         return $container->autowire(ProcessSimulator::class);
     },

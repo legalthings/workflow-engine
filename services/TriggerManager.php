@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-use Jasny\EventDispatcher\EventDispatcher;
+use Improved as i;
 use Jasny\ValidationException;
 use PHPUnit\Exception as PHPUnitException;
 
@@ -11,15 +11,23 @@ use PHPUnit\Exception as PHPUnitException;
 class TriggerManager
 {
     /**
-     * Add a trigger to the event dispatcher.
-     *
-     * @param EventDispatcher $dispatcher
-     * @param ?string         $schema      Only trigger if action matches this schema.
-     * @param callable $trigger
+     * @var callable[]
      */
-    public function add(EventDispatcher &$dispatcher, ?string $schema, callable $trigger): void
+    protected $handlers = [];
+
+    /**
+     * Add a new trigger handler.
+     * Creates a copy of the manager, as services are immutable.
+     *
+     * @param string|null $schema   Only trigger if action matches this schema.
+     * @param callable    $trigger
+     * @return static
+     */
+    public function with(?string $schema, callable $trigger): self
     {
-        $handler = function (Process $process, $payload) use ($trigger, $schema) {
+        $clone = clone $this;
+
+        $clone->handlers[] = function (Process $process, $payload) use ($trigger, $schema) {
             if (!$payload instanceof Action) {
                 return $payload; // Already handled
             }
@@ -41,7 +49,7 @@ class TriggerManager
             return $response;
         };
 
-        $dispatcher = $dispatcher->on('trigger', $handler);
+        return $clone;
     }
 
     /**
@@ -65,7 +73,8 @@ class TriggerManager
         unset($action->actors);
         $action->actor = $process->getActor($actorKey);
 
-        $result = $process->dispatch('trigger', $action);
+        $handlerResult = $this->trigger($process, $action);
+        $result = $process->dispatch('trigger', $handlerResult);
 
         return $result instanceof Response ? $result : null;
     }
@@ -127,5 +136,23 @@ class TriggerManager
         }
 
         return $response;
+    }
+
+    /**
+     * Trigger an event.
+     *
+     * @param Process              $process
+     * @param Action|Response|null $payload
+     * @return Action|Response|null
+     */
+    protected function trigger(Process $process, $payload = null)
+    {
+        return i\iterable_reduce(
+            $this->handlers,
+            function ($payload, $handler) use ($process) {
+                return i\function_call($handler, $process, $payload);
+            },
+            $payload
+        );
     }
 }

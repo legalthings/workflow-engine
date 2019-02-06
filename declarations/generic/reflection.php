@@ -3,7 +3,7 @@
 use Jasny\ReflectionFactory\ReflectionFactory;
 
 return [
-    ReflectionFactory::class => function() {
+    ReflectionFactory::class => static function() {
         return new ReflectionFactory();
     }
 ];

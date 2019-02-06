@@ -7,13 +7,13 @@ use Monolog\Handler\ErrorLogHandler;
 use Monolog\Logger;
 
 return [
-    LoggerInterface::class => function (ContainerInterface $container) {
+    LoggerInterface::class => static function(ContainerInterface $container) {
         $handler = new ErrorLogHandler();
         return new Logger('', [$handler]);
     },
 
     // Alias
-    'logger' => function (ContainerInterface $container) {
+    'logger' => static function(ContainerInterface $container) {
         return $container->get(LoggerInterface::class);
     }
 ];

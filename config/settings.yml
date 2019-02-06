@@ -1,6 +1,10 @@
 locale: en_US
 translate: true
 
+triggers:
+  nop:
+    schema: https://specs.livecontracts.io/v1.0.0/action/nop/schema.json#
+
 db:
   default:
     client: mongodb://localhost:27017

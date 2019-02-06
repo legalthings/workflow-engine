@@ -7,7 +7,7 @@
 use Psr\Container\ContainerInterface;
 use Jasny\DB;
 
-return function (ContainerInterface $container) {
+return static function(ContainerInterface $container) {
     DB::configure($container->get('config.db'));
 
     if (DB::getSettings('flow-mongo') !== null) {

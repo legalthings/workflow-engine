@@ -4,10 +4,10 @@ use JmesPath\Env as JmesPath;
 use Interop\Container\ContainerInterface;
 
 return [
-    'jmespath' => function() {
+    'jmespath' => static function() {
         return JmesPath::createRuntime();
     },
-    DataPatcher::class => function(ContainerInterface $container) {
+    DataPatcher::class => static function(ContainerInterface $container) {
         return new DataPatcher($container->get('jmespath'));
     },
 ];

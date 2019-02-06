@@ -6,7 +6,7 @@ use Jasny\Autowire\ReflectionAutowire;
 use Jasny\ReflectionFactory\ReflectionFactory;
 
 return [
-    AutowireInterface::class => function(ContainerInterface $container) {
+    AutowireInterface::class => static function(ContainerInterface $container) {
         $reflection = $container->get(ReflectionFactory::class);
 
         return new ReflectionAutowire($container, $reflection);

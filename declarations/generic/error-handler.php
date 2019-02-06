@@ -6,7 +6,7 @@ use Jasny\ErrorHandler;
 use Psr\Log\LoggerInterface;
 
 return [
-    ErrorHandlerInterface::class => function (ContainerInterface $container) {
+    ErrorHandlerInterface::class => static function(ContainerInterface $container) {
         $errorHandler = new ErrorHandler();
 
         $logger = $container->get(LoggerInterface::class);
@@ -18,7 +18,7 @@ return [
     },
 
     // Alias
-    'errorHandler' => function (ContainerInterface $container) {
+    'errorHandler' => static function(ContainerInterface $container) {
         return $container->get(ErrorHandlerInterface::class);
     }
 ];

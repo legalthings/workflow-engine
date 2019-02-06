@@ -3,7 +3,7 @@
 use Psr\Container\ContainerInterface;
 
 return [
-    'controller.factory' => function (ContainerInterface $container) {
+    'controller.factory' => static function(ContainerInterface $container) {
         return new ControllerFactory(null, $container);
     }
 ];

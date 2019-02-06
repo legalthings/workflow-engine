@@ -11,30 +11,30 @@ use Jasny\Router\Runner\Controller as Runner;
 use Symfony\Component\Yaml\Yaml;
 
 return [
-    'dummy-middleware' => function() {
-        return function (ServerRequest $request, Response $response, callable $next) {
+    'dummy-middleware' => static function() {
+        return static function(ServerRequest $request, Response $response, callable $next) {
             return $next($request, $response);
         };
     },
-    'router.routes' => function () {
+    'router.routes' => static function() {
         return Yaml::parse(file_get_contents('config/routes.yml'));
     },
-    'router.middleware' => function() {
+    'router.middleware' => static function() {
         $sources = glob('declarations/middleware/*.php');
 
-        return array_reduce($sources, function (array $middleware, string $source) {
+        return array_reduce($sources, static function(array $middleware, string $source) {
             $declaration = include $source;
             return $middleware + $declaration;
         }, []);
     },
-    'router.runner' => function (ContainerInterface $container) {
+    'router.runner' => static function(ContainerInterface $container) {
         return (new Runner())->withFactory($container->get('controller.factory'));
     },
 
-    RoutesInterface::class => function (ContainerInterface $container) {
+    RoutesInterface::class => static function(ContainerInterface $container) {
         return new Routes\Glob($container->get('router.routes'));
     },
-    RouterInterface::class => function (ContainerInterface $container) {
+    RouterInterface::class => static function(ContainerInterface $container) {
         $router = new Router($container->get(RoutesInterface::class));
         $router->setRunner($container->get('router.runner'));
 
@@ -48,7 +48,7 @@ return [
     },
 
     // Alias
-    'router' => function (ContainerInterface $container) {
+    'router' => static function(ContainerInterface $container) {
         return $container->get(RouterInterface::class);
     }
 ];

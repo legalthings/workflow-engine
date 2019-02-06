@@ -6,10 +6,10 @@ use Jasny\HttpMessage\ServerRequest;
 use Jasny\HttpMessage\Response;
 
 return [
-    ServerRequestInterface::class => function () {
+    ServerRequestInterface::class => static function() {
         return (new ServerRequest())->withGlobalEnvironment();
     },
-    ResponseInterface::class => function () {
+    ResponseInterface::class => static function() {
         return new Response();
     }
 ];

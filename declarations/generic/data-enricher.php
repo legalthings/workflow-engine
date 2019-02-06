@@ -3,7 +3,7 @@
 use LegalThings\DataEnricher;
 
 return [
-    DataEnricher::class => function() {
+    DataEnricher::class => static function() {
         return new DataEnricher();
     },
 ];

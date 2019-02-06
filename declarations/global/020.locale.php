@@ -7,7 +7,7 @@
 
 use Psr\Container\ContainerInterface;
 
-return function (ContainerInterface $container) {
+return static function(ContainerInterface $container) {
     if (!$container->has('config.locale')) {
         return;
     }

@@ -4,25 +4,25 @@ use Jasny\Container\AutowireContainerInterface;
 use Jasny\EventDispatcher\EventDispatcher;
 
 return [
-    "process_events" => function() {
+    "process_events" => static function() {
         return new EventDispatcher();
     },
-    ProcessGateway::class => function(AutowireContainerInterface $container) {
+    ProcessGateway::class => static function(AutowireContainerInterface $container) {
         return $container->autowire(ProcessGateway::class);
     },
-    ProcessStepper::class => function(AutowireContainerInterface $container) {
+    ProcessStepper::class => static function(AutowireContainerInterface $container) {
         return $container->autowire(ProcessStepper::class);
     },
-    ProcessSimulator::class => function(AutowireContainerInterface $container) {
+    ProcessSimulator::class => static function(AutowireContainerInterface $container) {
         return $container->autowire(ProcessSimulator::class);
     },
-    ProcessUpdater::class => function(AutowireContainerInterface $container) {
+    ProcessUpdater::class => static function(AutowireContainerInterface $container) {
         return $container->autowire(ProcessUpdater::class);
     },
-    ProcessInstantiator::class => function(AutowireContainerInterface $container) {
+    ProcessInstantiator::class => static function(AutowireContainerInterface $container) {
         return $container->autowire(ProcessInstantiator::class);
     },
-    StateInstantiator::class => function(AutowireContainerInterface $container) {
+    StateInstantiator::class => static function(AutowireContainerInterface $container) {
         return $container->autowire(StateInstantiator::class);
     },
 ];

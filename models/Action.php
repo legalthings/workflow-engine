@@ -16,7 +16,7 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
     /**
      * @var string
      */
-    public $schema = 'https://specs.livecontracts.io/v1.0.0/asset/action.json#';
+    public $schema = 'https://specs.livecontracts.io/v1.0.0/action/schema.json#';
 
     /**
      * @var string

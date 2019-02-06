@@ -9,7 +9,7 @@ use Jasny\ApplicationEnv;
 use Psr\Container\ContainerInterface;
 
 return [
-    ApplicationEnv::class => function () {
+    ApplicationEnv::class => static function() {
         $env = getenv('APPLICATION_ENV') ?: 'dev';
 
         if ($env === 'dev' && isset($_SERVER['HTTP_X_APPLICATION_ENV'])) {
@@ -22,7 +22,7 @@ return [
 
         return new ApplicationEnv($env);
     },
-    'app.env' => function(ContainerInterface $container) {
+    'app.env' => static function(ContainerInterface $container) {
         return $container->get(ApplicationEnv::class);
     }
 ];

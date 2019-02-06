@@ -13,7 +13,7 @@ use Monolog\Logger;
 use Monolog\Handler\ErrorLogHandler;
 use function Jasny\expect_type;
 
-return function (ContainerInterface $container) {
+return static function(ContainerInterface $container) {
     /* @var stdClass $logger */
     $config = $container->get('config');
 
@@ -34,7 +34,7 @@ return function (ContainerInterface $container) {
         error_reporting(E_ALL & ~E_NOTICE & ~E_USER_NOTICE & ~E_DEPRECATED & ~E_USER_DEPRECATED & ~E_STRICT);
     }
 
-    $stdlog = array_reduce($logger->getHandlers(), function ($found, $handler) {
+    $stdlog = array_reduce($logger->getHandlers(), static function($found, $handler) {
         return $found || $handler instanceof ErrorLogHandler;
     }, false);
 

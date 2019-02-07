@@ -59,9 +59,9 @@ abstract class AbstractTrigger
     protected function cloneConfigure($settings, array $properties)
     {
         $set = array_only((array)$settings, $properties);
-        $current = array_only(get_object_vars($this), $properties);
+        $current = array_only(get_object_vars($this), array_keys($set));
 
-        if ($current === $set) {
+        if ($set === $current) {
             return $this; // No changes
         }
 
@@ -101,19 +101,22 @@ abstract class AbstractTrigger
      * Apply trigger to an action.
      *
      * @param \Action $action
-     * @return \Response
+     * @return \Response|null
      */
-    abstract protected function apply(\Action $action): \Response;
+    abstract protected function apply(\Action $action): ?\Response;
 
     /**
      * Invoke for the trigger.
      *
      * @param \Process $process
      * @param \Action  $action
-     * @return \Response
+     * @return \Response|null
      */
-    public function __invoke(\Process $process, \Action $action): \Response
+    public function __invoke(\Process $process, \Action $action): ?\Response
     {
-        return $this->apply($action);
+        $triggerAction = clone $action;
+        $triggerAction->process = $process;
+
+        return $this->apply($triggerAction);
     }
 }

@@ -1,0 +1,92 @@
+{
+    "$schema": "https://specs.livecontracts.io/v1.0.0/scenario/schema.json#",
+    "actors": {
+        "user1": {
+            "title": "User1"
+        }
+    },
+    "actions": {
+        "step1": {
+            "display": true,
+            "title": "Step1",
+            "trigger": {
+                "type": "http",
+                "url": "https://www.example.com"
+            },
+            "responses": {
+                "ok": { },
+                "error": { }
+            }
+        },
+        "step2": {
+            "display": true,
+            "title": "Step2",
+            "trigger": {
+                "type": "nop",
+                "response": "ok",
+                "data": "second response"
+            },
+            "responses": {
+                "ok": { },
+                "error": { }
+            }
+        },
+        "step3": {
+            "display": true,
+            "title": "Step3",
+            "actor": "user1",
+            "responses": {
+                "ok": { },
+                "cancel": { }
+            }
+        }
+    },
+    "states": {
+        ":initial": {
+            "default_action": "step1",
+            "transitions": [
+                {
+                    "action": "step1",
+                    "response": "ok",
+                    "transition": "step2"
+                },
+                {
+                    "action": "step1",
+                    "response": "error",
+                    "transition": ":failed"
+                }
+            ]
+        },
+        "step2": {
+            "default_action": "step2",
+            "transitions": [
+                {
+                    "action": "step2",
+                    "response": "ok",
+                    "transition": "step3"
+                },
+                {
+                    "action": "step2",
+                    "response": "error",
+                    "transition": ":failed"
+                }
+            ]
+        },
+        "step3": {
+            "default_action": "step3",
+            "transitions": [
+                {
+                    "action": "step3",
+                    "response": "ok",
+                    "transition": ":success"
+                },
+                {
+                    "action": "step3",
+                    "response": "cancel",
+                    "transition": ":failed"
+                }
+
+            ]
+        }
+    }
+}

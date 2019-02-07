@@ -56,7 +56,7 @@ class DataPatcher
      * @param mixed $value
      * @return mixed
      */
-    protected function merge($target, $value)
+    public function merge($target, $value)
     {
         if ($this->isArrayish($target)) {
             $target[] = $value;

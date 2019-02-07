@@ -24,7 +24,7 @@ interface Trigger
      *
      * @param \Process $process
      * @param \Action  $action
-     * @return \Response
+     * @return \Response|null
      */
-    public function __invoke(\Process $process, \Action $action): \Response;
+    public function __invoke(\Process $process, \Action $action): ?\Response;
 }

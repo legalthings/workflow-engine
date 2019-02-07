@@ -1,0 +1,59 @@
+{
+    "$schema": "https://specs.livecontracts.io/v1.0.0/scenario/schema.json#",
+    "actors": {
+        "user1": {
+            "title": "User1"
+        }
+    },
+    "actions": {
+        "step1": {
+            "$schema": "https://specs.livecontracts.io/v1.0.0/action/http/schema.json#",
+            "display": true,
+            "title": "Step1",
+            "url": "https://www.example.com",
+            "responses": {
+                "ok": { },
+                "error": { }
+            }
+        },
+        "step2": {
+            "$schema": "https://specs.livecontracts.io/v1.0.0/action/nop/schema.json#",
+            "display": true,
+            "title": "Step2",
+            "trigger_response": "ok",
+            "data": "second response",
+            "responses": {
+                "ok": { },
+                "error": { }
+            }
+        }
+    },
+    "states": {
+        ":initial": {
+            "default_action": "step1",
+            "transitions": [
+                {
+                    "response": "ok",
+                    "transition": "step2"
+                },
+                {
+                    "response": "error",
+                    "transition": ":failed"
+                }
+            ]
+        },
+        "step2": {
+            "default_action": "step2",
+            "transitions": [
+                {
+                    "response": "ok",
+                    "transition": ":success"
+                },
+                {
+                    "response": "error",
+                    "transition": ":failed"
+                }
+            ]
+        }
+    }
+}

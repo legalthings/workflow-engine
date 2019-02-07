@@ -1,19 +1,23 @@
-class_name: ApiTester
-modules:
-    enabled:
-        - REST:
-            depends: PhpBrowser
-            url: http://localhost:8080
-        - \Helper\General
-        - \Helper\Api
-        - \Helper\MockService
-        - MongoDb
-        - Asserts
+actor: ApiTester
 coverage:
     enabled: true
-    remote: true
+    remote: false
     include:
         - controllers/*
-groups:
-    authz: tests/_groups/authz
-    basic: tests/_groups/basic
+modules:
+    config:
+        MongoDb:
+           dsn: 'mongodb://localhost:27017/lto_workflow_tests'
+           user: ''
+           password: ''
+           dump: 'tests/_data/dump.js'
+           populate: true
+           cleanup: true
+    enabled:
+        - \Helper\Api
+        - \Jasny\Codeception\Module:
+            container: tests/_support/container.php
+        - REST:
+            depends: \Jasny\Codeception\Module
+        - MongoDb
+        - Asserts

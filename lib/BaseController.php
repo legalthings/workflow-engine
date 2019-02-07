@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * Base class for controllers.
@@ -13,7 +13,7 @@ abstract class BaseController extends Jasny\Controller
      * @param mixed $result
      * @param string $format  Mime or content format
      */
-    protected function output($result, $format = 'json')
+    public function output($result, $format = 'json')
     {
         return parent::output($result, $format);
     }
@@ -52,13 +52,5 @@ abstract class BaseController extends Jasny\Controller
         header('Last-Modified: ' . $lastModified);
 
         return strtotime($lastModified) != strtotime($ifModifiedSince);
-    }
-    
-    /**
-     * Set the Not Modified (304) header
-     */
-    protected function notModified()
-    {
-        header("HTTP/1.1 304 Not Modified");
     }
 }

@@ -11,3 +11,13 @@ db:
   default:
     client: mongodb://localhost:27017
     database: lto_workflow_tests
+
+lto:
+  account:
+    sign:
+      secretkey: 37gsytK7XoJzzhyVNuTTm1rNRVpiXcvTWBM994KXgr5nYDMH6j5GJqcGKEXmqeJ1P93mKeDHAR1x3anS3VbBCgsi
+      publickey: 3UDCFY6MojrPKaayHgAEqrnp99JhviSAiraJX8J1fJ9E
+    encrypt:
+      secretkey: 3R2rpsEQqifWTt1BdLTbQv5vzXPQ91onH8Z3sVnkfPu7
+      publickey: EGG47VCK3ZnJYZAZpwG7u3SbDkC7QgDfLDrpGTdydURd
+  network: T

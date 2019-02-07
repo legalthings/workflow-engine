@@ -52,7 +52,7 @@ class App
     /**
      * @return EntryLoader&iterable<Closure>
      */
-    protected static function getContainerEntries(): EntryLoader
+    public static function getContainerEntries(): EntryLoader
     {
         $files = new ArrayIterator(glob('declarations/{generic,models}/*.php', GLOB_BRACE));
 

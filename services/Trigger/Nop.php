@@ -7,7 +7,7 @@ use Response;
 /**
  * Trigger that performs no operation.
  */
-class Nop
+class Nop extends AbstractTrigger
 {
     /**
      * Apply trigger to an action.

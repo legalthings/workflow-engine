@@ -2,7 +2,9 @@
 
 namespace Trigger;
 
+use function get_class_vars;
 use Improved as i;
+use Psr\Container\ContainerInterface;
 use function Jasny\array_only;
 use function Jasny\object_get_properties;
 
@@ -57,8 +59,9 @@ abstract class AbstractTrigger
     protected function cloneConfigure($settings, array $properties)
     {
         $set = array_only((array)$settings, $properties);
+        $current = array_only(get_object_vars($this), $properties);
 
-        if (array_only(object_get_properties($this, $properties)) === $set) {
+        if ($current === $set) {
             return $this; // No changes
         }
 
@@ -76,15 +79,18 @@ abstract class AbstractTrigger
      * Project the input based on jmespath.
      *
      * @param object|array $input
-     * @param string       $projection
      * @return object
      */
-    protected function project($input, string $projection)
+    protected function project($input)
     {
+        if ($this->projection === null) {
+            return $input;
+        }
+
         try {
-            $output = i\function_call($this->jmespath, $projection, $input);
-        } catch (JmesPath\SyntaxErrorException $e) {
-            throw new RuntimeException("JMESPath projection failed: " . $e->getMessage(), 0, $e);
+            $output = i\function_call($this->jmespath, $this->projection, $input);
+        } catch (\JmesPath\SyntaxErrorException $e) {
+            throw new \RuntimeException("JMESPath projection failed: " . $e->getMessage(), 0, $e);
         }
 
         return i\type_cast($output, 'object');

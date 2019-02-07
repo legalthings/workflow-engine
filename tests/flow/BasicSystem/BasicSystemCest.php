@@ -23,6 +23,7 @@ class BasicSystemCest
         $I->amGoingTo("invoke the trigger of the 'step1' action");
         $I->expectHttpRequest(new HttpResponse(200, [],'response body'));
         $I->invokeTrigger();
+        $I->seeTheNumberOfHttpRequestWere(1);
 
         $I->seeCurrentStateIs('step2');
         $I->seePreviousResponsesWere(['step1.ok']);
@@ -58,6 +59,7 @@ class BasicSystemCest
         $I->amGoingTo("invoke the trigger of the 'step1' action");
         $I->expectHttpRequest(new HttpResponse(400, [],'error response'));
         $I->invokeTrigger();
+        $I->seeTheNumberOfHttpRequestWere(1);
 
         $I->seeCurrentStateIs(':failed');
         $I->seePreviousResponsesWere(['step1.error']);

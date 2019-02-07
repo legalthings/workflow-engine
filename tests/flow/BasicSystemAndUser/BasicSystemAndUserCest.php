@@ -19,9 +19,11 @@ class BasicSystemAndUserCest
         $I->seeDefaultActionIs('step1');
         $I->seeNextStatesAre(['step2', 'step3', ':success']);
 
+        $I->am('system');
         $I->amGoingTo("invoke the trigger of the 'step1' action");
         $I->expectHttpRequest(new HttpResponse(200, [],'response body'));
         $I->invokeTrigger();
+        $I->seeTheNumberOfHttpRequestWere(1);
 
         $I->seeCurrentStateIs('step2');
         $I->seePreviousResponsesWere(['step1.ok']);
@@ -29,6 +31,7 @@ class BasicSystemAndUserCest
         $I->seeDefaultActionIs('step2');
         $I->seeNextStatesAre(['step3', ':success']);
 
+        $I->am('system');
         $I->amGoingTo("invoke the trigger of the 'step2' action");
         $I->invokeTrigger();
 
@@ -37,15 +40,14 @@ class BasicSystemAndUserCest
         $I->seePreviousResponseHas('data', 'second response');
         $I->seeNextStatesAre([':success']);
 
+        $I->am('user');
         $I->amGoingTo("do the 'step3' action, stepping to ':success'");
-        $I->am('user1');
         $I->doAction('step3', 'ok', 'the users says hi');
 
         $I->comment('verify the process after stepping');
         $I->seePreviousResponsesWere(['step1.ok', 'step2.ok', 'step3.ok']);
         $I->seeCurrentStateIs(':success');
         $I->seePreviousResponseHas('data', 'the users says hi');
-        $I->seeProcessHas('previous_response', 'the users says hi');
         $I->seeNextStatesAre([]);
     }
 }

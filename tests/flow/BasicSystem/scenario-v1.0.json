@@ -11,7 +11,7 @@
             "display": true,
             "title": "Step1",
             "url": "https://www.example.com",
-            "actors": ["system"],
+            "actor": "system",
             "responses": {
                 "ok": { },
                 "error": { }
@@ -23,7 +23,7 @@
             "title": "Step2",
             "trigger_response": "ok",
             "data": "second response",
-            "actors": ["system"],
+            "actor": "system",
             "responses": {
                 "ok": { },
                 "error": { }

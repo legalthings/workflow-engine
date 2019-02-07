@@ -1,31 +1,32 @@
 {
     "$schema": "https://specs.livecontracts.io/v1.0.0/scenario/schema.json#",
     "actors": {
-        "user1": {
-            "title": "User1"
+        "user": {
+            "title": "User"
+        },
+        "system": {
+            "title": "System"
         }
     },
     "actions": {
         "step1": {
+            "$schema": "https://specs.livecontracts.io/v1.0.0/action/http/schema.json#",
             "display": true,
             "title": "Step1",
-            "trigger": {
-                "type": "http",
-                "url": "https://www.example.com"
-            },
+            "actor": "system",
+            "url": "https://www.example.com",
             "responses": {
                 "ok": { },
                 "error": { }
             }
         },
         "step2": {
+            "$schema": "https://specs.livecontracts.io/v1.0.0/action/nop/schema.json#",
             "display": true,
             "title": "Step2",
-            "trigger": {
-                "type": "nop",
-                "response": "ok",
-                "data": "second response"
-            },
+            "trigger_response": "ok",
+            "data": "second response",
+            "actor": "system",
             "responses": {
                 "ok": { },
                 "error": { }
@@ -34,7 +35,7 @@
         "step3": {
             "display": true,
             "title": "Step3",
-            "actor": "user1",
+            "actor": "user",
             "responses": {
                 "ok": { },
                 "cancel": { }
@@ -43,7 +44,7 @@
     },
     "states": {
         ":initial": {
-            "default_action": "step1",
+            "action": "step1",
             "transitions": [
                 {
                     "action": "step1",
@@ -58,7 +59,7 @@
             ]
         },
         "step2": {
-            "default_action": "step2",
+            "action": "step2",
             "transitions": [
                 {
                     "action": "step2",
@@ -73,7 +74,7 @@
             ]
         },
         "step3": {
-            "default_action": "step3",
+            "action": "step3",
             "transitions": [
                 {
                     "action": "step3",

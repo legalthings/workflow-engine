@@ -76,7 +76,14 @@ class TriggerManager
         $handlerResult = $this->trigger($process, $action);
         $result = $process->dispatch('trigger', $handlerResult);
 
-        return $result instanceof Response ? $result : null;
+        if (!$result instanceof Response) {
+            return null;
+        };
+
+        $result->action = clone $processAction;
+        $result->actor = clone $action->actor;
+
+        return $result;
     }
 
     /**

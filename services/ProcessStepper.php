@@ -1,5 +1,6 @@
 <?php declare(strict_types=1);
 
+use Improved as i;
 use Jasny\ValidationResult;
 use Jasny\ValidationException;
 
@@ -50,7 +51,7 @@ class ProcessStepper
      */
     protected function validate(Process $process, Response $response): ValidationResult
     {
-        $actionKey = $response->action->key;
+        $actionKey = i\type_check($response->action ?? null, Action::class)->key;
         $responseKey = $response->key;
 
         if (!isset($process->scenario->actions[$actionKey])) {

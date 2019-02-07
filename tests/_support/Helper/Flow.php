@@ -535,16 +535,11 @@ class Flow extends \Codeception\Module
             return;
         }
 
-        $response = $this->triggerManager->invoke($this->process, $action);
+        $response = $this->triggerManager->invoke($this->process, $action, $this->actor);
 
-        if ($response === null) {
-            $state = $this->process->current->key;
-            $this->fail("Failed to trigger '$action'" . ($this->actor !== null ? " by '$this->actor'" : '')
-                . " in state '$state'");
-            return;
+        if ($response !== null) {
+            $this->processStepper->step($this->process, $response);
         }
-
-        $this->processStepper->step($response->response, $response->data, $action, $this->actor);
     }
 
     /**

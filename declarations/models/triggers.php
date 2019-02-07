@@ -7,8 +7,9 @@ use Jasny\Container\AutowireContainerInterface;
 return [
     TriggerManager::class => static function(AutowireContainerInterface $container) {
         $manager = $container->autowire(TriggerManager::class);
+        $configuration = (array)$container->get('config.triggers');
 
-        return Pipeline::with((array)$container->get('config.triggers'))
+        return Pipeline::with($configuration)
             ->map(static function($settings, $key) use ($container) {
                 return (object)[
                     'schema' => $settings->schema ?? null,
@@ -21,14 +22,14 @@ return [
             }, $manager);
     },
 
-    'nop_trigger' => static function(ContainerInterface $container) {
-        return new Trigger\Nop($container->get('jmespath'));
+    'nop_trigger' => static function(AutowireContainerInterface $container) {
+        return $container->autowire(Trigger\Nop::class);
     },
-    'http_trigger' => static function(ContainerInterface $container) {
-        return new Trigger\Http($container->get('jmespath'));
+    'http_trigger' => static function(AutowireContainerInterface $container) {
+        return $container->autowire(Trigger\Http::class);
     },
-    'event_trigger' => static function(ContainerInterface $container) {
-        return new Trigger\Event($container->get('jmespath'));
+    'event_trigger' => static function(AutowireContainerInterface $container) {
+        return $container->autowire(Trigger\Event::class);
     },
     'sequence_trigger' => static function() {
         return new Trigger\Sequence();

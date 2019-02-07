@@ -143,16 +143,18 @@ class ProcessStepperTest extends \Codeception\Test\Unit
 
     public function validationProvider()
     {
+        $errors = [
+            "Invalid response 'yo' for action 'first'",
+            "Manager isn't allowed to perform action 'first'",
+        ];
+
         return [
             ['non_existent', 'ok', 'client', ["Unknown action 'non_existent'"]],
             ['first', 'ok', 'robot', ["Unknown actor 'robot'"]],
             ['alt', 'ok', 'client', ["Action 'alt' isn't allowed in state ':initial'"]],
             ['first', 'yo', 'client', ["Invalid response 'yo' for action 'first'"]],
             ['first', 'ok', 'manager', ["Manager isn't allowed to perform action 'first'"]],
-            ['first', 'yo', 'manager', [
-                "Invalid response 'yo' for action 'first'",
-                "Manager isn't allowed to perform action 'first'",
-            ]],
+            ['first', 'yo', 'manager', $errors],
         ];
     }
 

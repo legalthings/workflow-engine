@@ -13,6 +13,7 @@ class BasicEntity extends stdClass implements Entity, Meta
     {
         Meta\Implementation::jsonSerializeFilter insteadof Entity\Implementation;
         setValues as private _setValues;
+        fromData as private _fromData;
     }
 
     /**
@@ -35,6 +36,18 @@ class BasicEntity extends stdClass implements Entity, Meta
         $this->cast();
 
         return $this;
+    }
+
+    /**
+     * Convert loaded values to an entity.
+     * Calls the construtor *after* setting the properties.
+     *
+     * @param array|stdClass $values
+     * @return static
+     */
+    public static function fromData($values)
+    {
+        return self::_fromData(array_rename_key((array)$values, '$schema', 'schema'));
     }
 
     /**

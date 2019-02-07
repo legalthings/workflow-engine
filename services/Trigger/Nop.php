@@ -20,7 +20,6 @@ class Nop extends AbstractTrigger
         $projected = $this->project($action);
 
         return (new Response)->setValues([
-            'action' => $action,
             'key' => $projected->trigger_response ?? $projected->default_response ?? 'ok',
             'data' => $projected->data ?? null,
         ]);

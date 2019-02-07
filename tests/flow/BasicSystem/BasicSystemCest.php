@@ -9,6 +9,7 @@ class BasicSystemCest
      */
     public function stepOk(\FlowTester $I, \Codeception\Example $example)
     {
+        $I->am('system');
         $I->wantTo('run a basic system flow responding with ok');
 
         $I->createProcessFrom($example['scenario']);
@@ -43,6 +44,7 @@ class BasicSystemCest
      */
     public function stepError(\FlowTester $I, \Codeception\Example $example)
     {
+        $I->am('system');
         $I->wantTo('run a basic system flow responding with error');
 
         $I->createProcessFrom($example['scenario']);
@@ -59,7 +61,7 @@ class BasicSystemCest
 
         $I->seeCurrentStateIs(':failed');
         $I->seePreviousResponsesWere(['step1.error']);
-        $I->seePreviousResponseHas('data', "Action 'step1' failed: error response");
+        $I->seePreviousResponseHas('data', 'error response');
         $I->seeNextStatesAre([]);
     }
 }

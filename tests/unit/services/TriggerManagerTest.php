@@ -135,6 +135,13 @@ class TriggerManagerTest extends \Codeception\Test\Unit
             ($action->key === 'qux' ? $defaultResponse : null);
 
         $this->assertSame($expected, $response);
+
+        if ($response !== null) {
+            $this->assertAttributeEquals($action, 'action', $response);
+            $this->assertAttributeNotSame($action, 'action', $response);
+            $this->assertAttributeEquals($process->actors['client'], 'actor', $response);
+            $this->assertAttributeNotSame($process->actors['client'], 'actor', $response);
+        }
     }
 
     /**
@@ -206,7 +213,7 @@ class TriggerManagerTest extends \Codeception\Test\Unit
         $this->assertAttributeInstanceOf(Action::class, 'action', $response);
         $this->assertAttributeEquals('foo', 'key', $response->action);
         $this->assertAttributeEquals('Foo', 'title', $response->action);
-        $this->assertAttributeEquals($process->getActor('client'), 'actor', $response->action);
+        $this->assertAttributeEquals($process->getActor('client'), 'actor', $response);
     }
 
     public function testValidationErrorResponse()
@@ -232,7 +239,7 @@ class TriggerManagerTest extends \Codeception\Test\Unit
         $this->assertAttributeInstanceOf(Action::class, 'action', $response);
         $this->assertAttributeEquals('foo', 'key', $response->action);
         $this->assertAttributeEquals('Foo', 'title', $response->action);
-        $this->assertAttributeEquals($process->getActor('client'), 'actor', $response->action);
+        $this->assertAttributeEquals($process->getActor('client'), 'actor', $response);
     }
 
     public function testDispatcher()

@@ -9,7 +9,7 @@ use LTO\HTTPSignatureException;
 use function Jasny\str_starts_with;
 
 /**
- * Description of HTTPSignatureMiddleware.
+ * Router middleware to capture and validate an HTTP signature.
  */
 class HTTPSignatureMiddleware
 {

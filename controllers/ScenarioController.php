@@ -1,16 +1,37 @@
 <?php
 
 /**
- * Scenario controller
+ * Scenario controller.
+ *
+ * `NotFoundMiddleware` and `ValidationMiddleware` are responsible for giving 40x responses for exceptions thrown by
+ * the model related services.
  */
 class ScenarioController extends BaseController
 {
+    /**
+     * @var ScenarioGateway
+     */
+    protected $scenarios;
+
+    /**
+     * @param ScenarioGateway $scenarios
+     */
+    public function __construct(ScenarioGateway $scenarios)
+    {
+        $this->scenarios = $scenarios;
+    }
+
     /**
      * List all scenarios
      */
     public function listAction()
     {
-        $this->error('not implemented');
+        $filter = array_without($this->getQueryParams(), ['limit', 'offset']);
+        $limit = $this->getQueryParams(['limit', 'offset']);
+
+        $list = $this->scenarios->fetchList($filter, null, $limit);
+
+        $this->output($list);
     }
 
     /**
@@ -18,17 +39,24 @@ class ScenarioController extends BaseController
      */
     public function addAction()
     {
-        $this->error('not implemented');
+        $scenario = $this->scenarios->create()->setValues($this->getInput());
+        $scenario->validate()->mustSucceed();
+
+        $this->scenarios->save($scenario);
+
+        $this->output($scenario);
     }
 
     /**
-     * Get a scenario
+     * Get a scenario.
      *
      * @param string $id  Scenario id
      */
-    public function getAction($id)
+    public function getAction(string $id)
     {
-        $this->error('not implemented');
+        $scenario = $this->scenarios->fetch($id);
+
+        $this->output($scenario);
     }
 
     /**
@@ -38,6 +66,11 @@ class ScenarioController extends BaseController
      */
     public function updateMetaAction($id)
     {
-        $this->error('not implemented');
+        $scenario = $this->scenarios->fetch($id);
+
+        $scenario->meta->setValues($this->getInput());
+        $this->scenarios->save($scenario, ['only' => 'meta']);
+
+        $this->output($scenario);
     }
 }

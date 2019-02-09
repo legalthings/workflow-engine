@@ -70,7 +70,7 @@ class Scenario extends MongoDocument implements Dynamic
 
     /**
      * Meta information. Can be specified by each node and isn't shared.
-     * @var object
+     * @var Meta
      */
     public $meta = [];
 

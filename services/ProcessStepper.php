@@ -68,20 +68,20 @@ class ProcessStepper
 
         $currentAction = $process->current->actions[$actionKey];
 
-        if (!$currentAction->isValidResponse($responseKey)) {
-            return Validation::error("Invalid response '%s' for action '%s'", $responseKey, $actionKey);
-        }
-
         if (!$process->hasActor($response->actor)) {
             return ValidationResult::error("Unknown %s", $response->actor->describe());
         }
 
-        if ($process->getActorForAction($currentAction->key) === null) {
-            return Validation::error(
+        if ($process->getActorForAction($currentAction->key, $response->actor) === null) {
+            return ValidationResult::error(
                 "%s isn't allowed to perform action '%s'",
-                $response->actor->describe(),
+                $process->getActor($response->actor)->describe(),
                 $actionKey
             );
+        }
+
+        if (!$currentAction->isValidResponse($responseKey)) {
+            return ValidationResult::error("Invalid response '%s' for action '%s'", $responseKey, $actionKey);
         }
 
         return ValidationResult::success();

@@ -1,6 +1,5 @@
 <?php declare(strict_types=1);
 
-use Improved as i;
 use Improved\IteratorPipeline\Pipeline;
 use Jasny\DB\EntitySet;
 use Jasny\ValidationResult;
@@ -194,17 +193,25 @@ class Process extends MongoDocument
      */
     public function getActorForAction(string $actionKey, $match): ?Actor
     {
-        $required = true;
         $action = $this->getAvailableAction($actionKey);
 
-        return $this->getMatchingActors($match, true)
-            ->apply(function() use (&$required) {
-                $required = false;
+        return $this->getMatchingActors($match)
+            ->then(function(iterable $actors): Generator {
+                $any = false;
+
+                foreach ($actors as $actor) {
+                    $any = true;
+                    yield $actor;
+                }
+
+                if (!$any) {
+                    throw new OutOfBoundsException('Actor not found');
+                }
             })
             ->filter(function(Actor $actor) use ($action) {
                 return $action->isAllowedBy($actor);
             })
-            ->first($required);
+            ->first();
     }
 
     /**
@@ -216,7 +223,7 @@ class Process extends MongoDocument
      */
     public function getAvailableAction(string $actionKey): Action
     {
-        if (isset($this->current->actions[$actionKey])) {
+        if (!isset($this->current->actions[$actionKey])) {
             $msg = "Action '%s' is not available in state '%s' for process '%s";
             throw new OutOfBoundsException(sprintf($msg, $actionKey, $this->current->key, $this->id));
         }
@@ -244,11 +251,6 @@ class Process extends MongoDocument
     public function validate(): ValidationResult
     {
         $validation = parent::validate();
-
-        foreach ($this->actors as $actor) {
-            $validation->add($actor->validate(), $actor->describe());
-        }
-
         $validation = $this->dispatcher->trigger('validate', $this, $validation);
 
         return $validation;

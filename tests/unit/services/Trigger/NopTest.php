@@ -45,7 +45,6 @@ class NopTest extends \Codeception\Test\Unit
         $response = ($this->trigger)($process, $action);
 
         $this->assertInstanceOf(\Response::class, $response);
-        $this->assertAttributeSame($action, 'action', $response);
         $this->assertAttributeEquals('yo', 'key', $response);
     }
 
@@ -57,7 +56,6 @@ class NopTest extends \Codeception\Test\Unit
         $response = ($this->trigger)($process, $action);
 
         $this->assertInstanceOf(\Response::class, $response);
-        $this->assertAttributeSame($action, 'action', $response);
         $this->assertAttributeEquals('ok', 'key', $response);
     }
 
@@ -78,8 +76,6 @@ class NopTest extends \Codeception\Test\Unit
         $response = ($this->trigger)($process, $action);
 
         $this->assertInstanceOf(\Response::class, $response);
-        $this->assertAttributeSame($action, 'action', $response);
-
         $this->assertAttributeEquals($data, 'data', $response);
     }
 

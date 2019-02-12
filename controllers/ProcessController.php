@@ -99,8 +99,8 @@ class ProcessController extends BaseController
         }
 
         $actor = $info instanceof \LTO\Account
-            ? (new Action)->set('signkeys', $info->getPublicSignKey())
-            : (new Action)->set('id', $info);
+            ? (new Action)->set('signkeys', [$info->getPublicSignKey()])
+            : (new Action)->set('identity', $info);
 
         if (!$process->hasActor($actor)) {
             throw new AuthException("Process doesn't have " . $actor->describe());

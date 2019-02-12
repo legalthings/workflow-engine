@@ -1,14 +1,14 @@
 <?php
 
 use Jasny\DB\Entity\Dynamic;
-use Jasny\DB\Entity\Validation;
 use Jasny\DB\Entity\Meta;
-use Jasny\ValidationResult;
 
 /**
  * A person or program in a process which performs some action.
+ *
+ * {@internal Validation is purely done via JSONSchema.}}
  */
-class Actor extends BasicEntity implements Meta, Validation, Dynamic
+class Actor extends BasicEntity implements Meta, Dynamic
 {
     use DeepClone;
     use Meta\Implementation;
@@ -30,10 +30,10 @@ class Actor extends BasicEntity implements Meta, Validation, Dynamic
     public $title;
 
     /**
-     * The user id
+     * The identity reference.
      * @var string|\stdClass
      */
-    public $id;
+    public $identity;
 
     /**
      * Actor's name
@@ -55,16 +55,6 @@ class Actor extends BasicEntity implements Meta, Validation, Dynamic
 
 
     /**
-     * Validate actor.
-     *
-     * @return ValidationResult
-     */
-    public function validate(): ValidationResult
-    {
-        return ValidationResult::success();
-    }
-
-    /**
      * Describe the actor based on the known properties.
      *
      * @return string
@@ -74,9 +64,9 @@ class Actor extends BasicEntity implements Meta, Validation, Dynamic
         return
             $this->title ??
             ($this->key !== null ? "actor '{$this->key}'" : null) ??
-            ($this->id !== null ? "actor with id '{$this->id}'" : null) ??
-            ($this->signkeys !== [] ? "actor with signkey '" . join("', '", $this->signkeys) . "'" : null) ??
-            'an unknown actor';
+            ($this->identity !== null ? "actor with identity '{$this->identity}'" : null) ??
+            ($this->signkeys !== [] ? "actor with signkey '" . join("'/'", $this->signkeys) . "'" : null) ??
+            'unknown actor';
     }
 
     /**
@@ -90,7 +80,7 @@ class Actor extends BasicEntity implements Meta, Validation, Dynamic
         return
             ($actor->key !== null || $actor->id !== null || $actor->signkeys !== []) && // Match at least one of these
             ($actor->key === null || $actor->key === $this->key) &&
-            ($actor->id === null || $actor->id === $this->id) &&
+            ($actor->identity === null || $actor->identity === $this->identity) &&
             ($actor->signkeys === [] || array_contains($this->signkeys, $actor->signkeys, true));
     }
 }

@@ -14,6 +14,7 @@ class BasicEntity extends stdClass implements Entity, Meta
         Meta\Implementation::jsonSerializeFilter insteadof Entity\Implementation;
         setValues as private _setValues;
         fromData as private _fromData;
+        jsonSerialize as private _jsonSerialize;
     }
 
     /**
@@ -71,7 +72,7 @@ class BasicEntity extends stdClass implements Entity, Meta
      */
     public function jsonSerialize()
     {
-        $object = parent::jsonSerialize();
+        $object = $this->_jsonSerialize();
         $object = object_rename_key($object, 'schema', '$schema');
 
         foreach ($object as $key => $value) {

@@ -3,6 +3,7 @@
 use Improved as i;
 use Jasny\ValidationException;
 use PHPUnit\Exception as PHPUnitException;
+use function Jasny\str_before;
 
 /**
  * Service to trigger automated action(s) for the process.
@@ -55,14 +56,16 @@ class TriggerManager
     /**
      * Invoke the trigger(s).
      *
-     * @param Process     $process
-     * @param string|null $actionKey  Key of the action that is triggered or null for default action.
-     * @param Actor       $actor      The actor that will perform the action.
+     * @param Process      $process
+     * @param string|null  $actionKey  Key of the action that is triggered or null for default action.
+     * @param Actor|string $actor      The actor that will perform the action.
      * @return Response|null
      * @throws UnexpectedValueException
      */
-    public function invoke(Process $process, ?string $actionKey, Actor $actor): ?Response
+    public function invoke(Process $process, ?string $actionKey, $actor): ?Response
     {
+        $actor = is_string($actor) ? (new Actor)->set('key', $actor) : $actor;
+
         $action = $this->getAllowedAction($process, $actionKey, $actor);
 
         if ($action === null) {
@@ -97,15 +100,14 @@ class TriggerManager
         $current = $process->current;
 
         if ($actionKey !== null && !isset($current->actions[$actionKey])) {
-            $msg = "Action '%s' is not allowed in state '%s' of process '%s'";
-            throw ValidationException::error($msg, $actionKey, $current->key, $process->id);
+            $msg = "Action '%s' is not allowed in state '%s'";
+            throw ValidationException::error($msg, $actionKey, $current->key);
         }
 
         $action = $actionKey ? $current->actions[$actionKey] : $process->current->getDefaultAction();
 
         if (!$process->hasActor($givenActor)) {
-            $msg = "Actor '%s' is not an actor in process '%s'";
-            throw ValidationException::error($msg, $actionKey, $current->key, $process->id);
+            throw ValidationException::error("Unknown %s", $givenActor->describe());
         }
 
         $actor = $process->getActorForAction($action->key, $givenActor);
@@ -113,13 +115,12 @@ class TriggerManager
         if ($action !== null && $actor !== null) {
             // ok :-)
         } elseif ($actionKey === null) {
-            return; // Default action can't be performed, no need for an error.
+            return null; // Default action can't be performed, no need for an error.
         } else {
             throw ValidationException::error(
-                "%s is not allowed to perform action '%s' in process '%s'",
+                "%s is not allowed to perform action '%s'",
                 $process->getActor($givenActor)->describe(),
-                $actionKey,
-                $process->id
+                $actionKey
             );
         }
 
@@ -143,7 +144,7 @@ class TriggerManager
         $response->key = 'error';
         $response->action = $action;
         $response->title = 'An error occured';
-        $response->data = (object)['message' => $exception->getMessage()];
+        $response->data = (object)['message' => trim(str_before($exception->getMessage(), "\n"), ' ;:')];
 
         if ($exception instanceof ValidationException) {
             $response->data->errors = $exception->getErrors();

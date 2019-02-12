@@ -145,8 +145,8 @@ class TriggerManagerTest extends \Codeception\Test\Unit
     }
 
     /**
-     * @expectedException UnexpectedValueException
-     * @expectedExceptionMessage Action 'other' is not allowed in state ':initial' of process '00000000-0000-0000-0000-000000000000'
+     * @expectedException \Jasny\ValidationException
+     * @expectedExceptionMessage Action 'other' is not allowed in state ':initial'
      */
     public function testActionNotAllowedInState()
     {
@@ -163,8 +163,8 @@ class TriggerManagerTest extends \Codeception\Test\Unit
     }
 
     /**
-     * @expectedException UnexpectedValueException
-     * @expectedExceptionMessage Manager is not allowed to perform action 'foo' in process '00000000-0000-0000-0000-000000000000'
+     * @expectedException \Jasny\ValidationException
+     * @expectedExceptionMessage Manager is not allowed to perform action 'foo'
      */
     public function testActionNotAllowedByActor()
     {
@@ -232,7 +232,7 @@ class TriggerManagerTest extends \Codeception\Test\Unit
         $this->assertAttributeEquals('error', 'key', $response);
         $this->assertAttributeEquals('An error occured', 'title', $response);
         $this->assertAttributeEquals((object)[
-            'message' => 'Validation failed',
+            'message' => "Validation failed",
             'errors' => ['Some error'],
         ], 'data', $response);
 

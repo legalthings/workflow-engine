@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "11cabf1f9555c8ef7c22c8f46d79d25a",
+    "content-hash": "26aa820df5bf9e9718dbae827e2c8c04",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -2158,16 +2158,16 @@
         },
         {
             "name": "jasny/validation-result",
-            "version": "v1.1.1",
+            "version": "v1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jasny/validation-result.git",
-                "reference": "dee12d1ddafdbbadb9d5e32b2f8c72b3e82884ce"
+                "reference": "fbce54837c8414cf5af22981ac33b26eb13b2a51"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jasny/validation-result/zipball/dee12d1ddafdbbadb9d5e32b2f8c72b3e82884ce",
-                "reference": "dee12d1ddafdbbadb9d5e32b2f8c72b3e82884ce",
+                "url": "https://api.github.com/repos/jasny/validation-result/zipball/fbce54837c8414cf5af22981ac33b26eb13b2a51",
+                "reference": "fbce54837c8414cf5af22981ac33b26eb13b2a51",
                 "shasum": ""
             },
             "require": {
@@ -2197,7 +2197,7 @@
             "keywords": [
                 "validation"
             ],
-            "time": "2019-02-11T15:21:41+00:00"
+            "time": "2019-02-12T12:51:58+00:00"
         },
         {
             "name": "kornrunner/keccak",
@@ -6958,7 +6958,7 @@
         {
             "alias": "1.0.99",
             "alias_normalized": "1.0.99.0",
-            "version": "1.1.1.0",
+            "version": "1.1.2.0",
             "package": "jasny/validation-result"
         },
         {

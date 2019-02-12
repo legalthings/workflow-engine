@@ -73,7 +73,7 @@ class Flow extends \Codeception\Module
     protected $httpTriggerHistory = [];
 
     /**
-     * @var string|null
+     * @var \Actor|null
      */
     protected $actor = null;
 
@@ -172,7 +172,7 @@ class Flow extends \Codeception\Module
      */
     public function setActor(string $key): void
     {
-        $this->actor = $key;
+        $this->actor = (new \Actor)->set('key', $key);
     }
 
     /**
@@ -280,16 +280,21 @@ class Flow extends \Codeception\Module
             return;
         }
 
-        $action = $this->process->getCurrentAllowedAction($key, $this->actor);
+        $action = $this->process->getAvailableAction($key);
 
         if ($action === null) {
-            $state = $this->process->current->key;
-            $msg = $this->process->getCurrentAllowedAction($key)
-                ? sprintf("Action '%s' is not allowed in state '%s'", $key, $state)
-                : sprintf("Actor '%s' is not allowed to do '%s' in state '%s'", $this->actor, $key, $state);
-
-            $this->fail($msg);
-            return;
+            $this->fail(sprintf(
+                "Action '%s' is not allowed in state '%s'",
+                $key,
+                $this->process->current->key
+            ));
+        } elseif (!$action->isAllowedBy($this->actor)) {
+            $this->fail(sprintf(
+                "%s is not allowed to do action '%s' in state '%s'",
+                $this->actor->describe(),
+                $key,
+                $this->process->current->key
+            ));
         }
     }
 

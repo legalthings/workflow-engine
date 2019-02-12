@@ -1,5 +1,6 @@
 locale: en_US
 translate: true
+noauth: false
 
 triggers:
   nop:
@@ -9,3 +10,6 @@ db:
   default:
     client: mongodb://localhost:27017
     database: lto_workflow
+
+environment_variables:
+  WORKFLOW_NO_AUTH: noauth

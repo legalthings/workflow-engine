@@ -10,5 +10,5 @@ return [
         $baseRewrite = defined('BASE_REWRITE') ? BASE_REWRITE : null;
 
         return new HTTPSignatureMiddleware($accountFactory, $baseRewrite);
-    }
+    },
 ];

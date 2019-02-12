@@ -136,14 +136,16 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
     /**
      * Check if the given actor may perform this action.
      *
-     * @param Actor|string $actor
+     * @param Actor $actor
      * @return bool
      */
-    public function isAllowedBy($actor): bool
+    public function isAllowedBy(Actor $actor): bool
     {
-        $key = $actor instanceof Actor ? $actor->key : $actor;
+        if ($actor->key === null) {
+            throw new UnexpectedValueException('Actor key not set');
+        }
 
-        return in_array($key, $this->actors, true);
+        return in_array($actor->key, $this->actors, true);
     }
 
     /**

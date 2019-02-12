@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 
 use Jasny\ApplicationEnv;
-use LTO\Account;
 
 /**
  * Default controller
@@ -19,7 +18,7 @@ class DefaultController extends BaseController
     protected $env;
 
     /**
-     * @var Account
+     * @var LTO\Account
      */
     protected $node;
 
@@ -27,9 +26,9 @@ class DefaultController extends BaseController
     /**
      * @param stdClass       $appConfig  "config.app"
      * @param ApplicationEnv $env
-     * @param Account        $node
+     * @param LTO\Account    $node
      */
-    public function __construct(stdClass $appConfig, ApplicationEnv $env, Account $node)
+    public function __construct(stdClass $appConfig, ApplicationEnv $env, LTO\Account $node)
     {
         $this->app = $appConfig;
         $this->env = (string)$env;

@@ -66,30 +66,29 @@ class ProcessStepper
             );
         }
 
-        if (!isset($process->actors[$response->actor->key])) {
-            return ValidationResult::error("Unknown actor '%s'", $response->actor->key);
-        }
-
-        $validation = new ValidationResult();
         $currentAction = $process->current->actions[$actionKey];
 
         if (!$currentAction->isValidResponse($responseKey)) {
-            $validation->addError("Invalid response '%s' for action '%s'", $responseKey, $actionKey);
+            return Validation::error("Invalid response '%s' for action '%s'", $responseKey, $actionKey);
         }
 
-        if (!$currentAction->isAllowedBy($response->actor)) {
-            $validation->addError(
+        if (!$process->hasActor($response->actor)) {
+            return ValidationResult::error("Unknown %s", $response->actor->describe());
+        }
+
+        if ($process->getActorForAction($currentAction->key) === null) {
+            return Validation::error(
                 "%s isn't allowed to perform action '%s'",
-                $process->getActor($response->actor)->title,
+                $response->actor->describe(),
                 $actionKey
             );
         }
 
-        return $validation;
+        return ValidationResult::success();
     }
 
     /**
-     * @param Process $process
+     * @param Process  $process
      * @param Response $response
      * @return Response
      */
@@ -105,7 +104,7 @@ class ProcessStepper
         $response->action->responses = null;
         $response->action->actors = null;
 
-        $response->actor = $process->getActor($response->actor->key);
+        $response->actor = $process->getActorForAction($currentAction->key, $response->actor);
 
         return $response;
     }

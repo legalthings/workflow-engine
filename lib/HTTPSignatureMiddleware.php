@@ -24,11 +24,6 @@ class HTTPSignatureMiddleware
      */
     protected $baseRewrite;
 
-    /**
-     * @var Account
-     */
-    public $account;
-
 
     /**
      * Class constructor.
@@ -86,8 +81,8 @@ class HTTPSignatureMiddleware
 
         try {
             $httpSignature->useAccountFactory($this->accountFactory)->verify();
-            $this->account = $httpSignature->getAccount();
-            $nextRequest = $request->withAttribute('account', $this->account);
+            $account = $httpSignature->getAccount();
+            $nextRequest = $request->withAttribute('account', $account);
         } catch (HTTPSignatureException $e) {
             $response->getBody()->write($e->getMessage());
 

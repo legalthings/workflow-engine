@@ -1,6 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
 use Improved as i;
+use Improved\IteratorPipeline\Pipeline;
 use Jasny\DB\EntitySet;
 use Jasny\ValidationResult;
 use Ramsey\Uuid\Uuid;
@@ -85,8 +86,7 @@ class Process extends MongoDocument
      */
     public function __construct()
     {
-        // Empty dispatcher, acts as null object.
-        $this->setDispatcher(new EventDispatcher());
+        $this->setDispatcher(new EventDispatcher()); // Empty dispatcher, acts as null object.
 
         if (!isset($this->id)) {
             $this->id = Uuid::uuid4()->toString();
@@ -143,23 +143,87 @@ class Process extends MongoDocument
         return $this;
     }
 
+
     /**
-     * Get a specific actor
+     * Find any actors that matches the given one.
      *
-     * @param string $key
+     * @param string|Actor $match  Actor or actor key.
+     * @return Pipeline
+     */
+    protected function getMatchingActors($match): Pipeline
+    {
+        $find = $match instanceof Actor ? $match : (new Actor)->set('key', $match);
+
+        return Pipeline::with($this->actors)
+            ->filter(function(Actor $actor) use ($find) {
+                return $actor->matches($find);
+            });
+    }
+
+    /**
+     * Check if the process has the specific actor.
+     *
+     * @param string|Actor $match  Actor or actor key.
+     * @return bool
+     */
+    public function hasActor($match): bool
+    {
+        return $this->getMatchingActors($match)->count() > 0;
+    }
+
+    /**
+     * Get the specific actor or an actor that matches the condition.
+     *
+     * @param string|Actor $match  Actor or actor key.
      * @return Actor
      * @throws OutOfBoundsException
      */
-    public function getActor($actor): Actor
+    public function getActor($match): Actor
     {
-        $key = $actor instanceof Actor ? $actor->key : $actor;
+        return $this->getMatchingActors($match, true)->first();
+    }
 
-        if (!isset($this->actors[$key])) {
-            throw new OutOfBoundsException("process doesn't have a '$key' actor");
+    /**
+     * Get an actor that is allowed to perform the specified action.
+     * If there actor exists, but isn't allowed to execute the action, return null.
+     *
+     * @param string       $actionKey
+     * @param string|Actor $actor     Actor or actor key.
+     * @return Actor|null
+     * @throws OutOfBoundsException
+     */
+    public function getActorForAction(string $actionKey, $match): ?Actor
+    {
+        $required = true;
+        $action = $this->getAvailableAction($actionKey);
+
+        return $this->getMatchingActors($match, true)
+            ->apply(function() use (&$required) {
+                $required = false;
+            })
+            ->filter(function(Actor $actor) use ($action) {
+                return $action->isAllowedBy($actor);
+            })
+            ->first($required);
+    }
+
+    /**
+     * Get an action that is available in the current state.
+     *
+     * @param string $actionKey
+     * @return Action
+     * @throws OutOfBoundsException
+     */
+    public function getAvailableAction(string $actionKey): Action
+    {
+        if (isset($this->current->actions[$actionKey])) {
+            $msg = "Action '%s' is not available in state '%s' for process '%s";
+            throw new OutOfBoundsException(sprintf($msg, $actionKey, $this->current->key, $this->id));
         }
 
-        return $this->actors[$key];
+        return $this->current->actions[$actionKey];
     }
+
 
     /**
      * Checks if the process is finished
@@ -181,9 +245,8 @@ class Process extends MongoDocument
     {
         $validation = parent::validate();
 
-        $prefix = $validation->translate("actor '%s'");
         foreach ($this->actors as $actor) {
-            $validation->add($actor->validate(), sprintf($prefix, $actor->title));
+            $validation->add($actor->validate(), $actor->describe());
         }
 
         $validation = $this->dispatcher->trigger('validate', $this, $validation);
@@ -206,25 +269,6 @@ class Process extends MongoDocument
         }
         
         return $this->previous[$length - 1];
-    }
-    
-    /**
-     * Get the actions in the current state that can be executed by the given actor.
-     *
-     * @param Actor|string $actor  May be null if anyone may access the action
-     * @return EntitySet&iterable<Action>
-     */
-    public function getAvailableActions($actor = null): iterable
-    {
-        if ($actor === null) {
-            return $this->current->actions;
-        }
-
-        $actions = i\iterable_filter($this->current->action, function ($action) use ($actor) {
-            $action->isAllowedBy($actor);
-        });
-
-        return EntitySet::forClass(Action::class, $actions);
     }
 
     /**

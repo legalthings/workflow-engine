@@ -58,19 +58,4 @@ class ScenarioController extends BaseController
 
         $this->output($scenario);
     }
-
-    /**
-     * Update a scenario meta information.
-     *
-     * @param string $id  Scenario id
-     */
-    public function updateMetaAction($id)
-    {
-        $scenario = $this->scenarios->fetch($id);
-
-        $scenario->meta->setValues($this->getInput());
-        $this->scenarios->save($scenario, ['only' => 'meta']);
-
-        $this->output($scenario);
-    }
 }

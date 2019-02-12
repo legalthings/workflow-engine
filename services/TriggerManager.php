@@ -57,21 +57,17 @@ class TriggerManager
      *
      * @param Process     $process
      * @param string|null $actionKey  Key of the action that is triggered or null for default action.
-     * @param string      $actorKey   Actor that will perform the action.
+     * @param Actor       $actor      The actor that will perform the action.
      * @return Response|null
      * @throws UnexpectedValueException
      */
-    public function invoke(Process $process, ?string $actionKey, string $actorKey): ?Response
+    public function invoke(Process $process, ?string $actionKey, Actor $actor): ?Response
     {
-        $processAction = $this->getAllowedAction($process, $actionKey, $actorKey);
+        $action = $this->getAllowedAction($process, $actionKey, $actor);
 
-        if ($processAction === null) {
+        if ($action === null) {
             return null;
         }
-
-        $action = clone $processAction;
-        unset($action->actors);
-        $action->actor = $process->getActor($actorKey);
 
         $handlerResult = $this->trigger($process, $action);
         $result = $process->dispatch('trigger', $handlerResult);
@@ -80,8 +76,9 @@ class TriggerManager
             return null;
         };
 
-        $result->action = clone $processAction;
+        $result->action = $action;
         $result->actor = clone $action->actor;
+        unset($result->action->actor);
 
         return $result;
     }
@@ -91,35 +88,45 @@ class TriggerManager
      *
      * @param Process     $process
      * @param string|null $actionKey
-     * @param string      $actorKey
+     * @param Actor       $givenActor
      * @return Action|null
      * @throws UnexpectedValueException
      */
-    protected function getAllowedAction(Process $process, ?string $actionKey, string $actorKey): ?Action
+    protected function getAllowedAction(Process $process, ?string $actionKey, Actor $givenActor): ?Action
     {
         $current = $process->current;
 
         if ($actionKey !== null && !isset($current->actions[$actionKey])) {
             $msg = "Action '%s' is not allowed in state '%s' of process '%s'";
-            throw new UnexpectedValueException(sprintf($msg, $actionKey, $current->key, $process->id));
+            throw ValidationException::error($msg, $actionKey, $current->key, $process->id);
         }
 
         $action = $actionKey ? $current->actions[$actionKey] : $process->current->getDefaultAction();
 
-        if ($action !== null && $action->isAllowedBy($actorKey)) {
-            return $action;
+        if (!$process->hasActor($givenActor)) {
+            $msg = "Actor '%s' is not an actor in process '%s'";
+            throw ValidationException::error($msg, $actionKey, $current->key, $process->id);
         }
 
-        if ($actionKey !== null) {
-            throw new UnexpectedValueException(sprintf(
+        $actor = $process->getActorForAction($action->key, $givenActor);
+
+        if ($action !== null && $actor !== null) {
+            // ok :-)
+        } elseif ($actionKey === null) {
+            return; // Default action can't be performed, no need for an error.
+        } else {
+            throw ValidationException::error(
                 "%s is not allowed to perform action '%s' in process '%s'",
-                $process->getActor($actorKey)->title ?? "Actor '{$actorKey}'",
+                $process->getActor($givenActor)->describe(),
                 $actionKey,
                 $process->id
-            ));
+            );
         }
 
-        return null;
+        $triggerAction = clone $action;
+        $triggerAction->actor = $actor;
+
+        return $triggerAction;
     }
 
     /**
@@ -154,12 +161,10 @@ class TriggerManager
      */
     protected function trigger(Process $process, $payload = null)
     {
-        return i\iterable_reduce(
-            $this->handlers,
-            function ($payload, $handler) use ($process) {
-                return i\function_call($handler, $process, $payload);
-            },
-            $payload
-        );
+        $callback = function ($payload, $handler) use ($process) {
+            return i\function_call($handler, $process, $payload);
+        };
+
+        return i\iterable_reduce($this->handlers, $callback, $payload);
     }
 }

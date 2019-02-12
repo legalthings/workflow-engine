@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "082fa7ff15408c2597516c02ebdd423f",
+    "content-hash": "11cabf1f9555c8ef7c22c8f46d79d25a",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -1426,16 +1426,16 @@
         },
         {
             "name": "jasny/autowire",
-            "version": "v1.1.2",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jasny/autowire.git",
-                "reference": "d9a1e5c3bc1296bdc2e981ec9780175a2c93f51a"
+                "reference": "474ac49b62c195c0e7f5d6d3c70f4dc04b2862ac"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jasny/autowire/zipball/d9a1e5c3bc1296bdc2e981ec9780175a2c93f51a",
-                "reference": "d9a1e5c3bc1296bdc2e981ec9780175a2c93f51a",
+                "url": "https://api.github.com/repos/jasny/autowire/zipball/474ac49b62c195c0e7f5d6d3c70f4dc04b2862ac",
+                "reference": "474ac49b62c195c0e7f5d6d3c70f4dc04b2862ac",
                 "shasum": ""
             },
             "require": {
@@ -1464,7 +1464,7 @@
                 }
             ],
             "description": "Autowiring for PSR-11 containers",
-            "time": "2018-10-28T18:50:06+00:00"
+            "time": "2019-02-12T01:33:58+00:00"
         },
         {
             "name": "jasny/config",
@@ -2158,16 +2158,16 @@
         },
         {
             "name": "jasny/validation-result",
-            "version": "v1.1.0",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jasny/validation-result.git",
-                "reference": "3c911e444e5c705bae94d62f442f7681e715d1c3"
+                "reference": "dee12d1ddafdbbadb9d5e32b2f8c72b3e82884ce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jasny/validation-result/zipball/3c911e444e5c705bae94d62f442f7681e715d1c3",
-                "reference": "3c911e444e5c705bae94d62f442f7681e715d1c3",
+                "url": "https://api.github.com/repos/jasny/validation-result/zipball/dee12d1ddafdbbadb9d5e32b2f8c72b3e82884ce",
+                "reference": "dee12d1ddafdbbadb9d5e32b2f8c72b3e82884ce",
                 "shasum": ""
             },
             "require": {
@@ -2197,7 +2197,7 @@
             "keywords": [
                 "validation"
             ],
-            "time": "2019-01-28T15:13:24+00:00"
+            "time": "2019-02-11T15:21:41+00:00"
         },
         {
             "name": "kornrunner/keccak",
@@ -6958,7 +6958,7 @@
         {
             "alias": "1.0.99",
             "alias_normalized": "1.0.99.0",
-            "version": "1.1.0.0",
+            "version": "1.1.1.0",
             "package": "jasny/validation-result"
         },
         {

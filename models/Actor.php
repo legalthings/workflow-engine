@@ -49,9 +49,9 @@ class Actor extends BasicEntity implements Meta, Validation, Dynamic
 
     /**
      * Public keys of the identity
-     * @var stdClass
+     * @var array
      */
-    public $signkeys;
+    public $signkeys = [];
 
 
     /**
@@ -62,5 +62,35 @@ class Actor extends BasicEntity implements Meta, Validation, Dynamic
     public function validate(): ValidationResult
     {
         return ValidationResult::success();
+    }
+
+    /**
+     * Describe the actor based on the known properties.
+     *
+     * @return string
+     */
+    public function describe(): string
+    {
+        return
+            $this->title ??
+            ($this->key !== null ? "actor '{$this->key}'" : null) ??
+            ($this->id !== null ? "actor with id '{$this->id}'" : null) ??
+            ($this->signkeys !== [] ? "actor with signkey '" . join("', '", $this->signkeys) . "'" : null) ??
+            'an unknown actor';
+    }
+
+    /**
+     * See if the specified actor matches this actor.
+     *
+     * @param Actor $actor  Only some properties need to be set.
+     * @return bool
+     */
+    public function matches(Actor $actor): bool
+    {
+        return
+            ($actor->key !== null || $actor->id !== null || $actor->signkeys !== []) && // Match at least one of these
+            ($actor->key === null || $actor->key === $this->key) &&
+            ($actor->id === null || $actor->id === $this->id) &&
+            ($actor->signkeys === [] || array_contains($this->signkeys, $actor->signkeys, true));
     }
 }

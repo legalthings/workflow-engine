@@ -8,6 +8,18 @@ abstract class BaseController extends Jasny\Controller
     use Jasny\Controller\RouteAction;
 
     /**
+     * Set the services that the controller depends on.
+     *
+     * @param array $services
+     */
+    protected function setServices(array $services): void
+    {
+        foreach ($services as $prop => $service) {
+            $this->$prop = $service;
+        }
+    }
+
+    /**
      * Output data as json
      *
      * @param mixed $result

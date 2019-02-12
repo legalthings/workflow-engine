@@ -39,6 +39,20 @@ class BasicEntity extends stdClass implements Entity, Meta
     }
 
     /**
+     * Set one or more values.
+     *
+     * @param string|array $key
+     * @param mixed        $value
+     * @return $this
+     */
+    public function set($key, $value = null)
+    {
+        $values = func_get_args() === 1 ? $key : [$key => $value];
+
+        return $this->setValues($values);
+    }
+
+    /**
      * Convert loaded values to an entity.
      * Calls the construtor *after* setting the properties.
      *

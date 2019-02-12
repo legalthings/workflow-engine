@@ -1,4 +1,6 @@
-<?php
+<?php declare(strict_types=1);
+
+use Jasny\ValidationException;
 
 /**
  * Process controller.
@@ -33,11 +35,6 @@ class ProcessController extends BaseController
      */
     protected $triggerManager;
 
-    /**
-     * @var LTO\Account
-     */
-    protected $node;
-
 
     /**
      * Class constructor for DI.
@@ -47,15 +44,9 @@ class ProcessController extends BaseController
         ScenarioGateway $scenarios,
         ProcessInstantiator $instantiator,
         ProcessStepper $stepper,
-        TriggerManager $triggerManager,
-        LTO\Account $node
+        TriggerManager $triggerManager
     ) {
-        $this->processes = $processes;
-        $this->scenarios = $scenarios;
-        $this->instantiator = $instantiator;
-        $this->stepper = $stepper;
-        $this->triggerManager = $triggerManager;
-        $this->node = $node;
+        $this->setServices(func_get_args());
     }
 
 
@@ -63,7 +54,6 @@ class ProcessController extends BaseController
      * Get the scenario id from the posted data and fetch the scenario.
      *
      * @return Scenario
-     * @throws EntityNotFoundException
      */
     protected function getScenarioFromInput(): Scenario
     {
@@ -71,7 +61,7 @@ class ProcessController extends BaseController
         $scenarioId = $input['scenario']['id'] ?? $input['scenario'] ?? null;
 
         if (!is_string($scenarioId)) {
-            return $this->badRequest("Scenario not specified");
+            throw ValidationException::error('Scenario not specified');
         }
 
         return $this->scenarios->fetch($scenarioId);
@@ -81,18 +71,42 @@ class ProcessController extends BaseController
      * Get the process id from the posted data and fetch the process.
      *
      * @return Process
-     * @throws EntityNotFoundException
      */
-    protected function getProcessFromInput(): Scenario
+    protected function getProcessFromInput(): Process
     {
         $input = $this->getInput();
         $processId = $input['process']['id'] ?? $input['process'] ?? null;
 
         if (!is_string($processId)) {
-            return $this->badRequest("Process not specified");
+            throw ValidationException::error('Process not specified');
         }
 
         return $this->processes->fetch($processId);
+    }
+
+    /**
+     * Get actor id or public sign key from the HTTP request.
+     *
+     * @param Process $process
+     * @return Actor
+     */
+    protected function getActorFromRequest(Process $process): Actor
+    {
+        $info = $this->request->getAttribute('identity') ?? $this->request->getAttribute('account');
+
+        if ($info === null) {
+            throw new AuthException('Request not signed or identity not specified');
+        }
+
+        $actor = $info instanceof \LTO\Account
+            ? (new Action)->set('signkeys', $info->getPublicSignKey())
+            : (new Action)->set('id', $info);
+
+        if (!$process->hasActor($actor)) {
+            throw new AuthException("Process doesn't have " . $actor->describe());
+        }
+
+        return $actor;
     }
 
 
@@ -104,6 +118,10 @@ class ProcessController extends BaseController
         $scenario = $this->getScenarioFromInput();
 
         $process = $this->instantiator->instantiate($scenario);
+        $process->validate()->mustSucceed();
+
+        $this->getActorFromRequest($process); // For auth
+
         $process->save();
 
         $this->output($process);
@@ -117,6 +135,7 @@ class ProcessController extends BaseController
     public function getAction(string $id): void
     {
         $process = $this->processes->fetch($id);
+        $this->getActorFromRequest($process); // Only for auth
 
         $this->output($process);
     }
@@ -127,8 +146,12 @@ class ProcessController extends BaseController
     public function handleResponseAction(): void
     {
         $process = $this->getProcessFromInput();
-        $response = (new Response)->setValues($this->getInput());
 
+        $response = (new Response)
+            ->setValues($this->getInput())
+            ->set('actor', $this->getActorFromRequest());
+
+        // Stepper does validation (in context of the current state of the process).
         $this->stepper->step($process, $response);
 
         $this->output($process);
@@ -136,31 +159,14 @@ class ProcessController extends BaseController
 
     /**
      * Invoke the triggers for the default action in a state.
-     * @todo Process::whoAmI() doesn't exist and TriggerManager::invoke() only takes a single actor.
      *
      * @param string $id  Process id
      */
     public function invokeAction(string $id): void
     {
         $process = $this->processes->fetch($id);
-        $actors = $process->whoAmI($this->node);
+        $actor = $this->getActorFromRequest();
 
-        $this->triggerManager->invoke($process, null, $actors->key);
-    }
-
-
-    /**
-     * Update a scenario meta information.
-     *
-     * @param string $id  Scenario id
-     */
-    public function updateMetaAction($id)
-    {
-        $process = $this->processes->fetch($id);
-
-        $process->meta->setValues($this->getInput());
-        $this->processes->save($process, ['only' => 'meta']);
-
-        $this->output($process);
+        $this->triggerManager->invoke($process, null, $actor);
     }
 }

@@ -170,7 +170,7 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
 
     /**
      * Convert loaded values to an entity.
-     * Calls the construtor *after* setting the properties.
+     * Calls the constructor *after* setting the properties.
      *
      * @param array|stdClass $values
      * @return static

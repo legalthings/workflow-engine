@@ -75,12 +75,6 @@ class BasicEntity extends stdClass implements Entity, Meta
         $object = $this->_jsonSerialize();
         $object = object_rename_key($object, 'schema', '$schema');
 
-        foreach ($object as $key => $value) {
-            if (!isset($value)) {
-                unset($object->$key);
-            }
-        }
-
         return $object;
     }
 }

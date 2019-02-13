@@ -18,11 +18,6 @@ class AvailableResponse extends BasicEntity implements Meta, Validation
     /**
      * @var string
      */
-    public $schema = 'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#response';
-
-    /**
-     * @var string
-     */
     public $key;
     
     /**
@@ -87,5 +82,18 @@ class AvailableResponse extends BasicEntity implements Meta, Validation
         }
         
         return $validation;
+    }
+
+    /**
+     * Prepare json serialization
+     *
+     * @return stdClass
+     */
+    public function jsonSerialize(): stdClass
+    {
+        $object = parent::jsonSerialize();
+        unset($object->key);
+
+        return $object;
     }
 }

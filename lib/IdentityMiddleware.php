@@ -11,7 +11,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 class IdentityMiddleware
 {
     /**
-     * @var Account
+     * @var LTO\Account
      */
     protected $node;
 
@@ -27,7 +27,7 @@ class IdentityMiddleware
      * @param LTO\Account $node    The LTO account of our node.
      * @param bool        $noAuth  Trust an identity if request isn't signed.
      */
-    public function __construct(Account $node, bool $noAuth)
+    public function __construct(LTO\Account $node, bool $noAuth)
     {
         $this->node = $node;
         $this->noAuth = $noAuth;

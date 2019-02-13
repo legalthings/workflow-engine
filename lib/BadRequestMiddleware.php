@@ -21,12 +21,12 @@ class BadRequestMiddleware
     {
         try {
             return $next($request, $response);
-        } catch (EntityNotFoundException $exception) {
-            return $this->badRequest($response, 400, $exception->getMessage());
-        } catch (ValidationException $exception) {
-            return $this->badRequest($response, 400, $exception->getErrors());
         } catch (AuthException $exception) {
             return $this->badRequest($response, 403, $exception->getMessage());
+        } catch (EntityNotFoundException $exception) {
+            return $this->badRequest($response, 404, $exception->getMessage());
+        } catch (ValidationException $exception) {
+            return $this->badRequest($response, 400, $exception->getErrors());
         }
     }
 

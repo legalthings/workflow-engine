@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 use Jasny\Container\AutowireContainerInterface;
+use Jasny\EventDispatcher\EventDispatcher;
 
 return [
     "scenario_events" => static function() {

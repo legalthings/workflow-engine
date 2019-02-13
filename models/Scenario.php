@@ -290,15 +290,11 @@ class Scenario extends MongoDocument implements Dynamic
         $object = object_rename_key($object, 'schema', '$schema');
 
         // Remove implicit states
-        $object->states = (object)array_filter($object->states->jsonSerialize(), function ($key) {
-            return !str_starts_with($key, ':') || $key === ':initial';
-        }, ARRAY_FILTER_USE_KEY);
-
-        foreach ($object as $key => $value) {
-            if (!isset($value)) {
-                unset($object->$key);
-            }
-        }
+        $object->states = Pipeline::with($object->states->jsonSerialize())
+            ->filter(function(stdClass $state, string $key) {
+                return !str_starts_with($key, ':') || $key === ':initial';
+            })
+            ->toArray();
 
         return $object;
     }

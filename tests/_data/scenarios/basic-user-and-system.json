@@ -37,7 +37,7 @@
             }
         },
         "step3": {
-            "display": true,
+            "$schema": "https://specs.livecontracts.io/v1.0.0/action/schema.json#",
             "title": "Step3",
             "actor": "user",
             "responses": {

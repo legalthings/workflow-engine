@@ -27,7 +27,30 @@ abstract class BaseController extends Jasny\Controller
      */
     public function output($result, $format = 'json')
     {
+        if ($format === 'json') {
+            if ($this instanceof ScenarioController) {
+                return $this->outputPrettyJson($result, 'scenario');
+            }            
+        }
+
         return parent::output($result, $format);
+    }
+
+    /**
+     * Outout prettyfied json
+     *
+     * @param mixed $data
+     * @return 
+     */
+    protected function outputPrettyJson($data, string $decorator)
+    {
+        $allDecorators = [
+            'scenario' => new JsonView\PrettyScenarioDecorator()
+        ];
+
+        $view = (new JsonView($allDecorators))->withDecorator($decorator);
+
+        $view->output($this->getResponse(), $data);
     }
 
     /**

@@ -13,7 +13,7 @@
         "ext-iconv": "*",
         "ext-intl": "*",
         "ext-json": "*",
-        "ext-sodium": "2.*",
+        "ext-sodium": ">= 2.0",
         "ext-mongodb": "*",
         "ext-curl": "*",
         "ext-date": "*",

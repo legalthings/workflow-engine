@@ -111,7 +111,7 @@ class JsonView
     {
         $serialized = $this->serialize($data);
 
-        return $this->encode($data, $serialized);
+        return $this->encodeSerialized($data, $serialized);
     }
 
     /**
@@ -126,10 +126,14 @@ class JsonView
             $data = $data->jsonSerialize();
         }
 
+        $callback = Closure::fromCallable([$this, __FUNCTION__]);
+
         if (is_iterable($data)) {
-            $data = Pipeline::with($data)->map([$this, __FUNCTION__])->toArray();
+            $data = Pipeline::with($data)->map($callback)->toArray();
+        } elseif ($data instanceof stdClass) {
+            $data = (object)Pipeline::with(get_object_vars($data))->map($callback)->toArray();
         } elseif (is_object($data)) {
-            $data = (object)Pipeline::with(object_get_properties($data))->map([$this, __FUNCTION__])->toArray();
+            $data = (object)Pipeline::with(object_get_properties($data))->map($callback)->toArray();
         }
 
         return $data;

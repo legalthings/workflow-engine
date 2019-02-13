@@ -8,6 +8,7 @@ db.getCollection("scenarios").insert([
     {
         "_id": "2557288f-108e-4398-8d2d-7914ffd93150",
         "schema": "https://specs.livecontracts.io/v1.0.0/scenario/schema.json#",
+        "title": "Basic system and user",
         "actors": [
             {
                 "key": "user",

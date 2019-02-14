@@ -12,10 +12,13 @@ abstract class BaseController extends Jasny\Controller
      *
      * @param array $services
      */
-    protected function setServices(array $services): void
+    protected function setServices(BaseController $object, string $method, array $services): void
     {
-        foreach ($services as $prop => $service) {
-            $this->$prop = $service;
+        $names = get_method_args_names(get_class($object), $method);
+
+        for ($i = 0; $i < count($services); $i++) { 
+            $name = $names[$i];
+            $this->$name = $services[$i];
         }
     }
 

@@ -7,4 +7,7 @@ return [
     ClientInterface::class => static function() {
         return new Client(['timeout' => 20]);
     },
+    Client::class => static function() {
+        return new Client(['timeout' => 20]);
+    },
 ];

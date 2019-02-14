@@ -72,12 +72,13 @@ class AvailableResponse extends BasicEntity implements Meta, Validation
         $validation = new ValidationResult();
 
         if (isset($this->update)) {
-            $updateValidation = $this->update->validate();
+            $updateValidation = [];
+            foreach ($this->update as $updateInstruction) {
+                $updateValidation[] = $updateInstruction->validate();
+            }
             
-            if (is_array($updateValidation)) {
-                array_map([$validation, 'add'], $updateValidation, ['update']);
-            } else {
-                $validation->add($updateValidation, "update");
+            if (count($updateValidation) > 0) {
+                array_map([$validation, 'add'], $updateValidation, ['update']);                
             }
         }
         

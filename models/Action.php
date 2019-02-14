@@ -120,6 +120,8 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
         foreach ($this->responses as $key => $response) {
             $validation->add($response->validate(), sprintf($responsePrefix, $key));
         }
+
+        return $validation;
     }
 
     /**

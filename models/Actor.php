@@ -78,7 +78,7 @@ class Actor extends BasicEntity implements Meta, Dynamic
     public function matches(Actor $actor): bool
     {
         return
-            ($actor->key !== null || $actor->id !== null || $actor->signkeys !== []) && // Match at least one of these
+            ($actor->key !== null || $actor->signkeys !== []) && // Match at least one of these
             ($actor->key === null || $actor->key === $this->key) &&
             ($actor->identity === null || $actor->identity === $this->identity) &&
             ($actor->signkeys === [] || array_contains($this->signkeys, $actor->signkeys, true));

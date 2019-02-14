@@ -92,9 +92,6 @@ class ProcessController extends BaseController
      */
     protected function getActorFromRequest(Process $process): Actor
     {
-        // Temp, for basic api tests passing
-        return (new Actor())->setValues(['title' => 'System', 'key' => 'system']);
-
         $info = $this->request->getAttribute('identity') ?? $this->request->getAttribute('account');
 
         if ($info === null) {
@@ -102,8 +99,8 @@ class ProcessController extends BaseController
         }
 
         $actor = $info instanceof \LTO\Account
-            ? (new Action)->set('signkeys', [$info->getPublicSignKey()])
-            : (new Action)->set('identity', $info);
+            ? (new Actor())->set('signkeys', [$info->getPublicSignKey()])
+            : (new Actor())->set('identity', $info);
 
         if (!$process->hasActor($actor)) {
             throw new AuthException("Process doesn't have " . $actor->describe());

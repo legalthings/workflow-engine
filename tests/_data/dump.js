@@ -16,7 +16,10 @@ db.getCollection("scenarios").insert([
             },
             {
                 "key": "system",
-                "title": "System"
+                "title": "System",
+                "signkeys": [
+                    "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn"
+                ]
             }
         ],
         "actions": [
@@ -114,7 +117,10 @@ db.getCollection("processes").insert([
             },
             {
                 "key": "system",
-                "title": "System"
+                "title": "System",
+                "signkeys": [
+                    "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn"
+                ]
             }
         ],
         "current": {

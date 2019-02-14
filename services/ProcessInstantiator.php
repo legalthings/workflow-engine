@@ -78,6 +78,10 @@ class ProcessInstantiator
             $actor->title = $schema->title;
             $actor->description = $schema->description;
 
+            if (isset($schema->signkeys)) {
+                $actor->signkeys = $schema->signkeys;
+            }
+
             $actors[$key] = $actor;
         }
 

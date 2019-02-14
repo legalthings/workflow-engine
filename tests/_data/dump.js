@@ -102,4 +102,36 @@ db.getCollection("scenarios").insert([
 
 
 db.getCollection("processes").insert([
+    {
+        "_id": "4527288f-108e-fk69-8d2d-7914ffd93894",
+        "schema": "https://specs.livecontracts.io/v1.0.0/process/schema.json#",           
+        "title": "Basic system and user process",
+        "scenario": "2557288f-108e-4398-8d2d-7914ffd93150",
+        "actors": [
+            {
+                "key": "user",
+                "title": "User"
+            },
+            {
+                "key": "system",
+                "title": "System"
+            }
+        ],
+        "current": {
+            "key": ":initial",
+            "actions": ["step1"],
+            "transitions": [
+                {
+                    "action": "step1",
+                    "response": "ok",
+                    "transition": "step2"
+                },
+                {
+                    "action": "step1",
+                    "response": "error",
+                    "transition": ":failed"
+                }
+            ]
+        }        
+    }
 ]);

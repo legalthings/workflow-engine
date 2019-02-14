@@ -33,7 +33,9 @@ abstract class BaseController extends Jasny\Controller
         if ($format === 'json') {
             if ($this instanceof ScenarioController) {
                 return $this->outputPrettyJson($result, 'scenario');
-            }            
+            } elseif($this instanceof ProcessController) {
+                return $this->outputPrettyJson($result, 'process');
+            }
         }
 
         return parent::output($result, $format);
@@ -48,7 +50,8 @@ abstract class BaseController extends Jasny\Controller
     protected function outputPrettyJson($data, string $decorator)
     {
         $allDecorators = [
-            'scenario' => new JsonView\PrettyScenarioDecorator()
+            'scenario' => new JsonView\PrettyScenarioDecorator(),
+            'process' => new JsonView\PrettyProcessDecorator()
         ];
 
         $view = (new JsonView($allDecorators))->withDecorator($decorator);

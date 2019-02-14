@@ -1,0 +1,37 @@
+{
+    "id": "4527288f-108e-fk69-8d2d-7914ffd93894",
+    "$schema": "https://specs.livecontracts.io/v1.0.0/process/schema.json#",
+    "title": "Basic system and user process",
+    "scenario": "2557288f-108e-4398-8d2d-7914ffd93150",
+    "actors": {
+        "user": {
+            "key": "user",
+            "title": "User"
+        },
+        "system": {
+            "key": "system",
+            "title": "System"
+        }
+    },
+    "previous": [],
+    "current": {
+        "transitions": [
+            {
+                "action": "step1",
+                "response": "ok",
+                "transition": "step2"
+            },
+            {
+                "action": "step1",
+                "response": "error",
+                "transition": ":failed"
+            }
+        ],
+        "display": "always",
+        "action": "step1"
+    },
+    "next": null,
+    "assets": [],
+    "definitions": [],
+    "meta": {}
+}

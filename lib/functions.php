@@ -131,3 +131,16 @@ function get_method_args_names(string $class, string $method)
         return $item->getName();
     }, $params);
 }
+
+/**
+ * Keep only specified properties in stdClass object
+ * @param  stdClass $object
+ * @param  array    $with
+ * @return stdClass
+ */
+function std_object_only_with(stdClass $object, array $with)
+{
+    $object = array_only((array)$object, $with);
+
+    return (object)$object;
+}

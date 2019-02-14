@@ -34,8 +34,6 @@ class PrettyScenarioDecorator
      */
     public function __invoke(\Scenario $scenario, stdClass $data): stdClass
     {
-        unset($data->description);        
-
         foreach ($data->actions as $key => $action) {
             $data->actions[$key] = $this->decorateAction($action);            
         }
@@ -46,6 +44,8 @@ class PrettyScenarioDecorator
 
         $data->assets = (object)$data->assets;
         $data->definitions = (object)$data->definitions;
+
+        unset($data->description);        
 
         return $data;
     }
@@ -58,13 +58,10 @@ class PrettyScenarioDecorator
      */
     protected function decorateAction(stdClass $action): stdClass
     {
-        $with = ['title' => 1, 'responses' => 1, 'url' => 1, '$schema' => 1, 'actors' => 1, 'trigger_response' => 1, 'data' => 1];
-
-        foreach ($action as $key => $value) {
-            if (!isset($with[$key])) {
-                unset($action->$key);
-            }
-        }
+        $action = std_object_only_with(
+            $action, 
+            ['title', 'responses', 'url', '$schema', 'actors', 'trigger_response', 'data']
+        );
 
         if (count($action->actors) === 1) {
             $action->actor = $action->actors[0];
@@ -86,13 +83,7 @@ class PrettyScenarioDecorator
      */
     protected function decorateState(stdClass $state): stdClass
     {
-        $with = ['display' => 1, 'transitions' => 1, 'actions' => 1];
-
-        foreach ($state as $key => $value) {
-            if (!isset($with[$key])) {
-                unset($state->$key);
-            }
-        }
+        $state = std_object_only_with($state, ['display', 'transitions', 'actions']);
 
         if (count($state->actions) === 1) {
             $state->action = $state->actions[0];
@@ -100,7 +91,7 @@ class PrettyScenarioDecorator
         }
 
         foreach ($state->transitions as $key => $transition) {            
-            $this->transitions[$key] = $this->decorateTransition($transition);
+            $state->transitions[$key] = $this->decorateTransition($transition);
         }
 
         if (count($state->transitions) === 1) {
@@ -119,14 +110,6 @@ class PrettyScenarioDecorator
      */
     protected function decorateTransition(stdClass $transition): stdClass
     {
-        $with = ['action' => 1, 'response' => 1, 'transition' => 1];
-
-        foreach ($transition as $key => $value) {
-            if (!isset($with[$key])) {
-                unset($transition->$key);
-            }
-        }
-
-        return $transition;
+        return std_object_only_with($transition, ['action', 'response', 'transition']);
     }
 }

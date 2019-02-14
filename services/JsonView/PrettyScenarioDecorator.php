@@ -86,7 +86,7 @@ class PrettyScenarioDecorator
         $state = std_object_only_with($state, ['display', 'transitions', 'actions']);
 
         if (count($state->actions) === 1) {
-            $state->action = $state->actions[0];
+            $state->action = reset($state->actions);
             unset($state->actions);
         }
 

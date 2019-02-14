@@ -62,7 +62,7 @@ db.getCollection("scenarios").insert([
                     {
                         "action": "step1",
                         "response": "ok",
-                        "transition": "step2"
+                        "transition": "second"
                     },
                     {
                         "action": "step1",
@@ -78,7 +78,7 @@ db.getCollection("scenarios").insert([
                     {
                         "action": "step2",
                         "response": "ok",
-                        "transition": "step3"
+                        "transition": "third"
                     },
                     {
                         "action": "step2",
@@ -119,12 +119,24 @@ db.getCollection("processes").insert([
         ],
         "current": {
             "key": ":initial",
-            "actions": ["step1"],
+            "actions": [
+                {
+                    "schema": "https://specs.livecontracts.io/v1.0.0/action/http/schema.json#",
+                    "key": "step1",
+                    "title": "Step1",
+                    "actor": "system",
+                    "url": "https://www.example.com",
+                    "responses": {
+                        "ok": { },
+                        "error": { }
+                    }
+                }
+            ],
             "transitions": [
                 {
                     "action": "step1",
                     "response": "ok",
-                    "transition": "step2"
+                    "transition": "second"
                 },
                 {
                     "action": "step1",

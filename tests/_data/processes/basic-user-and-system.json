@@ -19,7 +19,7 @@
             {
                 "action": "step1",
                 "response": "ok",
-                "transition": "step2"
+                "transition": "second"
             },
             {
                 "action": "step1",

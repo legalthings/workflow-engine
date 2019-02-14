@@ -59,7 +59,7 @@ $scenario = [
                 [
                     "action" => "step1",
                     "response" => "ok",
-                    "transition" => "step2"
+                    "transition" => "second"
                 ],
                 [
                     "action" => "step1",
@@ -75,7 +75,7 @@ $scenario = [
                 [
                     "action" => "step2",
                     "response" => "ok",
-                    "transition" => "step3"
+                    "transition" => "third"
                 ],
                 [
                     "action" => "step2",

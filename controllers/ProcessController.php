@@ -49,67 +49,6 @@ class ProcessController extends BaseController
         $this->setServices($this, __FUNCTION__, func_get_args());
     }
 
-
-    /**
-     * Get the scenario id from the posted data and fetch the scenario.
-     *
-     * @return Scenario
-     */
-    protected function getScenarioFromInput(): Scenario
-    {
-        $input = $this->getInput();
-        $scenarioId = $input['scenario']['id'] ?? $input['scenario'] ?? null;
-
-        if (!is_string($scenarioId)) {
-            throw ValidationException::error('Scenario not specified');
-        }
-
-        return $this->scenarios->fetch($scenarioId);
-    }
-
-    /**
-     * Get the process id from the posted data and fetch the process.
-     *
-     * @return Process
-     */
-    protected function getProcessFromInput(): Process
-    {
-        $input = $this->getInput();
-        $processId = $input['process']['id'] ?? $input['process'] ?? null;
-
-        if (!is_string($processId)) {
-            throw ValidationException::error('Process not specified');
-        }
-
-        return $this->processes->fetch($processId);
-    }
-
-    /**
-     * Get actor id or public sign key from the HTTP request.
-     *
-     * @param Process $process
-     * @return Actor
-     */
-    protected function getActorFromRequest(Process $process): Actor
-    {
-        $info = $this->request->getAttribute('identity') ?? $this->request->getAttribute('account');
-
-        if ($info === null) {
-            throw new AuthException('Request not signed or identity not specified');
-        }
-
-        $actor = $info instanceof \LTO\Account
-            ? (new Actor())->set('signkeys', [$info->getPublicSignKey()])
-            : (new Actor())->set('identity', $info);
-
-        if (!$process->hasActor($actor)) {
-            throw new AuthException("Process doesn't have " . $actor->describe());
-        }
-
-        return $actor;
-    }
-
-
     /**
      * Start a new process
      */
@@ -169,5 +108,78 @@ class ProcessController extends BaseController
         $actor = $this->getActorFromRequest($process);
 
         $this->triggerManager->invoke($process, null, $actor);
+    }
+
+    /**
+     * Delete process
+     *
+     * @param string $id
+     */
+    public function deleteAction(string $id): void
+    {
+        $process = $this->processes->fetch($id);
+
+        $this->getActorFromRequest($process); // Auth
+
+        $this->processes->delete($process);
+    }
+
+    /**
+     * Get the scenario id from the posted data and fetch the scenario.
+     *
+     * @return Scenario
+     */
+    protected function getScenarioFromInput(): Scenario
+    {
+        $input = $this->getInput();
+        $scenarioId = $input['scenario']['id'] ?? $input['scenario'] ?? null;
+
+        if (!is_string($scenarioId)) {
+            throw ValidationException::error('Scenario not specified');
+        }
+
+        return $this->scenarios->fetch($scenarioId);
+    }
+
+    /**
+     * Get the process id from the posted data and fetch the process.
+     *
+     * @return Process
+     */
+    protected function getProcessFromInput(): Process
+    {
+        $input = $this->getInput();
+        $processId = $input['process']['id'] ?? $input['process'] ?? null;
+
+        if (!is_string($processId)) {
+            throw ValidationException::error('Process not specified');
+        }
+
+        return $this->processes->fetch($processId);
+    }
+
+    /**
+     * Get actor id or public sign key from the HTTP request.
+     *
+     * @param Process $process
+     * @return Actor
+     */
+    protected function getActorFromRequest(Process $process): Actor
+    {
+        $info = $this->request->getAttribute('identity') ?? $this->request->getAttribute('account');
+
+        if ($info === null) {
+            throw new AuthException('Request not signed or identity not specified');
+        }
+
+        $actor = $info instanceof \LTO\Account
+            ? (new Actor())->set('signkeys', [$info->getPublicSignKey()])
+            : (new Actor())->set('identity', $info);
+
+        if (!$process->hasActor($actor)) {
+            throw new AuthException("Process doesn't have " . $actor->describe());
+        }
+
+        return $actor;
     }
 }

@@ -9,7 +9,7 @@
 /scenarios/*/meta +POST:                   { controller: scenario, action: update-meta, id: $2 }
 
 /processes +POST:                          { controller: process, action: start }
-/processes +DELETE:                        { controller: process, action: delete, id: $2 }
+/processes/* +DELETE:                      { controller: process, action: delete, id: $2 }
 /processes/* +GET:                         { controller: process, action: get, id: $2 }
 /processes/*/invoke +POST:                 { controller: process, action: invoke, id: $2 }
 /processes/*/meta +POST:                   { controller: process, action: update-meta, id: $2 }

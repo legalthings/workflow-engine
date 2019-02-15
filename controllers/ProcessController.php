@@ -46,9 +46,83 @@ class ProcessController extends BaseController
         ProcessStepper $stepper,
         TriggerManager $triggerManager
     ) {
-        $this->setServices(func_get_args());
+        $this->setServices($this, __FUNCTION__, func_get_args());
     }
 
+    /**
+     * Start a new process
+     */
+    public function startAction(): void
+    {
+        $scenario = $this->getScenarioFromInput();
+
+        $process = $this->instantiator->instantiate($scenario);
+        $process->validate()->mustSucceed();
+        
+        $this->getActorFromRequest($process); // For auth
+
+        $process->save();
+
+        $this->output($process);
+    }
+
+    /**
+     * Get a process
+     *
+     * @param string $id  Process id
+     */
+    public function getAction(string $id): void
+    {
+        $process = $this->processes->fetch($id);
+
+        $this->getActorFromRequest($process); // Only for auth
+
+        $this->output($process);
+    }
+
+    /**
+     * Handle a new response.
+     */
+    public function handleResponseAction(): void
+    {
+        $process = $this->getProcessFromInput();
+
+        $response = (new Response)
+            ->setValues($this->getInput())
+            ->set('actor', $this->getActorFromRequest($process));
+
+        // Stepper does validation (in context of the current state of the process).
+        $this->stepper->step($process, $response);
+
+        $this->output($process);
+    }
+
+    /**
+     * Invoke the triggers for the default action in a state.
+     *
+     * @param string $id  Process id
+     */
+    public function invokeAction(string $id): void
+    {
+        $process = $this->processes->fetch($id);
+        $actor = $this->getActorFromRequest($process);
+
+        $this->triggerManager->invoke($process, null, $actor);
+    }
+
+    /**
+     * Delete process
+     *
+     * @param string $id
+     */
+    public function deleteAction(string $id): void
+    {
+        $process = $this->processes->fetch($id);
+
+        $this->getActorFromRequest($process); // Auth
+
+        $this->processes->delete($process);
+    }
 
     /**
      * Get the scenario id from the posted data and fetch the scenario.
@@ -99,74 +173,13 @@ class ProcessController extends BaseController
         }
 
         $actor = $info instanceof \LTO\Account
-            ? (new Action)->set('signkeys', [$info->getPublicSignKey()])
-            : (new Action)->set('identity', $info);
+            ? (new Actor())->set('signkeys', [$info->getPublicSignKey()])
+            : (new Actor())->set('identity', $info);
 
         if (!$process->hasActor($actor)) {
             throw new AuthException("Process doesn't have " . $actor->describe());
         }
 
         return $actor;
-    }
-
-
-    /**
-     * Start a new process
-     */
-    public function startAction(): void
-    {
-        $scenario = $this->getScenarioFromInput();
-
-        $process = $this->instantiator->instantiate($scenario);
-        $process->validate()->mustSucceed();
-
-        $this->getActorFromRequest($process); // For auth
-
-        $process->save();
-
-        $this->output($process);
-    }
-
-    /**
-     * Get a process
-     *
-     * @param string $id  Process id
-     */
-    public function getAction(string $id): void
-    {
-        $process = $this->processes->fetch($id);
-        $this->getActorFromRequest($process); // Only for auth
-
-        $this->output($process);
-    }
-
-    /**
-     * Handle a new response.
-     */
-    public function handleResponseAction(): void
-    {
-        $process = $this->getProcessFromInput();
-
-        $response = (new Response)
-            ->setValues($this->getInput())
-            ->set('actor', $this->getActorFromRequest());
-
-        // Stepper does validation (in context of the current state of the process).
-        $this->stepper->step($process, $response);
-
-        $this->output($process);
-    }
-
-    /**
-     * Invoke the triggers for the default action in a state.
-     *
-     * @param string $id  Process id
-     */
-    public function invokeAction(string $id): void
-    {
-        $process = $this->processes->fetch($id);
-        $actor = $this->getActorFromRequest();
-
-        $this->triggerManager->invoke($process, null, $actor);
     }
 }

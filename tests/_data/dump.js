@@ -8,6 +8,7 @@ db.getCollection("scenarios").insert([
     {
         "_id": "2557288f-108e-4398-8d2d-7914ffd93150",
         "schema": "https://specs.livecontracts.io/v1.0.0/scenario/schema.json#",
+        "title": "Basic system and user",
         "actors": [
             {
                 "key": "user",
@@ -15,7 +16,10 @@ db.getCollection("scenarios").insert([
             },
             {
                 "key": "system",
-                "title": "System"
+                "title": "System",
+                "signkeys": [
+                    "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn"
+                ]
             }
         ],
         "actions": [
@@ -61,7 +65,7 @@ db.getCollection("scenarios").insert([
                     {
                         "action": "step1",
                         "response": "ok",
-                        "transition": "step2"
+                        "transition": "second"
                     },
                     {
                         "action": "step1",
@@ -77,7 +81,7 @@ db.getCollection("scenarios").insert([
                     {
                         "action": "step2",
                         "response": "ok",
-                        "transition": "step3"
+                        "transition": "third"
                     },
                     {
                         "action": "step2",
@@ -101,4 +105,51 @@ db.getCollection("scenarios").insert([
 
 
 db.getCollection("processes").insert([
+    {
+        "_id": "4527288f-108e-fk69-8d2d-7914ffd93894",
+        "schema": "https://specs.livecontracts.io/v1.0.0/process/schema.json#",           
+        "title": "Basic system and user process",
+        "scenario": "2557288f-108e-4398-8d2d-7914ffd93150",
+        "actors": [
+            {
+                "key": "user",
+                "title": "User"
+            },
+            {
+                "key": "system",
+                "title": "System",
+                "signkeys": [
+                    "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn"
+                ]
+            }
+        ],
+        "current": {
+            "key": ":initial",
+            "actions": [
+                {
+                    "schema": "https://specs.livecontracts.io/v1.0.0/action/http/schema.json#",
+                    "key": "step1",
+                    "title": "Step1",
+                    "actor": "system",
+                    "url": "https://www.example.com",
+                    "responses": {
+                        "ok": { },
+                        "error": { }
+                    }
+                }
+            ],
+            "transitions": [
+                {
+                    "action": "step1",
+                    "response": "ok",
+                    "transition": "second"
+                },
+                {
+                    "action": "step1",
+                    "response": "error",
+                    "transition": ":failed"
+                }
+            ]
+        }        
+    }
 ]);

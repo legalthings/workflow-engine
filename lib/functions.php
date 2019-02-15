@@ -115,3 +115,32 @@ function object_copy_properties($from, $to)
 
     return $to;
 }
+
+/**
+ * Get parameters names of given method
+ * @param  string $class
+ * @param  string $method
+ * @return array
+ */
+function get_method_args_names(string $class, string $method)
+{
+    $reflection =  new ReflectionMethod($class, $method);
+    $params = $reflection->getParameters();
+
+    return array_map(function($item) {
+        return $item->getName();
+    }, $params);
+}
+
+/**
+ * Keep only specified properties in stdClass object
+ * @param  stdClass $object
+ * @param  array    $with
+ * @return stdClass
+ */
+function std_object_only_with(stdClass $object, array $with)
+{
+    $object = array_only((array)$object, $with);
+
+    return (object)$object;
+}

@@ -16,6 +16,32 @@ class Api extends \Codeception\Module
         'client' => 'a00000000000000000000010',
         'lawyer' => 'a00000000000000000000011'
     ];
+
+    /**
+     * @return \Codeception\Module
+     */
+    public function getJasnyModule()
+    {
+        return $this->getModule('\Jasny\Codeception\Module');
+    }
+    
+    /**
+     * Adds Signature authentication via ED25519 secret key.
+     *
+     * @param string $secretkey
+     * @part json
+     * @part xml
+     */
+    public function amSignatureAuthenticated($secretkey)
+    {
+        $module = $this->getJasnyModule();
+        
+        $accountFactory = $module->container->get(\LTO\AccountFactory::class);
+        $account = $accountFactory->create($secretkey, 'base64');
+        
+        $request = $module->client->getBaseRequest()->withAttribute('account', $account);
+        $module->client->setBaseRequest($request);
+    }
     
     /**
      * Act a role

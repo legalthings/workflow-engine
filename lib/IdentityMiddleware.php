@@ -44,7 +44,7 @@ class IdentityMiddleware
     public function __invoke(ServerRequest $request, Response $response, callable $next): Response
     {
         /** @var Account|null $account */
-        $account = i\type_check($request->getAttribute('account'), [Account::class, 'null']);
+        $account = i\type_check($request->getAttribute('account'), [LTO\Account::class, 'null']);
 
         if ($this->isOurAccount($account) && $request->hasHeader('X-Identity')) {
             $identity = $request->getHeaderLine('X-Identity');
@@ -60,7 +60,7 @@ class IdentityMiddleware
      * @param Account|null $account
      * @return bool
      */
-    protected function isOurAccount(?Account $account): bool
+    protected function isOurAccount(?LTO\Account $account): bool
     {
         return $this->noAuth || ($account !== null && $account->getAddress() === $this->node->getAddress());
     }

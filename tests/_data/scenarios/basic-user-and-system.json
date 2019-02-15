@@ -37,7 +37,7 @@
             }
         },
         "step3": {
-            "display": true,
+            "$schema": "https://specs.livecontracts.io/v1.0.0/action/schema.json#",
             "title": "Step3",
             "actor": "user",
             "responses": {
@@ -54,7 +54,7 @@
                 {
                     "action": "step1",
                     "response": "ok",
-                    "transition": "step2"
+                    "transition": "second"
                 },
                 {
                     "action": "step1",
@@ -70,7 +70,7 @@
                 {
                     "action": "step2",
                     "response": "ok",
-                    "transition": "step3"
+                    "transition": "third"
                 },
                 {
                     "action": "step2",

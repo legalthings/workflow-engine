@@ -12,10 +12,13 @@ abstract class BaseController extends Jasny\Controller
      *
      * @param array $services
      */
-    protected function setServices(array $services): void
+    protected function setServices(BaseController $object, string $method, array $services): void
     {
-        foreach ($services as $prop => $service) {
-            $this->$prop = $service;
+        $names = get_method_args_names(get_class($object), $method);
+
+        for ($i = 0; $i < count($services); $i++) { 
+            $name = $names[$i];
+            $this->$name = $services[$i];
         }
     }
 
@@ -27,7 +30,33 @@ abstract class BaseController extends Jasny\Controller
      */
     public function output($result, $format = 'json')
     {
+        if ($format === 'json') {
+            if ($this instanceof ScenarioController) {
+                return $this->outputPrettyJson($result, 'scenario');
+            } elseif($this instanceof ProcessController) {
+                return $this->outputPrettyJson($result, 'process');
+            }
+        }
+
         return parent::output($result, $format);
+    }
+
+    /**
+     * Outout prettyfied json
+     *
+     * @param mixed $data
+     * @return 
+     */
+    protected function outputPrettyJson($data, string $decorator)
+    {
+        $allDecorators = [
+            'scenario' => new JsonView\PrettyScenarioDecorator(),
+            'process' => new JsonView\PrettyProcessDecorator()
+        ];
+
+        $view = (new JsonView($allDecorators))->withDecorator($decorator);
+
+        $view->output($this->getResponse(), $data);
     }
 
     /**

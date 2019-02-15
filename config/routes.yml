@@ -3,7 +3,6 @@
 # Api
 /:                                         { controller: default, action: info }
 
-/scenarios +GET:                           { controller: scenario, action: list }
 /scenarios +POST:                          { controller: scenario, action: add }
 /scenarios/* +GET:                         { controller: scenario, action: get, id: $2 }
 /scenarios/*/meta +POST:                   { controller: scenario, action: update-meta, id: $2 }

@@ -22,19 +22,6 @@ class ScenarioController extends BaseController
     }
 
     /**
-     * List all scenarios
-     */
-    public function listAction()
-    {
-        $filter = array_without($this->getQueryParams(), ['limit', 'offset']);
-        $limit = $this->getQueryParams(['limit', 'offset']);
-
-        $list = $this->scenarios->fetchList($filter, null, $limit);
-
-        $this->output($list);
-    }
-
-    /**
      * Add a scenario
      */
     public function addAction()

@@ -2,6 +2,8 @@
 namespace Helper;
 
 use Faker;
+use LTO\HTTPSignature;
+use Jasny\HttpMessage\ServerRequest;
 
 // here you can define custom actions
 // all public methods declared in helper class will be available in $I
@@ -41,6 +43,36 @@ class Api extends \Codeception\Module
         
         $request = $module->client->getBaseRequest()->withAttribute('account', $account);
         $module->client->setBaseRequest($request);
+    }
+
+    /**
+     * Get signed request
+     *
+     * @param string $method
+     * @param string $path 
+     * @param array $headers 
+     * @return Jasny\HttpMessage\ServerRequest
+     */
+    public function getSignedRequest(string $method, string $path, array $headers): ServerRequest
+    {
+        $request = new ServerRequest();
+        $uri = $request->getUri()->withPath($path);
+
+        $request = $request
+            ->withUri($uri)
+            ->withMethod($method);
+
+        $headersNames = ['(request-target)'];
+        foreach ($headers as $name => $value) {
+            $headersNames[] = strtolower($name);
+            $request = $request->withHeader($name, $value);
+        }
+
+        $module = $this->getJasnyModule();        
+        $node = $module->container->get(\LTO\Account::class);
+        $httpSignature = new HTTPSignature($request, $headersNames);
+
+        return $httpSignature->signWith($node);
     }
     
     /**

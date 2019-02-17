@@ -24,7 +24,14 @@ class ProcessInstantiatorTest extends \Codeception\Test\Unit
                 'email' => ['type' => 'string', 'format' => 'email'],
             ],
         ]);
-        $scenario->actors['client'] = new JsonSchema(['title' => 'Client', 'type' => 'object']);
+        $scenario->actors['client'] = new JsonSchema([
+            'title' => 'Client', 
+            'type' => 'object',
+            'signkeys' => [
+                '57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn'
+            ],
+            'identity' => '6uk7288s-afe4-7398-8dbh-7914ffd930pl'
+        ]);
 
         $scenario->states[':initial'] = new State();
         $scenario->states['step1'] = new State();
@@ -121,6 +128,8 @@ class ProcessInstantiatorTest extends \Codeception\Test\Unit
         $this->assertArrayHasKey('client', $actors->getArrayCopy());
         $this->assertInstanceOf(Actor::class, $actors['client']);
         $this->assertAttributeEquals('Client', 'title', $actors['client']);
+        $this->assertAttributeEquals(['57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn'], 'signkeys', $actors['client']);
+        $this->assertAttributeEquals('6uk7288s-afe4-7398-8dbh-7914ffd930pl', 'identity', $actors['client']);
     }
 
     /**
@@ -146,15 +155,5 @@ class ProcessInstantiatorTest extends \Codeception\Test\Unit
         $this->assertInstanceOf(Asset::class, $assets['attachments']);
         $this->assertAttributeEquals('Attachments', 'title', $assets['attachments']);
         $this->assertAttributeSame([], 'files', $assets['attachments']);
-    }
-
-    /**
-     * @param Asset $info
-     */
-    protected function assertInfo($info): void
-    {
-        $this->assertInstanceOf(Asset::class, $info);
-        $this->assertAttributeSame(null, 'amount', $info);
-        $this->assertAttributeEquals('standard', 'type', $info);
     }
 }

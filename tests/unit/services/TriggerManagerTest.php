@@ -90,7 +90,6 @@ class TriggerManagerTest extends \Codeception\Test\Unit
         return $process;
     }
 
-
     public function provider()
     {
         return [
@@ -142,6 +141,38 @@ class TriggerManagerTest extends \Codeception\Test\Unit
             $this->assertAttributeEquals($process->actors['client'], 'actor', $response);
             $this->assertAttributeNotSame($process->actors['client'], 'actor', $response);
         }
+    }
+
+    /**
+     * Provide data for testing 'invoke' method, in case when actor is not found
+     *
+     * @return array
+     */
+    public function actorNotFoundProvider()
+    {
+        return [
+            ['non_exist_actor'],
+            [(new Actor())->set('key', 'non_exist_actor')]
+        ];
+    }
+
+    /**
+     * Test 'invoke' method, in case when actor is not found
+     *
+     * @dataProvider actorNotFoundProvider
+     * @expectedException Jasny\ValidationException
+     * @expectedExceptionMessage Unknown actor 'non_exist_actor'
+     */
+    public function testActorNotFound($actor)
+    {
+        $manager = new TriggerManager();
+        $process = $this->createProcess();
+
+        $handler = $this->getMockBuilder(\stdClass::class)->setMethods(['__invoke'])->getMock();
+        $handler->expects($this->never())->method('__invoke');
+        $manager = $manager->with(null, $handler);
+
+        $manager->invoke($process, 'qux', $actor);
     }
 
     /**

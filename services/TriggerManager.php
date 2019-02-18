@@ -64,7 +64,7 @@ class TriggerManager
      */
     public function invoke(Process $process, ?string $actionKey, $actor): ?Response
     {
-        $actor = is_string($actor) ? (new Actor)->set('key', $actor) : $actor;
+        $actor = is_string($actor) ? (new Actor())->set('key', $actor) : $actor;
 
         $action = $this->getAllowedAction($process, $actionKey, $actor);
 

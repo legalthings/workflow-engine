@@ -21,7 +21,7 @@ class ProcessUpdater
     protected $patcher;
 
     /**
-     * Get next states for a process. You can use a stub function is your implementation doesn't need to determine the
+     * Get next states for a process. You can use a stub function if your implementation doesn't need to determine the
      * (golden) flow after each state change. Simulation can be heavy on performance.
      *
      * @var ProcessSimulator

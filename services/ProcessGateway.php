@@ -41,7 +41,7 @@ class ProcessGateway implements Gateway
     }
 
     /**
-     * Create an process.
+     * Create process.
      *
      * @return Process
      */
@@ -55,7 +55,7 @@ class ProcessGateway implements Gateway
     }
 
     /**
-     * Fetch an process.
+     * Fetch process.
      *
      * @param string|array $id  ID or filter
      * @param array        $opts
@@ -76,7 +76,7 @@ class ProcessGateway implements Gateway
     }
 
     /**
-     * Check if an process exists.
+     * Check if process exists.
      *
      * @param string|array $id  ID or filter
      * @param array        $opts

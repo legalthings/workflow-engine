@@ -5,7 +5,7 @@ use Jasny\DB\EntitySet;
 use Carbon\CarbonImmutable;
 
 /**
- * Instantiate an state from the state definition in the scenario.
+ * Instantiate a state from the state definition in the scenario.
  * @immutable
  */
 class StateInstantiator

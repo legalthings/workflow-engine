@@ -52,12 +52,6 @@ class Identity extends MongoDocument implements Identifiable
     public $encryptkey;
     
     /**
-     * Privileges
-     * @var EntitySet&iterable<Privilege>
-     */
-    public $privileges;
-    
-    /**
      * Get id property
      *
      * @return string

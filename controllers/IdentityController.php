@@ -48,7 +48,7 @@ class IdentityController extends BaseController
      *
      * @param string $id  Identity id
      */
-    public function getAction(string $id): void
+    public function updateAction(string $id): void
     {
         $identity = $this->identities->fetch($id);
 

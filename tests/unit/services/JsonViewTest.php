@@ -81,42 +81,7 @@ class JsonViewTest extends \Codeception\Test\Unit
      */
     public function outputProvider()
     {
-        $iterator = new class() implements IteratorAggregate {
-            public function getIterator()
-            {
-                foreach (['key1' => 'value1', 'key2' => 'value2'] as $key => $value) {
-                    yield $key => $value;
-                }
-            }
-        };
-
-        $object = new class() {
-            public $test = 'a';
-            public $test2 = 'b';
-            protected $test3 = 'c';
-            private $test4 = 'd';
-        };
-
-        $serializable = new class($iterator, $object) implements JsonSerializable {
-            public function __construct($iterator, $object) {
-                $this->iterator = $iterator;
-                $this->object = $object;
-            }
-
-            public function jsonSerialize()
-            {
-                return [
-                    'zoo' => '&baz "bar"',
-                    'iterator' => $this->iterator,
-                    'nested' => (object)['object' => $this->object]
-                ];
-            }
-
-            public function getLastModified()
-            {
-                return '12345';
-            }
-        };
+        list($iterator, $object, $serializable) = $this->getData();        
 
         return [
             [
@@ -226,6 +191,53 @@ class JsonViewTest extends \Codeception\Test\Unit
         $result = $view->encode($data);
 
         $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Get data that needs to be processed
+     *
+     * @return array
+     */
+    protected function getData()
+    {
+        $iterator = new class() implements IteratorAggregate {
+            public function getIterator()
+            {
+                foreach (['key1' => 'value1', 'key2' => 'value2'] as $key => $value) {
+                    yield $key => $value;
+                }
+            }
+        };
+
+        $object = new class() {
+            public $test = 'a';
+            public $test2 = 'b';
+            protected $test3 = 'c';
+            private $test4 = 'd';
+        };
+
+        $serializable = new class($iterator, $object) implements JsonSerializable {
+            public function __construct($iterator, $object) {
+                $this->iterator = $iterator;
+                $this->object = $object;
+            }
+
+            public function jsonSerialize()
+            {
+                return [
+                    'zoo' => '&baz "bar"',
+                    'iterator' => $this->iterator,
+                    'nested' => (object)['object' => $this->object]
+                ];
+            }
+
+            public function getLastModified()
+            {
+                return '12345';
+            }
+        };
+
+        return [$iterator, $object, $serializable];
     }
 
     /**

@@ -86,7 +86,7 @@ class JsonView
     {
         $serialized = $this->serialize($data);
 
-        $etag = $this->calculateEtag(json_encode($serialized), 'W/');
+        $etag = $this->calculateEtag($serialized, 'W/');
         $json = $this->encodeSerialized($data, $serialized);
 
         $response = $response
@@ -131,9 +131,9 @@ class JsonView
         if (is_iterable($data)) {
             $data = Pipeline::with($data)->map($callback)->toArray();
         } elseif ($data instanceof stdClass) {
-            $data = (object)Pipeline::with(get_object_vars($data))->map($callback)->toArray();
+            $data = Pipeline::with(get_object_vars($data))->map($callback)->toArray();
         } elseif (is_object($data)) {
-            $data = (object)Pipeline::with(object_get_properties($data))->map($callback)->toArray();
+            $data = Pipeline::with(object_get_properties($data))->map($callback)->toArray();
         }
 
         return $data;
@@ -146,7 +146,7 @@ class JsonView
      * @param mixed $serialized
      * @return string
      */
-    public function encodeSerialized($subject, $serialized): string
+    protected function encodeSerialized($subject, $serialized): string
     {
         $options = 0;
 
@@ -164,12 +164,15 @@ class JsonView
     /**
      * Calculate the HTTP ETag for the JSON.
      *
-     * @param string $json
+     * @codeCoverageIgnore
+     * @param mixed $serialized
      * @param string $prefix  Prefix, mostly `W/` for weak.
      * @return string
      */
-    protected function calculateEtag(string $json, string $prefix = ''): string
+    protected function calculateEtag($serialized, string $prefix = ''): string
     {
+        $json = json_encode($serialized);
+
         return $prefix . base58_encode(hash('sha256', $json, true));
     }
 }

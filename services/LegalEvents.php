@@ -32,7 +32,9 @@ class LegalEvents
      */
     public function __construct(HttpClient $client, string $url)
     {
-        if (!in_array(parse_url($url, PHP_URL_SCHEME), ['http', 'https'], true)) {
+        $scheme = parse_url($url, PHP_URL_SCHEME);
+
+        if (!in_array($scheme, ['http', 'https'], true)) {
             throw new ConfigException("Invalid LegalEvent url '$url'");
         }
 
@@ -49,7 +51,7 @@ class LegalEvents
     public function createRequest(EventChain $chain): Request
     {        
         $request = new Request('POST', 'event-chains');
-        $request->withHeader('Content-Type', 'application/json');
+        $request = $request->withHeader('Content-Type', 'application/json');
 
         $body = stream_for(json_encode($chain));
         $request = $request->withBody($body);
@@ -62,12 +64,12 @@ class LegalEvents
      * 
      * @param Request $request
      */
-    public function send($request): void
+    public function send(Request $request): void
     {
         try {
             $this->client->send($request, ['base_uri' => $this->baseUri]);
         } catch (ClientException $exception) {
-            throw new Exception("Failed to send message to legalevents service", $exception);
+            throw new Exception("Failed to send message to legalevents service", $exception->getCode(), $exception);
         }
     }
 }

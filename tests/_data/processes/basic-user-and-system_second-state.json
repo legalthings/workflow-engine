@@ -4,28 +4,33 @@
     "scenario": "2557288f-108e-4398-8d2d-7914ffd93150",
     "actors": {
         "user": {
+            "$schema" : "http://json-schema.org/draft-07/schema#",
             "key": "user",
             "title": "User"
         },
         "system": {
+            "$schema" : "http://json-schema.org/draft-07/schema#",
             "key": "system",
             "title": "System"
         }
     },
     "previous": [
         {
-            "title": null,
+            "title": "Step1",
             "action": "step1",
             "key": "ok",
+            "display" : "always",
             "actor": {
                 "key": "system",
                 "title": "System"
             },
-            "data": null,
             "$schema": "https://specs.livecontracts.io/v1.0.0/response/schema.json#"
         }
     ],
     "current": {
+        "key": "second",
+        "display": "always",
+        "action": "step2",
         "transitions": [
             {
                 "action": "step2",
@@ -37,9 +42,7 @@
                 "response": "error",
                 "transition": ":failed"
             }
-        ],
-        "display": "always",
-        "action": "step2"
+        ]
     },
     "next": [
         {
@@ -53,8 +56,8 @@
             "actors": []
         }
     ],
-    "assets": [],
-    "definitions": [],
+    "assets": {},
+    "definitions": {},
     "meta": {},
     "$schema": "https://specs.livecontracts.io/v1.0.0/process/schema.json#"
 }

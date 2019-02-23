@@ -46,7 +46,7 @@ class ProcessController extends BaseController
         ProcessStepper $stepper,
         TriggerManager $triggerManager
     ) {
-        $this->setServices($this, __FUNCTION__, func_get_args());
+        $this->setServices(func_get_args());
     }
 
     /**

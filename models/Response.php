@@ -67,11 +67,11 @@ class Response extends BasicEntity implements Meta
     public function cast()
     {
         if (is_string($this->action)) {
-            $this->action = (new Action)->setValues(['key' => $this->action]);
+            $this->action = (new Action())->setValues(['key' => $this->action]);
         }
 
         if (is_string($this->actor)) {
-            $this->actor = (new Actor)->setValues(['key' => $this->actor]);
+            $this->actor = (new Actor())->setValues(['key' => $this->actor]);
         }
 
         return parent::cast();

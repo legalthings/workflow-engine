@@ -28,7 +28,9 @@ db.getCollection("scenarios").insert([
                 "schema": "https://specs.livecontracts.io/v1.0.0/action/http/schema.json#",
                 "key": "step1",
                 "title": "Step1",
-                "actor": "system",
+                "description": "Step1",
+                "label": "Launch step 1",
+                "actors": ["system"],
                 "url": "https://www.example.com",
                 "responses": {
                     "ok": { },
@@ -39,9 +41,11 @@ db.getCollection("scenarios").insert([
                 "schema": "https://specs.livecontracts.io/v1.0.0/action/nop/schema.json#",
                 "key": "step2",
                 "title": "Step2",
+                "description": "Step2",
+                "label": "Launch step 2",
                 "trigger_response": "ok",
                 "data": "second response",
-                "actor": "system",
+                "actors": ["system", "user"],
                 "responses": {
                     "ok": { },
                     "error": { }
@@ -51,7 +55,9 @@ db.getCollection("scenarios").insert([
                 "schema": "https://specs.livecontracts.io/v1.0.0/action/schema.json#",
                 "key": "step3",
                 "title": "Step3",
-                "actor": "user",
+                "description": "Step3",
+                "label": "Launch step 3",
+                "actors": ["user"],
                 "responses": {
                     "ok": { },
                     "cancel": { }
@@ -62,6 +68,10 @@ db.getCollection("scenarios").insert([
             {
                 "key": ":initial",
                 "actions": ["step1"],
+                "title": "Initial state",
+                "description": "Initial state",
+                "instructions": [],
+                "timeout": "P1D",
                 "transitions": [
                     {
                         "action": "step1",
@@ -78,6 +88,10 @@ db.getCollection("scenarios").insert([
             {
                 "key": "second",
                 "actions": ["step2"],
+                "title": "Second state",
+                "description": "Second state",
+                "instructions": [],
+                "timeout": "P1D",
                 "transitions": [
                     {
                         "action": "step2",
@@ -94,6 +108,10 @@ db.getCollection("scenarios").insert([
             {
                 "key": "third",
                 "actions": ["step3"],
+                "title": "Third state",
+                "description": "Third state",
+                "instructions": [],
+                "timeout": "P1D",
                 "transitions": [
                     {
                         "transition": ":success"

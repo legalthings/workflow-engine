@@ -124,7 +124,7 @@ function object_copy_properties($from, $to)
  */
 function get_method_args_names(string $class, string $method)
 {
-    $reflection =  new ReflectionMethod($class, $method);
+    $reflection = new ReflectionMethod($class, $method);
     $params = $reflection->getParameters();
 
     return array_map(function($item) {

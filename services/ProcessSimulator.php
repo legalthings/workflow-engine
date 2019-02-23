@@ -12,7 +12,7 @@ use LegalThings\DataEnricher;
  * Ends at a final state, a state where none of the transitions are available or when looping back on an state that is
  * already seen.
  *
- * All actions and state transfers will evaluated using the current process state. This can affect the outcome of
+ * All actions and state transfers will be evaluated using the current process state. This can affect the outcome of
  * data instructions.
  */
 class ProcessSimulator

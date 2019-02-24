@@ -143,7 +143,7 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
      */
     public function isAllowedBy(Actor $actor): bool
     {
-        if ($actor->key === null) {
+        if (!isset($actor->key)) {
             throw new UnexpectedValueException('Actor key not set');
         }
 
@@ -164,10 +164,20 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
         }
 
         if (!isset($this->responses[$key])) {
-            throw new OutOfBoundsException("$this doesn't have a '$key' response");
+            throw new OutOfBoundsException("Action '$this' doesn't have a '$key' response");
         }
 
         return $this->responses[$key];
+    }
+
+    /**
+     * Cast to string
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->key ?? '[action object]';
     }
 
     /**
@@ -177,7 +187,7 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
      * @param array|stdClass $values
      * @return static
      */
-    public static function fromData($values)
+    public static function fromData($values): self
     {
         $values = arrayify($values);
         $values = array_rename_key($values, 'actor', 'actors');

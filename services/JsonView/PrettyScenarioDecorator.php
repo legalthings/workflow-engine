@@ -35,15 +35,15 @@ class PrettyScenarioDecorator
     public function __invoke(\Scenario $scenario, stdClass $data): stdClass
     {
         foreach ($data->actors as $key => $actor) {
-            $data->actors->$key = $this->decorateActor($actor);            
+            $data->actors[$key] = $this->decorateActor($actor);            
         }
 
         foreach ($data->actions as $key => $action) {
-            $data->actions->$key = $this->decorateAction($action);            
+            $data->actions[$key] = $this->decorateAction($action);            
         }
 
         foreach ($data->states as $key => $state) {
-            $data->states->$key = $this->decorateState($state);            
+            $data->states[$key] = $this->decorateState($state);            
         }
 
         $data->assets = (object)$data->assets;
@@ -62,7 +62,7 @@ class PrettyScenarioDecorator
      */
     protected function decorateActor(stdClass $actor): stdClass
     {
-        return std_object_only_with($actor, ['$schema', 'key', 'title']);
+        return std_object_only_with($actor, ['$schema', 'title']);
     }
 
     /**
@@ -84,7 +84,7 @@ class PrettyScenarioDecorator
         }
 
         foreach ($action->responses as $key => $response) {
-            $action->responses->$key = (object)[];
+            $action->responses[$key] = (object)[];
         }
 
         return $action;

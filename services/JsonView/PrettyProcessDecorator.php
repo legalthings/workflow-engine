@@ -28,7 +28,7 @@ class PrettyProcessDecorator
     public function __invoke(\Process $process, stdClass $data)
     {
         foreach ($data->actors as $key => $actor) {
-            $data->actors->$key = $this->decorateActor($actor);            
+            $data->actors[$key] = $this->decorateActor($actor);            
         }
 
         foreach ($data->previous as $key => $response) {
@@ -71,6 +71,9 @@ class PrettyProcessDecorator
     protected function decorateResponse(stdClass $response): stdClass
     {
         $response = std_object_only_with($response, ['title', 'action', '$schema', 'actor', 'key', 'data', 'display']);
+
+        unset($response->actor->{'$schema'});
+
         $response->actor = $this->decorateActor($response->actor);
         $response->action = $response->action->key;
 

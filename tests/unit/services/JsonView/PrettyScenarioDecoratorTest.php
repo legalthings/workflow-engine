@@ -44,8 +44,17 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
     protected function getExpectedScenario($name): stdClass
     {
         $expectedJson = file_get_contents(__DIR__ . "/../../../_data/scenarios/$name.json");
+        $expected = json_decode($expectedJson);
 
-        return json_decode($expectedJson);
+        $expected->actors = (array)$expected->actors;
+        $expected->actions = (array)$expected->actions;
+        $expected->states = (array)$expected->states;
+
+        foreach ($expected->actions as $key => $action) {
+            $expected->actions[$key]->responses = (array)$action->responses;
+        }
+
+        return $expected;
     }
 
     /**
@@ -65,7 +74,7 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
             'meta' => (object)[]
         ];
 
-        $scenario->actors = (object)[
+        $scenario->actors = [
             'user' => (object)[
                 '$schema' => 'http://json-schema.org/draft-07/schema#',
                 'key' => 'user',
@@ -95,7 +104,7 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
      */
     protected function getActionsData()
     {
-        return (object)[
+        return [
             'step1' => (object)[
                 '$schema' => 'https://specs.livecontracts.io/v1.0.0/action/http/schema.json#',
                 'key' => 'step1',
@@ -104,7 +113,7 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
                 'label' => 'Launch step 1',
                 'actors' => ['system'],
                 'url' => 'https://www.example.com',
-                'responses' => (object)[
+                'responses' => [
                     'ok' => [ ],
                     'error' => [ ]
                 ]
@@ -118,7 +127,7 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
                 'trigger_response' => 'ok',
                 'data' => 'second response',
                 'actors' => ['system', 'user'],
-                'responses' => (object)[
+                'responses' => [
                     'ok' => [ ],
                     'error' => [ ]
                 ]
@@ -130,7 +139,7 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
                 'description' => 'Step3',
                 'label' => 'Launch step 3',
                 'actors' => ['user'],
-                'responses' => (object)[
+                'responses' => [
                     'ok' => [ ],
                     'cancel' => [ ]
                 ]
@@ -145,7 +154,7 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
      */
     protected function getStatesData()
     {
-        return (object)[
+        return [
             ':initial' => (object)[
                 'key' => ':initial',
                 'actions' => ['step1'],

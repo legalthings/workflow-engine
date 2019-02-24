@@ -94,7 +94,7 @@ class JsonViewTest extends \Codeception\Test\Unit
             ],
             [
                 (object)['zoo' => '&baz "bar"'], 
-                ['zoo' => '&baz "bar"'], 
+                (object)['zoo' => '&baz "bar"'], 
                 json_encode(
                     ['zoo' => '&baz "bar"', 'dec1' => true, 'dec3' => true, 'dec4' => true],
                     JSON_HEX_AMP | JSON_HEX_QUOT
@@ -109,7 +109,7 @@ class JsonViewTest extends \Codeception\Test\Unit
             ],
             [
                 $object,
-                ['test' => 'a', 'test2' => 'b'],
+                (object)['test' => 'a', 'test2' => 'b'],
                 json_encode(
                     ['test' => 'a', 'test2' => 'b', 'dec1' => true, 'dec3' => true, 'dec4' => true]
                 )
@@ -119,7 +119,7 @@ class JsonViewTest extends \Codeception\Test\Unit
                 [
                     'zoo' => '&baz "bar"', 
                     'iterator' => ['key1' => 'value1', 'key2' => 'value2'],
-                    'nested' => ['object' => ['test' => 'a', 'test2' => 'b']]
+                    'nested' => (object)['object' => (object)['test' => 'a', 'test2' => 'b']]
                 ],
                 json_encode(
                     [

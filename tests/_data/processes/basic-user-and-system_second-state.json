@@ -4,25 +4,28 @@
     "scenario": "2557288f-108e-4398-8d2d-7914ffd93150",
     "actors": {
         "user": {
-            "$schema" : "http://json-schema.org/draft-07/schema#",
+            "$schema" : "https://specs.livecontracts.io/v1.0.0/asset/actor.json#",
             "key": "user",
             "title": "User"
         },
         "system": {
-            "$schema" : "http://json-schema.org/draft-07/schema#",
+            "$schema" : "https://specs.livecontracts.io/v1.0.0/asset/actor.json#",
             "key": "system",
             "title": "System"
         }
     },
     "previous": [
         {
-            "title": "Step1",
+            "title": null,
             "action": "step1",
             "key": "ok",
             "display" : "always",
+            "data" : {
+                "foo" : "bar"
+            },
             "actor": {
                 "key": "system",
-                "title": "System"
+                "title": "System"                
             },
             "$schema": "https://specs.livecontracts.io/v1.0.0/response/schema.json#"
         }

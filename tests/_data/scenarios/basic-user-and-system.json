@@ -5,12 +5,10 @@
     "actors": {
         "user": {
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "key": "user",
             "title": "User"
         },
         "system": {
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "key": "system",
             "title": "System"
         }
     },

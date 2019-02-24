@@ -46,7 +46,7 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
         $process = $this->createMock(Process::class);
 
         unset($data->current->transitions[1]);
-        
+
         $expected->current->transition = $expected->current->transitions[0];
         unset($expected->current->transitions);
 
@@ -64,8 +64,11 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
     protected function getExpectedProcess($name): stdClass
     {
         $expectedJson = file_get_contents(__DIR__ . "/../../../_data/processes/$name.json");
+        $expected = json_decode($expectedJson);
 
-        return json_decode($expectedJson);
+        $expected->actors = (array)$expected->actors;
+
+        return $expected;
     }
 
     /**
@@ -85,14 +88,14 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
             'meta' => (object)[]
         ];
 
-        $process->actors = (object)[
+        $process->actors = [
             'user' => (object)[
-                '$schema' => 'http://json-schema.org/draft-07/schema#',
+                '$schema' => 'https://specs.livecontracts.io/v1.0.0/asset/actor.json#',
                 'key' => 'user',
                 'title' => 'User'
             ],
             'system' => (object)[
-                '$schema' => 'http://json-schema.org/draft-07/schema#',
+                '$schema' => 'https://specs.livecontracts.io/v1.0.0/asset/actor.json#',
                 'key' => 'system',
                 'title' => 'System',
                 'signkeys' => [
@@ -105,7 +108,7 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
         $process->previous = [
             (object)[
                 '$schema' => 'https://specs.livecontracts.io/v1.0.0/response/schema.json#',
-                'title' => 'Step1',
+                'title' => null,
                 'action' => (object)[
                     '$schema' => 'https://specs.livecontracts.io/v1.0.0/action/http/schema.json#',
                     'key' => 'step1',
@@ -121,6 +124,9 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
                 ],
                 'key' => 'ok',
                 'display' => 'always',
+                'data' => (object)[
+                    'foo' => 'bar'
+                ],
                 'actor' => (object)[
                     'key' => 'system',
                     'title' => 'System',

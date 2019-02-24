@@ -10,7 +10,8 @@ $response = [
     'action' => 'step1',
     'key' => 'ok',
     'actor' => 'system',
-    'process' => '4527288f-108e-fk69-8d2d-7914ffd93894'
+    'process' => '4527288f-108e-fk69-8d2d-7914ffd93894',
+    'data' => ['foo' => 'bar']
 ];
 
 $I->haveHttpHeader('Content-Type', 'application/json');

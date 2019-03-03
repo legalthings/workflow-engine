@@ -19,18 +19,6 @@ class AssocEntitySet extends EntitySet
     protected $flags = EntitySet::PRESERVE_KEYS | EntitySet::ALLOW_DUPLICATES | self::AUTOCREATE;
 
     /**
-     * Class constructor
-     *
-     * @param Entities[]|\Traversable $entities  Array of entities
-     * @param int|\Closure            $total     Total number of entities (if set is limited)
-     * @param int                     $flags     Control the behaviour of the entity set
-     */
-    public function __construct($entities = [], $total = null, $flags = 0)
-    {
-        parent::__construct($this->convertArrayToAssoc($entities), $total, $flags);
-    }
-
-    /**
      * Convert an ordered array with object with a key into an associated array
      * 
      * @param array $input

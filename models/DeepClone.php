@@ -17,7 +17,7 @@ trait DeepClone
                 } elseif ($prop instanceof Traversable) {
                     $prop = clone $prop;
                     foreach ($clone(iterator_to_array($prop)) as $key => $item) {
-                        $prop[$key] = $item;
+                        $prop->$key = $item;
                     }
                 } elseif (is_object($prop)) {
                     $prop = clone $prop;

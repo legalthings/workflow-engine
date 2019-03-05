@@ -14,10 +14,10 @@ trait DeepClone
             foreach ($input as $key => &$prop) {
                 if ($prop instanceof stdClass) {
                     $prop = $clone(clone $prop);
-                } elseif ($prop instanceof Traversable) {
+                } elseif ($prop instanceof Traversable && $prop instanceof ArrayAccess) {
                     $prop = clone $prop;
                     foreach ($clone(iterator_to_array($prop)) as $key => $item) {
-                        $prop->$key = $item;
+                        $prop[$key] = $item;
                     }
                 } elseif (is_object($prop)) {
                     $prop = clone $prop;

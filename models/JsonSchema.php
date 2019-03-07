@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Improved\IteratorPipeline\Pipeline;
 use Jasny\DB\BasicEntity;
@@ -46,7 +46,6 @@ class JsonSchema extends BasicEntity
      */
     public $default;
 
-
     /**
      * JsonSchema constructor.
      * @param array|\stdClass $schema
@@ -58,7 +57,6 @@ class JsonSchema extends BasicEntity
             $this->$key = $value;
         }
     }
-
 
     /**
      * Build an value from a schema
@@ -87,7 +85,7 @@ class JsonSchema extends BasicEntity
      *
      * @return object
      */
-    protected function buildObject()
+    protected function buildObject(): object
     {
         $value = (object)[];
 
@@ -99,7 +97,6 @@ class JsonSchema extends BasicEntity
 
         return $value;
     }
-
 
     /**
      * Cast value from a schema
@@ -134,7 +131,7 @@ class JsonSchema extends BasicEntity
 
         foreach ($properties as $key => $property) {
             $propValue = isset($value->$key) ? $value->$key : null;
-            $value->$key = (new static($property))->cast($propValue);
+            $value->$key = (new static($property))->typeCast($propValue);
         }
 
         return $value;
@@ -153,7 +150,7 @@ class JsonSchema extends BasicEntity
     }
 
     /**
-     * Get data that needs stored in the DB.
+     * Get data that needs to be stored in the DB.
      *
      * @return array
      */
@@ -171,7 +168,7 @@ class JsonSchema extends BasicEntity
      */
     public function jsonSerialize()
     {
-        $data = object_get_properties($this);
+        $data = object_get_properties($this, true);
 
         foreach (['schema', 'id', 'comment'] as $key) {
             if ($data[$key] !== null) {

@@ -2,6 +2,7 @@
 
 use Improved as i;
 use Jasny\DB\EntitySet;
+use Carbon\CarbonImmutable;
 
 /**
  * The current state a process is in.
@@ -40,7 +41,7 @@ class CurrentState extends State
 
     /**
      * State timeout
-     * @var DateTime
+     * @var DateTimeImmutable|null
      */
     public $due_date;
 
@@ -77,6 +78,21 @@ class CurrentState extends State
         }
 
         return parent::cast();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toData(array $opts = []): array
+    {
+        $data = parent::toData($opts);
+
+        if (isset($data['due_date']) && $data['due_date'] instanceof DateTimeImmutable) {
+            $date = $data['due_date']->format(DateTime::ISO8601);
+            $data['due_date'] = DateTime::createFromFormat(DateTime::ISO8601, $date);
+        }
+
+        return $data;
     }
 
     /**

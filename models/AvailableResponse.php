@@ -78,7 +78,8 @@ class AvailableResponse extends BasicEntity implements Meta, Validation
             }
             
             if (count($updateValidation) > 0) {
-                array_map([$validation, 'add'], $updateValidation, ['update']);                
+                $prefix = array_fill(0, count($updateValidation), 'update');
+                array_map([$validation, 'add'], $updateValidation, $prefix);                
             }
         }
         

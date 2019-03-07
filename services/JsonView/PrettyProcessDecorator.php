@@ -70,7 +70,10 @@ class PrettyProcessDecorator
      */
     protected function decorateResponse(stdClass $response): stdClass
     {
-        $response = std_object_only_with($response, ['title', 'action', '$schema', 'actor', 'key', 'data']);
+        $response = std_object_only_with($response, ['title', 'action', '$schema', 'actor', 'key', 'data', 'display']);
+
+        unset($response->actor->{'$schema'});
+
         $response->actor = $this->decorateActor($response->actor);
         $response->action = $response->action->key;
 
@@ -103,7 +106,7 @@ class PrettyProcessDecorator
      */
     protected function decorateState(stdClass $state): stdClass
     {
-        $state = std_object_only_with($state, ['display', 'transitions', 'actions']);
+        $state = std_object_only_with($state, ['key', 'display', 'transitions', 'actions']);
 
         foreach ($state->actions as $key => $action) {            
             $state->actions[$key] = $action->key;
@@ -119,7 +122,7 @@ class PrettyProcessDecorator
         }
 
         if (count($state->transitions) === 1) {
-            $state->transition = $state->transitions[0]->transition;
+            $state->transition = reset($state->transitions);
             unset($state->transitions);
         }
 

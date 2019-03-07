@@ -31,7 +31,7 @@
         "action": "step1"
     },
     "next": null,
-    "assets": [],
-    "definitions": [],
+    "assets": {},
+    "definitions": {},
     "meta": {}
 }

@@ -2,7 +2,6 @@
 
 namespace Trigger;
 
-use const E_USER_WARNING;
 use Jasny\TestHelper;
 use JmesPath\Env as JmesPath;
 use Psr\Container\ContainerInterface;

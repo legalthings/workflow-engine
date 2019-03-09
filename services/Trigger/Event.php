@@ -2,110 +2,75 @@
 
 namespace Trigger;
 
-use TriggerResponse;
-use LTO\Event as LtoEvent;
+use EventChainRepository;
+use LTO;
 
 /**
- * Description of Event
- *
- * @author arnold
+ * Create and add an event to the event chain.
  */
-class Event
+class Event extends AbstractTrigger
 {
     /**
-     * Global guzzle config
-     * @var array
+     * @var EventChainRepository
      */
-    public static $guzzleConfig = [];
-    
+    protected $repository;
+
     /**
-     * HTTP URL
-     * @var \stdClass|\stdClass[]
-     * @required
+     * Account to sign new events (our account).
+     * @var LTO\Account
      */
-    public $body;
-    
-    
+    protected $account;
+
     /**
-     * Cast Http trigger entity
-     * 
-     * @return $this
+     * Event trigger constructor.
+     *
+     * @param EventChainRepository $repository
+     * @param LTO\Account          $account
+     * @param callable             $jmespath    "jmespath"
      */
-    public function cast()
+    public function __construct(EventChainRepository $repository, LTO\Account $account, callable $jmespath)
     {
-        if (!is_array($this->body)) {
-            // Do nothing
-        } elseif (count(array_filter(array_keys($this->body), 'is_string')) > 0) {
-            $this->body = (object)$this->body;
-        } else {
-            $this->body = array_map(function($body) {
-                return (object)$body;
-            }, $this->body);
-        }
-        
-        return parent::cast();
+        $this->repository = $repository;
+        $this->account = $account;
+
+        parent::__construct($jmespath);
     }
-    
-    
+
     /**
-     * Get the response by simulating the action
-     * 
-     * @return string
-     */
-    public function simulate()
-    {
-        return 'ok';
-    }
-    
-    /**
-     * Invoke for an action
+     * Invoke for an action.
      *
      * @param \Action $action
-     * @return TriggerResponse
+     * @return \Response|null
      */
-    public function invoke(\Action $action)
+    public function apply(\Action $action): ?\Response
     {
-        $this->cast();
+        $info = $this->project($action);
+        $this->assert($info);
 
-        return is_array($this->body) ? $this->invokeMultiple() : $this->invokeSingle();
+        $chain = $this->repository->get($info->chain);
+
+        $newEvent = (new LTO\Event($info->body, $chain->getLatestHash()))->signWith($this->account);
+        $chain->add($newEvent);
+
+        $this->repository->update($chain);
+
+        return new \Response();
     }
-    
+
     /**
-     * Invoke the trigger for a single event
-     * 
-     * @return TriggerResponse
+     * Assert projected info.
+     *
+     * @param \stdClass $info
+     * @throws \UnexpectedValueException
      */
-    protected function invokeSingle()
+    protected function assert(\stdClass $info): void
     {
-        $event = new LtoEvent($this->body);
-        
-        $callback = function() use ($event) {
-            return (object)['event' => (object)['body' => $this->body, 'hash' => $event->getHash()]];
-        };
-        
-        return new TriggerResponse('ok', $callback, [$event]);
-    }
-    
-    /**
-     * Invoke the trigger for a multiple event
-     * 
-     * @return TriggerResponse
-     */
-    protected function invokeMultiple()
-    {
-        $bodies = $this->body;
-        $events = [];
-        
-        foreach ($bodies as $body) {
-            $events[] = new LtoEvent($body);
+        if (!isset($info->chain)) {
+            throw new \UnexpectedValueException('Unable to add an event: chain is unkown');
         }
-        
-        $callback = function() use ($bodies, $events) {
-            return (object)['events' => array_map(function($body, $event) {
-                return (object)['body' => $body, 'hash' => $event->getHash()];
-            }, $bodies, $events)];
-        };
-        
-        return new TriggerResponse('ok', $callback, $events);
+
+        if (!isset($info->body)) {
+            throw new \UnexpectedValueException('Unable to add an event: body is unkown');
+        }
     }
 }

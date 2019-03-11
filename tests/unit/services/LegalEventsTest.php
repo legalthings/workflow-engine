@@ -49,16 +49,35 @@ class LegalEventsTest extends \Codeception\Test\Unit
     public function testConstructException()
     {
         $client = $this->createMock(HttpClient::class);
-        new LegalEvents($client, 'ftp://some.ftp.com');        
-    }   
+        new LegalEvents($client, 'ftp://some.ftp.com');
+    }
 
     /**
      * Test 'createRequest' method
      */
     public function testCreateRequest()
     {
-        $chain = $this->getEventChainMock();
-        $api = $this->createPartialMock(LegalEvents::class, []);
+        $data = [
+            "id" => "foo_id",
+            "events" => [
+                [
+                    "body" => "foo",
+                    "hash" => '12345',
+                ],
+                [
+                    "body" => "bar",
+                    "hash" => '67890',
+                ]
+            ]
+        ];
+
+        $chain = $this->createMock(EventChain::class);
+        $chain->expects($this->once())->method('jsonSerialize')
+            ->willReturn($data);
+
+        $httpClient = $this->createMock(HttpClient::class);
+
+        $api = new LegalEvents($httpClient, 'http://example.com');
 
         $result = $api->createRequest($chain);
         $body = $result->getBody();
@@ -67,10 +86,8 @@ class LegalEventsTest extends \Codeception\Test\Unit
         $this->assertSame('POST', $result->getMethod());
         $this->assertEquals(['Content-Type' => ['application/json']], $result->getHeaders());
 
-        $expectedBody = '{"id":"foo_id","events":[{"body":"foo","timestamp":null,"previous":null,"signkey":null,"signature":null,"hash":null},{"body":"bar","timestamp":null,"previous":null,"signkey":null,"signature":null,"hash":null}]}';
-
         $this->assertInstanceOf(StreamInterface::class, $body);
-        $this->assertSame($expectedBody, (string)$body);
+        $this->assertSame($data, json_decode((string)$body, true));
     }
 
     /**
@@ -81,7 +98,7 @@ class LegalEventsTest extends \Codeception\Test\Unit
         $client = $this->createMock(HttpClient::class);
         $request = $this->createMock(Request::class);
 
-        $api = new LegalEvents($client, 'http://www.foo');        
+        $api = new LegalEvents($client, 'http://www.foo');
 
         $client->expects($this->once())->method('send')->with($request, ['base_uri' => 'http://www.foo/']);
 
@@ -99,36 +116,13 @@ class LegalEventsTest extends \Codeception\Test\Unit
         $client = $this->createMock(HttpClient::class);
         $request = $this->createMock(Request::class);
 
-        $api = new LegalEvents($client, 'http://www.foo');        
+        $api = new LegalEvents($client, 'http://www.foo');
 
         $client->expects($this->once())->method('send')->with($request, ['base_uri' => 'http://www.foo/'])
             ->will($this->returnCallback(function() use ($request) {
                 throw new ClientException('Some client exception', $request);
             }));
 
-        $api->send($request);   
-    }
-
-    /**
-     * Get event chain mock
-     *
-     * @return EventChain
-     */
-    protected function getEventChainMock()
-    {
-        $chain = $this->createMock(EventChain::class);        
-
-        $events = [
-            $this->createMock(Event::class),
-            $this->createMock(Event::class)
-        ];
-
-        $events[0]->body = 'foo';
-        $events[1]->body = 'bar';
-
-        $chain->id = 'foo_id';
-        $chain->events = $events;
-
-        return $chain;
+        $api->send($request);
     }
 }

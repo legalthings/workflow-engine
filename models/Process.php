@@ -137,7 +137,9 @@ class Process extends MongoDocument
 
         parent::cast();
 
-        $this->dispatcher->trigger('cast', $this);
+        if ($this->dispatcher !== null) {
+            $this->dispatcher->trigger('cast', $this);
+        }
 
         return $this;
     }

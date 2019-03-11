@@ -135,7 +135,9 @@ class Scenario extends MongoDocument implements Dynamic
             }
         }
 
-        $this->dispatcher->trigger('cast', $this);
+        if ($this->dispatcher !== null) {
+            $this->dispatcher->trigger('cast', $this);
+        }
 
         return $this;
     }
@@ -260,7 +262,9 @@ class Scenario extends MongoDocument implements Dynamic
     {
         $values = array_rename_key((array)$values, '$schema', 'schema');
 
-        $values = $this->dispatcher->trigger('setValues', $this, $values);
+        if ($this->dispatcher !== null) {
+            $values = $this->dispatcher->trigger('setValues', $this, $values);
+        }
 
         return parent::setValues($values);
     }

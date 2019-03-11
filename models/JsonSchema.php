@@ -85,7 +85,7 @@ class JsonSchema extends BasicEntity
      *
      * @return object
      */
-    protected function buildObject(): object
+    protected function buildObject()
     {
         $value = (object)[];
 

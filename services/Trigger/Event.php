@@ -16,6 +16,11 @@ class Event extends AbstractTrigger
     protected $repository;
 
     /**
+     * @var callable
+     */
+    protected $createEvent;
+
+    /**
      * Account to sign new events (our account).
      * @var LTO\Account
      */
@@ -24,13 +29,19 @@ class Event extends AbstractTrigger
     /**
      * Event trigger constructor.
      *
+     * @param callable             $createEvent
      * @param EventChainRepository $repository
      * @param LTO\Account          $account
-     * @param callable             $jmespath    "jmespath"
+     * @param callable             $jmespath     "jmespath"
      */
-    public function __construct(EventChainRepository $repository, LTO\Account $account, callable $jmespath)
-    {
+    public function __construct(
+        callable $createEvent,
+        EventChainRepository $repository,
+        LTO\Account $account,
+        callable $jmespath
+    ) {
         $this->repository = $repository;
+        $this->createEvent = $createEvent;
         $this->account = $account;
 
         parent::__construct($jmespath);
@@ -49,12 +60,12 @@ class Event extends AbstractTrigger
 
         $chain = $this->repository->get($info->chain);
 
-        $newEvent = (new LTO\Event($info->body, $chain->getLatestHash()))->signWith($this->account);
+        $newEvent = ($this->createEvent)($info->body, $chain->getLatestHash())->signWith($this->account);
         $chain->add($newEvent);
 
         $this->repository->update($chain);
 
-        return new \Response();
+        return $this->createResponse($newEvent);
     }
 
     /**
@@ -72,5 +83,19 @@ class Event extends AbstractTrigger
         if (!isset($info->body)) {
             throw new \UnexpectedValueException('Unable to add an event: body is unkown');
         }
+    }
+
+    /**
+     * Create response for an event.
+     *
+     * @param LTO\Event $event
+     * @return \Response
+     */
+    protected function createResponse(LTO\Event $event): \Response
+    {
+        $data = $event->jsonSerialize();
+        unset($data->body);
+
+        return (new \Response)->setValues(['data' => $data, 'key' => 'ok']);
     }
 }

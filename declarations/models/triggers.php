@@ -29,7 +29,7 @@ return [
         return $container->autowire(Trigger\Http::class);
     },
     'event_trigger' => static function(AutowireContainerInterface $container) {
-        return $container->autowire(Trigger\Event::class);
+        return $container->autowire(Trigger\Event::class, $container->get('event.create'));
     },
     'sequence_trigger' => static function() {
         return new Trigger\Sequence();

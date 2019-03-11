@@ -2,9 +2,15 @@
 
 use GuzzleHttp\Client as HttpClient;
 use LTO\Account;
+use LTO\Event;
 use Psr\Container\ContainerInterface;
 
 return [
+    'event.create' => static function() {
+        return static function($body, string $latest_hash): Event {
+            return new Event($body, $latest_hash);
+        };
+    },
     'event-chain.http-client' => static function(ContainerInterface $container) {
         $reconfigure = function (HttpClient $client, array $newOptions): HttpClient {
             return new HttpClient($newOptions + $client->getConfig());

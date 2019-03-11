@@ -27,7 +27,7 @@ return static function(ContainerInterface $container) {
         $display_errors = $config->display_errors ?? $_SERVER['HTTP_X_DISPLAY_ERRORS'] ?? null;
 
         if ($display_errors !== null) {
-            ini_set('display_errors', $display_errors);
+            ini_set('display_errors', $display_errors ? '1' : '0');
         }
     } else {
         ini_set('display_error', 'off');

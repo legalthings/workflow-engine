@@ -7,12 +7,7 @@ $I->amSignatureAuthenticated("PIw+8VW129YY/6tRfThI3ZA0VygH4cYWxIayUZbdA3I9CKUdmq
 
 $I->sendGET('/processes/4527288f-108e-fk69-8d2d-7914ffd93894');
 
-$I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
+$I->seeResponseCodeIs(200);
 
-// TODO Move this to API helper
-$expectedJson = file_get_contents(__DIR__ . '/../../_data/processes/basic-user-and-system.json');
-$expected = json_decode($expectedJson, true);
-
-$I->seeResponseContainsJson($expected);
-
+$I->seeResponseIsProcess('basic-user-and-system');

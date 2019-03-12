@@ -56,10 +56,11 @@ class ProcessController extends BaseController
     {
         $scenario = $this->getScenarioFromInput();
 
-        $process = $this->instantiator->instantiate($scenario);
+        $process = $this->instantiator->instantiate($scenario)
+            ->setValues($this->getInput());
         $process->validate()->mustSucceed();
         
-        $this->getActorFromRequest($process); // For auth
+        $this->authActorsFromRequest($process);
 
         $process->save();
 
@@ -75,7 +76,7 @@ class ProcessController extends BaseController
     {
         $process = $this->processes->fetch($id);
 
-        $this->getActorFromRequest($process); // Only for auth
+        $this->authActorsFromRequest($process);
 
         $this->output($process);
     }
@@ -159,7 +160,18 @@ class ProcessController extends BaseController
     }
 
     /**
-     * Get actor id or public sign key from the HTTP request.
+     * Check if the actor from the HTTP request is in this process.
+     *
+     * @param Process $process
+     */
+    protected function authActorsFromRequest(Process $process): void
+    {
+        $this->getActorFromRequest($process);
+    }
+
+    /**
+     * Get actor from id or public sign key from the HTTP request.
+     * This method also does authentication.
      *
      * @param Process $process
      * @return Actor

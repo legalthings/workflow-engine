@@ -27,23 +27,25 @@ class PrettyProcessDecorator
      */
     public function __invoke(\Process $process, stdClass $data)
     {
-        foreach ($data->actors as $key => $actor) {
-            $data->actors[$key] = $this->decorateActor($actor);            
+        foreach ($data->actors as &$actor) {
+            $actor = $this->decorateActor($actor);
         }
 
-        foreach ($data->previous as $key => $response) {
-            $data->previous[$key] = $this->decorateResponse($response);
+        foreach ($data->previous as &$response) {
+            $response = $this->decorateResponse($response);
         }
 
-        if (is_array($data->next)) {
-            foreach ($data->next as $key => $nextState) {
-                $data->next[$key] = $this->decorateNextState($nextState);
+        if (is_array($data->next) && $data->next !== []) {
+            foreach ($data->next as &$nextState) {
+                $nextState = $this->decorateNextState($nextState);
             }            
         }
 
         if (isset($data->current)) {
             $data->current = $this->decorateState($data->current);   
         }
+
+        $this->removeEmptyProperties($data, ['chain', 'assets', 'definitions', 'next']);
 
         $data->scenario = $data->scenario->id;
         $data = object_rename_key($data, 'schema', '$schema');
@@ -108,20 +110,20 @@ class PrettyProcessDecorator
     {
         $state = std_object_only_with($state, ['key', 'display', 'transitions', 'actions']);
 
-        foreach ($state->actions as $key => $action) {            
-            $state->actions[$key] = $action->key;
+        foreach ($state->actions as &$action) {
+            $action = $action->key;
         }
 
-        if (count($state->actions) === 1) {
+        if (count((array)$state->actions) === 1) {
             $state->action = reset($state->actions);
             unset($state->actions);
         }
 
-        foreach ($state->transitions as $key => $transition) {            
-            $state->transitions[$key] = $this->decorateTransition($transition);
+        foreach ($state->transitions as &$transition) {
+            $transition = $this->decorateTransition($transition);
         }
 
-        if (count($state->transitions) === 1) {
+        if (count((array)$state->transitions) === 1) {
             $state->transition = reset($state->transitions);
             unset($state->transitions);
         }
@@ -138,5 +140,22 @@ class PrettyProcessDecorator
     protected function decorateTransition(stdClass $transition): stdClass
     {
         return std_object_only_with($transition, ['action', 'response', 'transition']);
+    }
+
+    /**
+     * Remove all properties that are `null` or an empty array.
+     *
+     * @param stdClass $data
+     * @param string[] $properties
+     */
+    protected function removeEmptyProperties(stdClass $data, array $properties): void
+    {
+        foreach ($properties as $prop) {
+            $value = $data->$prop;
+
+            if ($value === null || $value === [] || ($value instanceof stdClass &&  $value == (object)[])) {
+                unset($data->$prop);
+            }
+        }
     }
 }

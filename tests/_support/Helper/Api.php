@@ -2,8 +2,9 @@
 namespace Helper;
 
 use Faker;
-use LTO\HTTPSignature;
+use Jasny\HttpSignature\HttpSignature;
 use Jasny\HttpMessage\ServerRequest;
+use PHPUnit\Framework\Assert;
 
 // here you can define custom actions
 // all public methods declared in helper class will be available in $I
@@ -68,11 +69,11 @@ class Api extends \Codeception\Module
             $request = $request->withHeader($name, $value);
         }
 
-        $module = $this->getJasnyModule();        
+        $module = $this->getJasnyModule();
         $node = $module->container->get(\LTO\Account::class);
-        $httpSignature = new HTTPSignature($request, $headersNames);
+        $httpSignature = $module->container->get(HTTPSignature::class);
 
-        return $httpSignature->signWith($node);
+        return $httpSignature->sign($request, $node->getPublicSignKey(), 'ed25519');
     }
     
     /**
@@ -270,8 +271,8 @@ class Api extends \Codeception\Module
         }
         
         $actual = json_decode($this->getModule('REST')->grabResponse());
-        \PHPUnit_Framework_Assert::assertInternalType('array', $actual);
-        \PHPUnit_Framework_Assert::assertCount(count($processes), $actual);
+        Assert::assertIsArray($actual);
+        Assert::assertCount(count($processes), $actual);
     }
     
     /**
@@ -282,8 +283,9 @@ class Api extends \Codeception\Module
     public function seeResponseIsProcessFullListWith(array $processes)
     {
         $actual = json_decode($this->getModule('REST')->grabResponse());
-        \PHPUnit_Framework_Assert::assertInternalType('array', $actual);
-        \PHPUnit_Framework_Assert::assertCount(count($processes), $actual);
+
+        Assert::assertIsArray($actual);
+        Assert::assertCount(count($processes), $actual);
     }
     
     /**
@@ -309,6 +311,77 @@ class Api extends \Codeception\Module
     public function addPermissionsToResponse($processId, $actionIndex, $responseIndex, $permissions)
     {
         $collection = $this->getModule('MongoDb')->driver->getDbh()->selectCollection('processes');
-        $collection->update(['_id' => new \MongoId($processId)], ['$set' => ["scenario.actions.{$actionIndex}.responses.{$responseIndex}.permissions" => $permissions]]);
+        $collection->update([
+            '_id' => new \MongoId($processId)],
+            ['$set' => ["scenario.actions.{$actionIndex}.responses.{$responseIndex}.permissions" => $permissions]]
+        );
+    }
+
+    /**
+     * Check if the response JSON matches a process from the data directory.
+     *
+     * @param string $name    Process filename (without ext)
+     * @param string $variant
+     */
+    public function seeResponseIsProcess(string $name, string $variant = '')
+    {
+        $path = getcwd() . '/tests/_data/processes/' . $name . ($variant !== '' ? '.' . $variant : '') . '.json';
+
+        if (!file_exists($path)) {
+            throw new \BadMethodCallException("Unable to locate process JSON: '$path' doesn't exist.");
+        }
+
+        $this->assertResponseJsonEqualsFile($path);
+    }
+
+    /**
+     * Check if the response JSON matches a scenario from the data directory.
+     *
+     * @param string $name  Scenario filename (without ext)
+     */
+    public function seeResponseIsScenario($name)
+    {
+        $path = getcwd() . '/tests/_data/scenarios/' . $name . '.json';
+
+        if (!file_exists($path)) {
+            throw new \BadMethodCallException("Unable to locate scenario JSON: '$path' doesn't exist.");
+        }
+
+        $this->assertResponseJsonEqualsFile($path);
+    }
+
+    /**
+     * Check if the response JSON matches an identity from the data directory.
+     *
+     * @param string $name  Identity filename (without ext)
+     */
+    public function seeResponseIsIdentity($name)
+    {
+        $path = getcwd() . '/tests/_data/identities/' . $name . '.json';
+
+        if (!file_exists($path)) {
+            throw new \BadMethodCallException("Unable to locate scenario JSON: '$path' doesn't exist.");
+        }
+
+        $this->assertResponseJsonEqualsFile($path);
+    }
+
+    /**
+     * Assert response equals the contents of a JSON file.
+     *
+     * @param string $path
+     */
+    protected function assertResponseJsonEqualsFile(string $path): void
+    {
+        $json = $this->getModule('REST')->grabResponse();
+
+        Assert::assertJson($json);
+
+        $expected = json_decode(file_get_contents($path));
+        $actual = json_decode($json);
+
+        unset($actual->id);
+
+        Assert::assertEquals($expected, $actual);
     }
 }

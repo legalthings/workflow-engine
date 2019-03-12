@@ -13,7 +13,7 @@ class Response extends BasicEntity implements Meta
     /**
      * @var string
      */
-    public $schema = 'https://specs.livecontracts.io/v1.0.0/response/schema.json#';
+    public $schema = 'https://specs.livecontracts.io/v0.2.0/response/schema.json#';
 
     /**
      * The title that will be displayed in the process if the action is performed.

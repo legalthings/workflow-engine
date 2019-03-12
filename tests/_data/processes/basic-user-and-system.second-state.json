@@ -1,21 +1,22 @@
 {
-    "id": "4527288f-108e-fk69-8d2d-7914ffd93894",
-    "title": "Basic system and user process",
+    "$schema": "https://specs.livecontracts.io/v0.2.0/process/schema.json#",
+    "title": "Basic system and user",
     "scenario": "2557288f-108e-4398-8d2d-7914ffd93150",
     "actors": {
         "user": {
-            "$schema" : "https://specs.livecontracts.io/v1.0.0/asset/actor.json#",
+            "$schema" : "https://specs.livecontracts.io/v0.2.0/asset/actor.json#",
             "key": "user",
             "title": "User"
         },
         "system": {
-            "$schema" : "https://specs.livecontracts.io/v1.0.0/asset/actor.json#",
+            "$schema" : "https://specs.livecontracts.io/v0.2.0/asset/actor.json#",
             "key": "system",
             "title": "System"
         }
     },
     "previous": [
         {
+            "$schema": "https://specs.livecontracts.io/v0.2.0/response/schema.json#",
             "title": null,
             "action": "step1",
             "key": "ok",
@@ -26,8 +27,7 @@
             "actor": {
                 "key": "system",
                 "title": "System"                
-            },
-            "$schema": "https://specs.livecontracts.io/v1.0.0/response/schema.json#"
+            }
         }
     ],
     "current": {
@@ -59,8 +59,5 @@
             "actors": []
         }
     ],
-    "assets": {},
-    "definitions": {},
-    "meta": {},
-    "$schema": "https://specs.livecontracts.io/v1.0.0/process/schema.json#"
+    "meta": {}
 }

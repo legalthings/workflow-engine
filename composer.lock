@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "afb2f37af3c705cfee4a45a617bc54bf",
+    "content-hash": "38f3a154e421ba43eb7240fa094ea1fb",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -2003,6 +2003,51 @@
             "time": "2019-03-02T00:51:02+00:00"
         },
         {
+            "name": "jasny/http-dummy",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jasny/http-dummy.git",
+                "reference": "0522303cdd08106f737f950faa90ae68bdefd5bb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jasny/http-dummy/zipball/0522303cdd08106f737f950faa90ae68bdefd5bb",
+                "reference": "0522303cdd08106f737f950faa90ae68bdefd5bb",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2.0",
+                "psr/http-message": "^1.0",
+                "psr/http-server-middleware": "^1.0"
+            },
+            "require-dev": {
+                "guzzlehttp/guzzle": "^6.3",
+                "jasny/php-code-quality": "^2.3",
+                "php-http/client-common": "^2.0",
+                "php-http/mock-client": "^1.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Jasny\\HttpDummy\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Arnold Daniels",
+                    "email": "arnold@jasny.net",
+                    "homepage": "http://www.jasny.net"
+                }
+            ],
+            "description": "Dummy client and server middleware for PSR-7 requests",
+            "time": "2019-03-12T00:09:09+00:00"
+        },
+        {
             "name": "jasny/http-message",
             "version": "v1.3.5",
             "source": {
@@ -2459,16 +2504,16 @@
         },
         {
             "name": "lto/api",
-            "version": "v0.2.2",
+            "version": "v0.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/legalthings/lto-api.php.git",
-                "reference": "d8ea95b88c327b85e1890c0fca3256f4cb2f454f"
+                "reference": "ad9e0248ac2ad842492f89c8f6f41b48464c7618"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/legalthings/lto-api.php/zipball/d8ea95b88c327b85e1890c0fca3256f4cb2f454f",
-                "reference": "d8ea95b88c327b85e1890c0fca3256f4cb2f454f",
+                "url": "https://api.github.com/repos/legalthings/lto-api.php/zipball/ad9e0248ac2ad842492f89c8f6f41b48464c7618",
+                "reference": "ad9e0248ac2ad842492f89c8f6f41b48464c7618",
                 "shasum": ""
             },
             "require": {
@@ -2515,7 +2560,7 @@
                 }
             ],
             "description": "LTO Network client",
-            "time": "2019-03-08T21:59:34+00:00"
+            "time": "2019-03-11T11:37:21+00:00"
         },
         {
             "name": "mongodb/mongodb",

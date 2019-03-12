@@ -35,7 +35,8 @@ class AssocEntitySet extends EntitySet
             })
             ->apply(function($item, $key) {
                 $item->key = $key;
-            });
+            })
+            ->toArray();
     }
     
     /**
@@ -112,5 +113,15 @@ class AssocEntitySet extends EntitySet
             })
             ->values()
             ->toArray();
+    }
+
+    /**
+     * Prepare JSON serialization
+     *
+     * @return \stdClass
+     */
+    public function jsonSerialize()
+    {
+        return (object)parent::jsonSerialize();
     }
 }

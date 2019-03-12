@@ -12,25 +12,29 @@ $httpTriggerHistory = [];
 
 // Overwrite the following container entries
 $overwrite = [
-    ServerRequestInterface::class => function() {
+    ServerRequestInterface::class => static function() {
         return new ServerRequest();
     },
-    LoggerInterface::class => function() {
+    LoggerInterface::class => static function() {
         return new Logger('', [new TestHandler()]);
     },
-    'http.history' => function() use (&$httpTriggerHistory) {
+
+    'http.history' => static function() use (&$httpTriggerHistory) {
         return $httpTriggerHistory;
     },
-    GuzzleHttp\Handler\MockHandler::class => function() {
+    GuzzleHttp\Handler\MockHandler::class => static function() {
         return new GuzzleHttp\Handler\MockHandler();
     },
-    GuzzleHttp\ClientInterface::class => function(ContainerInterface $container) use (&$httpTriggerHistory) {
+    GuzzleHttp\ClientInterface::class => static function(ContainerInterface $container) use (&$httpTriggerHistory) {
         $mock = $container->get(GuzzleHttp\Handler\MockHandler::class);
         
         $handler = GuzzleHttp\HandlerStack::create($mock);
         $handler->push(GuzzleHttp\Middleware::history($httpTriggerHistory));
         
         return new GuzzleHttp\Client(['handler' => $handler]);
+    },
+    GuzzleHttp\Client::class => static function(ContainerInterface $container) {
+        return $container->get(GuzzleHttp\ClientInterface::class); // Alias
     }
 ];
 

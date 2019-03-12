@@ -130,10 +130,8 @@ class JsonView
 
         if (is_iterable($data)) {
             $data = Pipeline::with($data)->map($callback)->toArray();
-        } elseif ($data instanceof stdClass) {
-            $data = (object)Pipeline::with(get_object_vars($data))->map($callback)->toArray();
         } elseif (is_object($data)) {
-            $data = (object)Pipeline::with(object_get_properties($data))->map($callback)->toArray();
+            $data = (object)Pipeline::with(object_get_properties($data, true))->map($callback)->toArray();
         }
 
         return $data;

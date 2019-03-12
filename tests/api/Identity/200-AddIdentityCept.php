@@ -3,7 +3,7 @@
 $I = new ApiTester($scenario);
 $I->wantTo('add an identity');
 
-$json = file_get_contents(__DIR__ . '/../../_data/identities/developer-identity.json');
+$json = file_get_contents(__DIR__ . '/../../_data/identities/developer.json');
 $data = json_decode($json, true);
 
 unset($data['id']);

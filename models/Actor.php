@@ -16,7 +16,7 @@ class Actor extends BasicEntity implements Meta, Dynamic
     /**
      * @var string
      */
-    public $schema = 'https://specs.livecontracts.io/v1.0.0/asset/actor.json#';
+    public $schema = 'https://specs.livecontracts.io/v0.2.0/asset/actor.json#';
 
     /**
      * @var string

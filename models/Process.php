@@ -13,26 +13,36 @@ class Process extends MongoDocument
 {
     /**
      * @var string
+     * @immutable
      */
-    public $schema = 'https://specs.livecontracts.io/v1.0.0/process/schema.json#';
+    public $schema = 'https://specs.livecontracts.io/v0.2.0/process/schema.json#';
 
     /**
      * @var string
+     * @immutable
      */
     public $id;
 
     /**
      * The title of the process.
-     * 
      * @var string
+     * @immutable
      */
     public $title;
 
     /**
-     * Scenario id
+     * Scenario that the process is based on.
      * @var Scenario
+     * @immutable
      */
     public $scenario;
+
+    /**
+     * Event chain id.
+     * @var string|null
+     * @immutable
+     */
+    public $chain;
 
     /**
      * @var Actor[]|AssocEntitySet
@@ -133,6 +143,10 @@ class Process extends MongoDocument
         if (!$this->previous instanceof EntitySet) {
             // Should not really contain duplicates, but entity is not identifiable.
             $this->previous = EntitySet::forClass(Response::class, $this->previous, 0, EntitySet::ALLOW_DUPLICATES);
+        }
+
+        if (!is_scalar($this->chain) && $this->chain !== null) {
+            $this->chain = is_object($this->chain) ? $this->chain->id : $this->chain['id'];
         }
 
         parent::cast();

@@ -1,6 +1,5 @@
 {
-    "$schema": "https://specs.livecontracts.io/v1.0.0/scenario/schema.json#",
-    "id": "2557288f-108e-4398-8d2d-7914ffd93150",
+    "$schema": "https://specs.livecontracts.io/v0.2.0/scenario/schema.json#",
     "title": "Basic system and user",
     "actors": {
         "user": {
@@ -14,7 +13,7 @@
     },
     "actions": {
         "step1": {
-            "$schema": "https://specs.livecontracts.io/v1.0.0/action/http/schema.json#",
+            "$schema": "https://specs.livecontracts.io/v0.2.0/action/http/schema.json#",
             "title": "Step1",
             "actor": "system",
             "url": "https://www.example.com",
@@ -24,7 +23,7 @@
             }
         },
         "step2": {
-            "$schema": "https://specs.livecontracts.io/v1.0.0/action/nop/schema.json#",
+            "$schema": "https://specs.livecontracts.io/v0.2.0/action/nop/schema.json#",
             "title": "Step2",
             "trigger_response": "ok",
             "data": "second response",
@@ -35,7 +34,7 @@
             }
         },
         "step3": {
-            "$schema": "https://specs.livecontracts.io/v1.0.0/action/schema.json#",
+            "$schema": "https://specs.livecontracts.io/v0.2.0/action/schema.json#",
             "title": "Step3",
             "actor": "user",
             "responses": {

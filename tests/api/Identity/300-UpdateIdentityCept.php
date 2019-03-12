@@ -19,7 +19,7 @@ $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 
 // TODO Move this to API helper
-$expectedJson = file_get_contents(__DIR__ . '/../../_data/identities/developer-identity.json');
+$expectedJson = file_get_contents(__DIR__ . '/../../_data/identities/developer.json');
 $expected = json_decode($expectedJson, true);
 
 $expected['info'] = $info;

@@ -8,6 +8,8 @@ use Jasny\ValidationResult;
 
 /**
  * A scenario is the blueprint of a process.
+ *
+ * {@internal The whole scenario is immutable, no need to specify that per property.}}
  */
 class Scenario extends MongoDocument implements Dynamic
 {
@@ -16,7 +18,7 @@ class Scenario extends MongoDocument implements Dynamic
     /**
      * @var string
      */
-    public $schema = 'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#';
+    public $schema = 'https://specs.livecontracts.io/v0.2.0/scenario/schema.json#';
     
     /**
      * @var string
@@ -294,7 +296,7 @@ class Scenario extends MongoDocument implements Dynamic
         $object = object_rename_key($object, 'schema', '$schema');
 
         // Remove implicit states
-        $object->states = Pipeline::with($object->states->jsonSerialize())
+        $object->states = (object)Pipeline::with((array)$object->states->jsonSerialize())
             ->filter(function(stdClass $state, string $key) {
                 return !str_starts_with($key, ':') || $key === ':initial';
             })

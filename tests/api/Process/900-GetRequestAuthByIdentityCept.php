@@ -12,11 +12,7 @@ $I->haveHttpHeader('date', $request->getHeaderLine('date'));
 $I->haveHttpHeader('authorization', $request->getHeaderLine('authorization'));
 
 $I->sendGET($path);
-$I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
+$I->seeResponseCodeIs(200);
 
-// TODO Move this to API helper
-$expectedJson = file_get_contents(__DIR__ . '/../../_data/processes/basic-user-and-system.json');
-$expected = json_decode($expectedJson, true);
-
-$I->seeResponseContainsJson($expected);
+$I->seeResponseIsProcess('basic-user-and-system');

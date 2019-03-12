@@ -7,7 +7,7 @@ db = db.getSiblingDB('lto_workflow_tests');
 db.getCollection("scenarios").insert([
     {
         "_id": "2557288f-108e-4398-8d2d-7914ffd93150",
-        "schema": "https://specs.livecontracts.io/v1.0.0/scenario/schema.json#",
+        "schema": "https://specs.livecontracts.io/v0.2.0/scenario/schema.json#",
         "title": "Basic system and user",
         "actors": [
             {
@@ -25,7 +25,7 @@ db.getCollection("scenarios").insert([
         ],
         "actions": [
             {
-                "schema": "https://specs.livecontracts.io/v1.0.0/action/http/schema.json#",
+                "schema": "https://specs.livecontracts.io/v0.2.0/action/http/schema.json#",
                 "key": "step1",
                 "title": "Step1",
                 "description": "Step1",
@@ -38,7 +38,7 @@ db.getCollection("scenarios").insert([
                 }
             },
             {
-                "schema": "https://specs.livecontracts.io/v1.0.0/action/nop/schema.json#",
+                "schema": "https://specs.livecontracts.io/v0.2.0/action/nop/schema.json#",
                 "key": "step2",
                 "title": "Step2",
                 "description": "Step2",
@@ -52,7 +52,7 @@ db.getCollection("scenarios").insert([
                 }
             },
             {
-                "schema": "https://specs.livecontracts.io/v1.0.0/action/schema.json#",
+                "schema": "https://specs.livecontracts.io/v0.2.0/action/schema.json#",
                 "key": "step3",
                 "title": "Step3",
                 "description": "Step3",
@@ -125,8 +125,8 @@ db.getCollection("scenarios").insert([
 db.getCollection("processes").insert([
     {
         "_id": "4527288f-108e-fk69-8d2d-7914ffd93894",
-        "schema": "https://specs.livecontracts.io/v1.0.0/process/schema.json#",           
-        "title": "Basic system and user process",
+        "schema": "https://specs.livecontracts.io/v0.2.0/process/schema.json#",           
+        "title": "Basic system and user",
         "scenario": "2557288f-108e-4398-8d2d-7914ffd93150",
         "actors": [
             {
@@ -146,7 +146,7 @@ db.getCollection("processes").insert([
             "key": ":initial",
             "actions": [
                 {
-                    "schema": "https://specs.livecontracts.io/v1.0.0/action/http/schema.json#",
+                    "schema": "https://specs.livecontracts.io/v0.2.0/action/http/schema.json#",
                     "key": "step1",
                     "title": "Step1",
                     "actor": "system",
@@ -176,12 +176,7 @@ db.getCollection("processes").insert([
 db.getCollection("identities").insert([
     {
         "_id": "1237288f-8u6f-3edt-8d2d-4f4ffd938vk",
-        "info" : {
-            "name" : "ILT"
-        },
         "node" : "amqps://localhost",
-        "name" : "Developer",
-        "email" : "mail@example.com",
         "signkeys" : {
             "user" : "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn",
             "system" : "FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y"

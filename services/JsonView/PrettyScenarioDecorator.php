@@ -49,7 +49,7 @@ class PrettyScenarioDecorator
         $data->assets = (object)$data->assets;
         $data->definitions = (object)$data->definitions;
 
-        unset($data->description);        
+        $this->removeEmptyProperties($data, ['assets', 'definitions', 'allow_actions', 'description']);
 
         return $data;
     }
@@ -114,6 +114,10 @@ class PrettyScenarioDecorator
             unset($state->transitions);
         }
 
+        if ($state->display === 'always') {
+            unset($state->display);
+        }
+
         return $state;
     }
 
@@ -125,6 +129,26 @@ class PrettyScenarioDecorator
      */
     protected function decorateTransition(stdClass $transition): stdClass
     {
-        return std_object_only_with($transition, ['action', 'response', 'transition']);
+        $object = std_object_only_with($transition, ['action', 'response', 'transition']);
+        $this->removeEmptyProperties($object, ['action', 'response']);
+
+        return $object;
+    }
+
+    /**
+     * Remove all properties that are `null` or an empty array.
+     *
+     * @param stdClass $data
+     * @param string[] $properties
+     */
+    protected function removeEmptyProperties(stdClass $data, array $properties): void
+    {
+        foreach ($properties as $prop) {
+            $value = $data->$prop;
+
+            if ($value === null || $value === [] || ($value instanceof stdClass &&  $value == (object)[])) {
+                unset($data->$prop);
+            }
+        }
     }
 }

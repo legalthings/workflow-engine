@@ -1,0 +1,53 @@
+# This is a basic scenario where a user and an automated system interact.
+#
+# The HTTP GET request is initially done by the system, but can be invoked by
+#   the user if it fails.
+---
+
+$schema: https://specs.livecontracts.io/v0.2.0/scenario/schema.json#
+title: Basic system and user
+
+actors:
+  user:
+    title: User
+  system:
+    $ref: https://specs.livecontracts.io/v0.2.0/actor/organization/schema.json#
+    title: System
+
+actions:
+  step1:
+    $schema: https://specs.livecontracts.io/v0.2.0/action/http/schema.json#
+    title: Step1
+    actors:
+      - system
+      - user
+    method: GET
+    url: https://www.example.com
+  step2:
+    $schema: https://specs.livecontracts.io/v0.2.0/action/nop/schema.json#
+    title: Step2
+    actor: system
+    data: "Nam pretium turpis et arcu. Duis arcu tortor, ipsum."
+  step3:
+    $schema: https://specs.livecontracts.io/v0.2.0/action/schema.json#
+    title: Step3
+    actor: user
+
+states:
+  :initial:
+    action: step1
+    transitions:
+      - response: ok
+        transition: second
+      - response: error
+        transition: -
+  second:
+    action: step2
+    transitions:
+      - response: ok
+        transition: third
+      - response: error
+        transition: :failed
+  third:
+    action: step3
+    transition: :success

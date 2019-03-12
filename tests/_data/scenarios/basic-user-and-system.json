@@ -46,7 +46,6 @@
     "states": {
         ":initial": {
             "action": "step1",
-            "display": "always",
             "transitions": [
                 {
                     "action": "step1",
@@ -62,7 +61,6 @@
         },
         "second": {
             "action": "step2",
-            "display": "always",
             "transitions": [
                 {
                     "action": "step2",
@@ -78,12 +76,8 @@
         },
         "third": {
             "action": "step3",
-            "display": "always",
             "transition": ":success"
         }
     },
-    "assets": { },
-    "definitions": { },
-    "allow_actions": [ ],
     "meta": { }
 }

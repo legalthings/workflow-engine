@@ -1,0 +1,38 @@
+{
+    "$schema": "https://specs.livecontracts.io/v0.2.0/scenario/schema.json#",
+    "title": "Basic user",
+    "actors": {
+        "user": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "title": "User"
+        }
+    },
+    "actions": {
+        "step1": {
+            "$schema": "https://specs.livecontracts.io/v0.2.0/action/schema.json#",
+            "title": "Step1",
+            "actor": "user",
+            "responses": {
+                "ok": { },
+                "cancel": { }
+            }
+        }
+    },
+    "states": {
+        ":initial": {
+            "action": "step1",
+            "transitions": [
+                {
+                    "response": "ok",
+                    "transition": ":success"
+                },
+                {
+                    "response": "cancel",
+                    "transition": ":failed"
+                }
+
+            ]
+        }
+    },
+    "meta": { }
+}

@@ -3,16 +3,26 @@
 $I = new ApiTester($scenario);
 $I->wantTo('add an identity');
 
-$json = file_get_contents(__DIR__ . '/../../_data/identities/developer.json');
-$data = json_decode($json, true);
+$data = [
+    'id' => '9be1f3ed-94fd-4f6b-ab54-962a7bf7dad3',
+    'node' => 'amqps://localhost',
+    'signkeys' => [
+        'user' => '5LucyTBFqSeg8qg4e33uuLY93RZqSQZjmrtsUydUNYgg',
+        'system' => 'FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y',
+    ],
+    'encryptkey' => 'CLpT61PqmYNpPH5CpJQnYKLpq4kaegjPSG4vY9rGtfm3',
+];
 
-unset($data['id']);
 
 $I->haveHttpHeader('Content-Type', 'application/json');
 $I->sendPOST('/identities', $data);
 
-$I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
+$I->seeResponseCodeIs(200);
+$I->seeResponseContainsJson($data);
 
-$I->canSeeResponseContainsJson($data);
-$I->seeResponseJsonMatchesJsonPath('$.id');
+$I->expectTo('see that the new entity has been persisted');
+
+$I->sendGET('/identities/' . $id);
+$I->seeResponseCodeIs(200);
+$I->seeResponseContainsJson($expected);

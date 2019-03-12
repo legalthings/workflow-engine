@@ -32,7 +32,13 @@ class IdentityGateway implements Gateway
      */
     public function fetch($id, array $opts = []): ?Identity
     {
-        return Identity::fetch($id, $opts);
+        $identity = Identity::fetch($id, $opts);
+
+        if ($identity === null) {
+            throw new EntityNotFoundException("Identity not found");
+        }
+
+        return $identity;
     }
 
     /**

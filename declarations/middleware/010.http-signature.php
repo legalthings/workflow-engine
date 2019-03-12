@@ -25,7 +25,7 @@ return [
     },
     static function (RouterInterface $router, ContainerInterface $container) {
         $accountFactory = $container->get(AccountFactory::class);
-        $middleware = new AccountMiddleware($accountFactory);
+        $middleware = new AccountMiddleware($accountFactory, 'base58');
 
         return $middleware->asDoublePass();
     },

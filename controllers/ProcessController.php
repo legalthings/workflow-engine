@@ -178,15 +178,13 @@ class ProcessController extends BaseController
      */
     protected function getActorFromRequest(Process $process): Actor
     {
-        $info = $this->request->getAttribute('identity') ?? $this->request->getAttribute('account');
+        $node = $this->request->getAttribute('account');
 
-        if ($info === null) {
-            throw new AuthException('Request not signed or identity not specified', 401);
+        if ($node === null) {
+            throw new AuthException('Request not signed or identity not specified');
         }
 
-        $actor = $info instanceof \LTO\Account
-            ? (new Actor())->set('signkeys', [$info->getPublicSignKey()])
-            : (new Actor())->set('identity', $info);
+        $actor = (new Actor())->set('signkeys', [$node->getPublicSignKey()]);
 
         if (!$process->hasActor($actor)) {
             throw new AuthException("Process doesn't have " . $actor->describe());

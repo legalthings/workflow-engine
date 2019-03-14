@@ -181,7 +181,7 @@ class ProcessController extends BaseController
         $node = $this->request->getAttribute('account');
 
         if ($node === null) {
-            throw new AuthException('Request not signed or identity not specified');
+            throw new AuthException('Request not signed');
         }
 
         $actor = (new Actor())->set('signkeys', [$node->getPublicSignKey()]);

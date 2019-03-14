@@ -8,6 +8,11 @@ use Jasny\DB\Entity\Identifiable;
 class Identity extends MongoDocument implements Identifiable
 {    
     /**
+     * @var string
+     */
+    public $schema = 'https://specs.livecontracts.io/v0.2.0/identity/schema.json#';
+    
+    /**
      * Unique identifier
      * @var string
      * @required

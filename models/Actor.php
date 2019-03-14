@@ -30,8 +30,8 @@ class Actor extends BasicEntity implements Meta, Dynamic
     public $title;
 
     /**
-     * The identity reference.
-     * @var string|\stdClass
+     * The identity
+     * @var Identity
      */
     public $identity;
 
@@ -64,7 +64,7 @@ class Actor extends BasicEntity implements Meta, Dynamic
         return
             $this->title ??
             ($this->key !== null ? "actor '{$this->key}'" : null) ??
-            ($this->identity !== null ? "actor with identity '{$this->identity}'" : null) ??
+            ($this->identity !== null ? "actor with identity '{$this->identity->getId()}'" : null) ??
             ($this->signkeys !== [] ? "actor with signkey '" . join("'/'", $this->signkeys) . "'" : null) ??
             'unknown actor';
     }
@@ -80,7 +80,26 @@ class Actor extends BasicEntity implements Meta, Dynamic
         return
             ($actor->key !== null || $actor->identity !== null || $actor->signkeys !== []) && // Match at least one of these
             ($actor->key === null || $actor->key === $this->key) &&
-            ($actor->identity === null || $actor->identity === $this->identity) &&
+            ($actor->identity === null || (isset($this->identity) && $actor->identity->getId() === $this->identity->getId())) &&
             ($actor->signkeys === [] || array_contains($this->signkeys, $actor->signkeys, true));
+    }
+
+    /**
+     * Convert loaded values to an entity.
+     * Calls the construtor *after* setting the properties.
+     *
+     * @codeCoverageIgnore
+     * @param array|stdClass $values
+     * @return static
+     */
+    public static function fromData($values)
+    {
+        $instance = parent::fromData($values);
+
+        if (isset($instance->identity)) {
+            $instance->identity->expand();
+        }
+
+        return $instance;
     }
 }

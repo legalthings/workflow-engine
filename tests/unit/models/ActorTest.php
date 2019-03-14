@@ -27,21 +27,22 @@ class ActorTest extends \Codeception\Test\Unit
      */
     public function describeProvider()
     {
+        $identity = $this->createConfiguredMock(Identity::class, ['getId' => 'a']);
         $values = [
             'title' => 'John Doe',
             'key' => 'john_doe',
-            'identity' => 'doe identity',
+            'identity' => $identity,
             'signkeys' => ['foo', 'bar']
         ];
 
         return [
             [array_only($values, ['title']), 'John Doe'],
             [array_only($values, ['key']), "actor 'john_doe'"],
-            [array_only($values, ['identity']), "actor with identity 'doe identity'"],
+            [array_only($values, ['identity']), "actor with identity 'a'"],
             [array_only($values, ['signkeys']), "actor with signkey 'foo'/'bar'"],
             [$values, 'John Doe'],
             [array_without($values, ['title']), "actor 'john_doe'"],
-            [array_without($values, ['title', 'key']), "actor with identity 'doe identity'"]
+            [array_without($values, ['title', 'key']), "actor with identity 'a'"]
         ];
     }
 
@@ -66,11 +67,16 @@ class ActorTest extends \Codeception\Test\Unit
      */
     public function matchesProvider()
     {
+        $identity1 = $this->createConfiguredMock(Identity::class, ['getId' => 'a']);
+        $identity2 = $this->createConfiguredMock(Identity::class, ['getId' => 'b']);
+
         return [
             [['key' => 'foo'], ['key' => 'foo'], true],
             [['key' => 'foo'], ['key' => 'bar'], false],
-            [['identity' => 'foo'], ['identity' => 'foo'], true],
-            [['identity' => 'foo'], ['identity' => 'bar'], false],
+            [['identity' => $identity1], ['identity' => $identity1], true],
+            [['identity' => $identity1], ['identity' => $identity2], false],
+            [['identity' => $identity1], ['identity' => null], false],
+            [['identity' => null], ['identity' => $identity1], false],
             [['signkeys' => ['foo', 'bar', 'baz']], ['signkeys' => ['foo', 'baz']], true],
             [['signkeys' => ['foo', 'bar', 'baz']], ['signkeys' => ['foo', 'baz', 'zet']], false],
             [[], [], false]

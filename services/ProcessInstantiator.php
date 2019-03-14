@@ -14,6 +14,11 @@ class ProcessInstantiator
     protected $gateway;
 
     /**
+     * @var IdentityGateway
+     **/
+    protected $identityGateway;
+
+    /**
      * @var StateInstantiator
      */
     protected $stateInstantiator;
@@ -25,10 +30,15 @@ class ProcessInstantiator
      * @param ProcessGateway    $gateway
      * @param StateInstantiator $stateInstantiator
      */
-    public function __construct(ProcessGateway $gateway, StateInstantiator $stateInstantiator)
+    public function __construct(
+        ProcessGateway $gateway, 
+        StateInstantiator $stateInstantiator, 
+        IdentityGateway $identityGateway
+    )
     {
         $this->gateway = $gateway;
-        $this->stateInstantiator = $stateInstantiator;
+        $this->identityGateway = $identityGateway;
+        $this->stateInstantiator = $stateInstantiator;        
     }
 
 
@@ -82,7 +92,11 @@ class ProcessInstantiator
                 $actor->signkeys = $schema->signkeys;
             }
             if (isset($schema->identity)) {
-                $actor->identity = $schema->identity;
+                $actor->identity = $this->identityGateway->fetch($schema->identity);
+
+                if (!isset($actor->identity)) {
+                    throw new Exception("Identity with id {$schema->identity} not found");
+                }
             }
 
             $actors[$key] = $actor;

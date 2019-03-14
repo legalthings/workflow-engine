@@ -24,7 +24,9 @@ return [
         $service = new HttpSignature(
             ['ed25519', 'ed25519-sha256'],
             new SignCallback($node),
-            new VerifyCallback($factory)
+            function() { return true; }
+            // Temporary disable verification, until whole httpSignature is fixed
+            // new VerifyCallback($factory)
         );
 
         $requiredReadHeaders = ['(request-target)', 'date', 'x-identity', 'x-original-key-id'];

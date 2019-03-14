@@ -16,20 +16,7 @@
     },
     "previous": [],
     "current": {
-        "key": ":initial",
-        "transitions": [
-            {
-                "action": "step1",
-                "response": "ok",
-                "transition": "second"
-            },
-            {
-                "action": "step1",
-                "response": "error",
-                "transition": ":failed"
-            }
-        ],
-        "action": "step1"
+        "key": ":success"
     },
     "meta": {}
 }

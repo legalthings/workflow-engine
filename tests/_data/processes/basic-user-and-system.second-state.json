@@ -32,7 +32,6 @@
     ],
     "current": {
         "key": "second",
-        "display": "always",
         "action": "step2",
         "transitions": [
             {

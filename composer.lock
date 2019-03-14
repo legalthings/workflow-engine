@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "38f3a154e421ba43eb7240fa094ea1fb",
+    "content-hash": "1eb717b53368bd22070e36fe8e87477c",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -1957,16 +1957,16 @@
         },
         {
             "name": "jasny/http-digest",
-            "version": "v1.0.0",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jasny/http-digest.git",
-                "reference": "d3724bdd5c399cda20cb769c6cbfc1f366addc68"
+                "reference": "3570946831de42518289d68001fcf68ba2fdbdc0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jasny/http-digest/zipball/d3724bdd5c399cda20cb769c6cbfc1f366addc68",
-                "reference": "d3724bdd5c399cda20cb769c6cbfc1f366addc68",
+                "url": "https://api.github.com/repos/jasny/http-digest/zipball/3570946831de42518289d68001fcf68ba2fdbdc0",
+                "reference": "3570946831de42518289d68001fcf68ba2fdbdc0",
                 "shasum": ""
             },
             "require": {
@@ -2000,52 +2000,7 @@
                     "homepage": "http://www.jasny.net"
                 }
             ],
-            "time": "2019-03-02T00:51:02+00:00"
-        },
-        {
-            "name": "jasny/http-dummy",
-            "version": "v1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/jasny/http-dummy.git",
-                "reference": "0522303cdd08106f737f950faa90ae68bdefd5bb"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/jasny/http-dummy/zipball/0522303cdd08106f737f950faa90ae68bdefd5bb",
-                "reference": "0522303cdd08106f737f950faa90ae68bdefd5bb",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.2.0",
-                "psr/http-message": "^1.0",
-                "psr/http-server-middleware": "^1.0"
-            },
-            "require-dev": {
-                "guzzlehttp/guzzle": "^6.3",
-                "jasny/php-code-quality": "^2.3",
-                "php-http/client-common": "^2.0",
-                "php-http/mock-client": "^1.3"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Jasny\\HttpDummy\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Arnold Daniels",
-                    "email": "arnold@jasny.net",
-                    "homepage": "http://www.jasny.net"
-                }
-            ],
-            "description": "Dummy client and server middleware for PSR-7 requests",
-            "time": "2019-03-12T00:09:09+00:00"
+            "time": "2019-03-13T04:23:44+00:00"
         },
         {
             "name": "jasny/http-message",
@@ -2504,16 +2459,16 @@
         },
         {
             "name": "lto/api",
-            "version": "v0.2.3",
+            "version": "v0.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/legalthings/lto-api.php.git",
-                "reference": "ad9e0248ac2ad842492f89c8f6f41b48464c7618"
+                "reference": "9f02fb73e94687327170879cce1dde89e19a0207"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/legalthings/lto-api.php/zipball/ad9e0248ac2ad842492f89c8f6f41b48464c7618",
-                "reference": "ad9e0248ac2ad842492f89c8f6f41b48464c7618",
+                "url": "https://api.github.com/repos/legalthings/lto-api.php/zipball/9f02fb73e94687327170879cce1dde89e19a0207",
+                "reference": "9f02fb73e94687327170879cce1dde89e19a0207",
                 "shasum": ""
             },
             "require": {
@@ -2560,7 +2515,7 @@
                 }
             ],
             "description": "LTO Network client",
-            "time": "2019-03-11T11:37:21+00:00"
+            "time": "2019-03-13T14:57:22+00:00"
         },
         {
             "name": "mongodb/mongodb",
@@ -2810,16 +2765,16 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "2.14.2",
+            "version": "2.16.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "a1f4f9abcde8241ce33bf5090896e9c16d0b4232"
+                "reference": "dd16fedc022180ea4292a03aabe95e9895677911"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/a1f4f9abcde8241ce33bf5090896e9c16d0b4232",
-                "reference": "a1f4f9abcde8241ce33bf5090896e9c16d0b4232",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/dd16fedc022180ea4292a03aabe95e9895677911",
+                "reference": "dd16fedc022180ea4292a03aabe95e9895677911",
                 "shasum": ""
             },
             "require": {
@@ -2866,7 +2821,7 @@
                 "datetime",
                 "time"
             ],
-            "time": "2019-02-28T09:07:12+00:00"
+            "time": "2019-03-12T09:31:40+00:00"
         },
         {
             "name": "paragonie/random_compat",

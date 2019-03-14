@@ -47,11 +47,10 @@
         "jasny/event-dispatcher": "^0.1.1",
         "nesbot/carbon": "^2.10",
         "flow/jsonpath": "^0.4.0",
-        "jasny/http-digest": "^1.0",
-        "jasny/http-signature": "^1.1",
+        "jasny/http-signature": "^1.1 <>1.1.1",
+        "jasny/http-digest": "^1.1",
         "lto/api": "^0.2.1",
-        "ramsey/uuid": "^3.8",
-        "jasny/http-dummy": "^1.0"
+        "ramsey/uuid": "^3.8"
     },
     "require-dev" : {
         "jasny/php-code-quality" : "^2.0.0",

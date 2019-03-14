@@ -181,7 +181,7 @@ class ProcessController extends BaseController
         $info = $this->request->getAttribute('identity') ?? $this->request->getAttribute('account');
 
         if ($info === null) {
-            throw new AuthException('Request not signed or identity not specified');
+            throw new AuthException('Request not signed or identity not specified', 401);
         }
 
         $actor = $info instanceof \LTO\Account

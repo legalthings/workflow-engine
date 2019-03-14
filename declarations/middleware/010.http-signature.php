@@ -3,7 +3,6 @@
 use Jasny\RouterInterface;
 use Jasny\HttpDigest\HttpDigest;
 use Jasny\HttpDigest\ServerMiddleware as HttpDigestMiddleware;
-use Jasny\HttpDummy\ServerMiddleware as HttpDummyMiddleware;
 use Jasny\HttpSignature\HttpSignature;
 use Jasny\HttpSignature\ServerMiddleware as HttpSignatureMiddleware;
 use Psr\Container\ContainerInterface;
@@ -12,13 +11,9 @@ use LTO\AccountFactory;
 
 return [
     static function (RouterInterface $router, ContainerInterface $container) {
-        // Disable digest verification when in debug mode.
-        if ((bool)$container->get('config.debug')) {
-            return (new HttpDummyMiddleware)->asDoublePass();
-        }
-
         $service = $container->get(HttpDigest::class);
-        $middleware = new HttpDigestMiddleware($service);
+        $middleware = (new HttpDigestMiddleware($service))
+            ->withOptionalDigest((bool)$container->get('config.debug'));
 
         return $middleware->asDoublePass();
     },

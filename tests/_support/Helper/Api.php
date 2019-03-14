@@ -11,39 +11,47 @@ use PHPUnit\Framework\Assert;
 
 class Api extends \Codeception\Module
 {
-    protected $sessions = [
-        'actor' => 'a00000000000000000000001',
-        'admin' => 'a00000000000000000000002',
-        'other user' => 'a00000000000000000000003',
-        'affiliate' => 'a00000000000000000000004',
-        'client' => 'a00000000000000000000010',
-        'lawyer' => 'a00000000000000000000011'
+    protected $privateKeys = [
+        'system' => '2DDGtVHrX66Ae8C4shFho4AqgojCBTcE4phbCRTm3qXCKPZZ7reJBXiiwxweQAkJ3Tsz6Xd3r5qgnbA67gdL5fWE',
+        'user' => '4hGqYDMDaV2coJWigCtfQUzGbRVv6EjF9tPumxfdsV42KNF3LCpvewg6LXUmN11rjTnsgk32V8yr2Aqs8nRW9q7w',
+        'node' => '37gsytK7XoJzzhyVNuTTm1rNRVpiXcvTWBM994KXgr5nYDMH6j5GJqcGKEXmqeJ1P93mKeDHAR1x3anS3VbBCgsi',
+        'stranger' => '8gMxsaj2YT8HkLCh6k4pnYPUiAXkHtJRA2Bc29c1CMhN7FsMxSQSWjK7rWirHgoP9bkHy6ExwfiGPdQA3yyj1N1',
     ];
 
     /**
      * @return \Codeception\Module
      */
-    public function getJasnyModule()
+    protected function getJasnyModule()
     {
         return $this->getModule('\Jasny\Codeception\Module');
     }
     
-    /**
-     * Adds Signature authentication via ED25519 secret key.
-     *
-     * @param string $secretkey
-     * @part json
-     * @part xml
-     */
-    public function amSignatureAuthenticated($secretkey)
+    public function signRequest(string $method, string $path)
     {
-        $module = $this->getJasnyModule();
-        
-        $accountFactory = $module->container->get(\LTO\AccountFactory::class);
-        $account = $accountFactory->create($secretkey, 'base64');
-        
-        $request = $module->client->getBaseRequest()->withAttribute('account', $account);
-        $module->client->setBaseRequest($request);
+        $account = $this->getJasnyModule()->container->get(\LTO\Account::class);
+        $request = $this->getSignedRequest($account, $method, $path);
+
+        $rest = $this->getModule('REST');
+        $rest->haveHttpHeader('Date', $request->getHeaderLine('Date'));
+        $rest->haveHttpHeader('Authorization', $request->getHeaderLine('Authorization'));
+    }
+
+    public function signRequestAs(string $role, string $method, string $path)
+    {
+        if (!isset($this->privateKeys[$role])) {
+            throw new \InvalidArgumentException("Role '$role' is not defined");
+        }
+
+        $privateKey = $this->privateKeys[$role];
+
+        $accountFactory = $this->getJasnyModule()->container->get(\LTO\AccountFactory::class);
+        $account = $accountFactory->create($privateKey, 'base58');
+
+        $request = $this->getSignedRequest($account, $method, $path);
+
+        $rest = $this->getModule('REST');
+        $rest->haveHttpHeader('Date', $request->getHeaderLine('Date'));
+        $rest->haveHttpHeader('Authorization', $request->getHeaderLine('Authorization'));
     }
 
     /**
@@ -51,11 +59,12 @@ class Api extends \Codeception\Module
      *
      * @param string $method
      * @param string $path 
-     * @param array $headers 
      * @return Jasny\HttpMessage\ServerRequest
      */
-    public function getSignedRequest(string $method, string $path, array $headers): ServerRequest
+    protected function getSignedRequest(\LTO\Account $account, string $method, string $path): ServerRequest
     {
+        $headers = ['date' => date(DATE_RFC1123)];
+
         $request = new ServerRequest();
         $uri = $request->getUri()->withPath($path);
 
@@ -69,29 +78,35 @@ class Api extends \Codeception\Module
             $request = $request->withHeader($name, $value);
         }
 
-        $module = $this->getJasnyModule();
-        $node = $module->container->get(\LTO\Account::class);
-        $httpSignature = $module->container->get(HTTPSignature::class);
+        $httpSignature = new HttpSignature(
+            'ed25519',
+            new \LTO\Account\SignCallback($account),
+            function () {}
+        );
 
-        return $httpSignature->sign($request, $node->getPublicSignKey(), 'ed25519');
+        return $httpSignature->sign($request, $account->getPublicSignKey());
     }
     
     /**
-     * Act a role
+     * Sign as one of the predefined identities.
      * 
-     * @param $role
+     * @param string $role
      */
-    public function am($role)
+    public function amSignatureAuthenticatedAs(string $role)
     {
-        $rest = $this->getModule('REST');
-        
-        if (isset($this->sessions[$role])) {
-            $rest->haveHttpHeader('X-Session', $this->sessions[$role]);
-        } else if ($role == 'trusted') {
-            $rest->haveHttpHeader('X-Trusted-Ip', true);
-        } else {
-            $rest->haveHttpHeader('X-Session', null); // Delete ?
+        if (!isset($this->privateKeys[$role])) {
+            throw new \InvalidArgumentException("Role '$role' is not defined");
         }
+
+        $privateKey = $this->privateKeys[$role];
+
+        $module = $this->getJasnyModule();
+
+        $accountFactory = $module->container->get(\LTO\AccountFactory::class);
+        $account = $accountFactory->create($privateKey, 'base58');
+
+        $request = $module->client->getBaseRequest()->withAttribute('account', $account);
+        $module->client->setBaseRequest($request);
     }
     
     /**

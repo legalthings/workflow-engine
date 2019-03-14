@@ -27,7 +27,7 @@ return [
             new VerifyCallback($factory)
         );
 
-        $requiredReadHeaders = ['(request-target)', 'date', 'x-original-key-id'];
+        $requiredReadHeaders = ['(request-target)', 'date', 'x-identity', 'x-original-key-id'];
         $requiredWriteHeaders = array_merge($requiredReadHeaders, ['content-type', 'digest']);
 
         return $service

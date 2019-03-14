@@ -22,7 +22,7 @@ class BadRequestMiddleware
         try {
             return $next($request, $response);
         } catch (AuthException $exception) {
-            return $this->badRequest($response, 403, $exception->getMessage());
+            return $this->badRequest($response, $exception->getCode() === 401 ? 401 : 403, $exception->getMessage());
         } catch (EntityNotFoundException $exception) {
             return $this->badRequest($response, 404, $exception->getMessage());
         } catch (ValidationException $exception) {

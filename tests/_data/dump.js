@@ -131,14 +131,18 @@ db.getCollection("processes").insert([
         "actors": [
             {
                 "key": "user",
-                "title": "User"
+                "title": "User",
+                "signkeys": {
+                    "user": "AZeQurvj5mFHkPihiFa83nS2Fzxv3M75N7o9m5KQHUmo",
+                    "system": "C47Qse1VRCGnn978WB1kqvkcsd1oG8p9SfJXUbwVZ9vV"
+                }
             },
             {
                 "key": "system",
                 "title": "System",
-                "signkeys": [
-                    "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn"
-                ],
+                "signkeys": {
+                    "system": "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn"
+                },
                 "identity": "6uk7288s-afe4-7398-8dbh-7914ffd930pl"
             }
         ],
@@ -170,7 +174,35 @@ db.getCollection("processes").insert([
                 }
             ]
         }        
-    }
+    },
+    {
+        "_id": "cad2f7fd-8d1d-410d-8ae4-c60c0aaf05e4",
+        "schema": "https://specs.livecontracts.io/v0.2.0/process/schema.json#",
+        "title": "Basic system and user",
+        "scenario": "2557288f-108e-4398-8d2d-7914ffd93150",
+        "actors": [
+            {
+                "key": "user",
+                "title": "User",
+                "signkeys": {
+                    "user": "AZeQurvj5mFHkPihiFa83nS2Fzxv3M75N7o9m5KQHUmo",
+                    "system": "C47Qse1VRCGnn978WB1kqvkcsd1oG8p9SfJXUbwVZ9vV"
+                },
+                "identity": "e2d54eef-3748-4ceb-b723-23ff44a2512b"
+            },
+            {
+                "key": "system",
+                "title": "System",
+                "signkeys": {
+                    "system": "3UDCFY6MojrPKaayHgAEqrnp99JhviSAiraJX8J1fJ9E"
+                },
+                "identity": "e8a1479e-d40f-4b54-a31d-15f39bdb00f5"
+            }
+        ],
+        "current": {
+            "key": ":success"
+        }
+    },
 ]);
 
 db.getCollection("identities").insert([

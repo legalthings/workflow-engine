@@ -108,7 +108,15 @@ class PrettyProcessDecorator
      */
     protected function decorateState(stdClass $state): stdClass
     {
+        if (in_array($state->key, [':success', ':failed', ':cancelled'])) {
+            return (object)['key' => $state->key];
+        }
+
         $state = std_object_only_with($state, ['key', 'display', 'transitions', 'actions']);
+
+        if (isset($state->display) && $state->display === 'always') {
+            unset($state->display);
+        }
 
         foreach ($state->actions as &$action) {
             $action = $action->key;

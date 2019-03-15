@@ -46,7 +46,7 @@ class GetProcessWithOriginalKeyIdCest
         $I->expect('the process isn\'t returned when supplying an original key that isn\'t in the process');
 
         $I->signRequest('GET', '/processes/' . $this->processId);
-        $I->haveHttpHeader('X-Original-Key-Id', 'C47Qse1VRCGnn978WB1kqvkcsd1oG8p9SfJXUbwVZ9vV');
+        $I->haveHttpHeader('X-Original-Key-Id', '3UDCFY6MojrPKaayHgAEqrnp99JhviSAiraJX8J1fJ9E');
 
         $I->sendGET('/processes/' . $this->processId);
         $I->seeResponseCodeIs(403);

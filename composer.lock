@@ -2055,16 +2055,16 @@
         },
         {
             "name": "jasny/http-signature",
-            "version": "v1.1.0",
+            "version": "v1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jasny/http-signature.git",
-                "reference": "ed2eeaaa2f9ea06f39bbfb8d11895c20524976e9"
+                "reference": "b5ee6193006e7cb07419996aa4b1dc41e21b8411"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jasny/http-signature/zipball/ed2eeaaa2f9ea06f39bbfb8d11895c20524976e9",
-                "reference": "ed2eeaaa2f9ea06f39bbfb8d11895c20524976e9",
+                "url": "https://api.github.com/repos/jasny/http-signature/zipball/b5ee6193006e7cb07419996aa4b1dc41e21b8411",
+                "reference": "b5ee6193006e7cb07419996aa4b1dc41e21b8411",
                 "shasum": ""
             },
             "require": {
@@ -2100,7 +2100,7 @@
                 }
             ],
             "description": "Implementation of the IETF HTTP Signatures draft RFC",
-            "time": "2019-02-28T22:46:56+00:00"
+            "time": "2019-03-14T05:12:19+00:00"
         },
         {
             "name": "jasny/meta",
@@ -2459,16 +2459,16 @@
         },
         {
             "name": "lto/api",
-            "version": "v0.2.4",
+            "version": "v0.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/legalthings/lto-api.php.git",
-                "reference": "9f02fb73e94687327170879cce1dde89e19a0207"
+                "reference": "48d0b52004437f6f0bfa4b131b2bf99ae6d6994b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/legalthings/lto-api.php/zipball/9f02fb73e94687327170879cce1dde89e19a0207",
-                "reference": "9f02fb73e94687327170879cce1dde89e19a0207",
+                "url": "https://api.github.com/repos/legalthings/lto-api.php/zipball/48d0b52004437f6f0bfa4b131b2bf99ae6d6994b",
+                "reference": "48d0b52004437f6f0bfa4b131b2bf99ae6d6994b",
                 "shasum": ""
             },
             "require": {
@@ -2515,7 +2515,7 @@
                 }
             ],
             "description": "LTO Network client",
-            "time": "2019-03-13T14:57:22+00:00"
+            "time": "2019-03-15T05:25:54+00:00"
         },
         {
             "name": "mongodb/mongodb",

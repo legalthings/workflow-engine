@@ -35,6 +35,11 @@ class ProcessController extends BaseController
      */
     protected $triggerManager;
 
+    /**
+     * Account that signed the request.
+     * @var \LTO\Account
+     */
+    protected $account;
 
     /**
      * Class constructor for DI.
@@ -50,6 +55,18 @@ class ProcessController extends BaseController
     }
 
     /**
+     * Executed before each action.
+     */
+    public function before()
+    {
+        $this->account = $this->request->getAttribute('account');
+
+        if ($this->account === null) {
+            throw new AuthException('Request not signed', 401);
+        }
+    }
+
+    /**
      * Start a new process
      */
     public function startAction(): void
@@ -60,7 +77,7 @@ class ProcessController extends BaseController
             ->setValues($this->getInput());
         $process->validate()->mustSucceed();
         
-        $this->authActorsFromRequest($process);
+        $this->authzForAccount($process);
 
         $process->save();
 
@@ -75,8 +92,7 @@ class ProcessController extends BaseController
     public function getAction(string $id): void
     {
         $process = $this->processes->fetch($id);
-
-        $this->authActorsFromRequest($process);
+        $this->authzForAccount($process);
 
         $this->output($process);
     }
@@ -87,10 +103,11 @@ class ProcessController extends BaseController
     public function handleResponseAction(): void
     {
         $process = $this->getProcessFromInput();
+        $this->authzForAccount($process);
 
         $response = (new Response)
             ->setValues($this->getInput())
-            ->set('actor', $this->getActorFromRequest($process));
+            ->set('actor', $this->getActorForAccount());
 
         // Stepper does validation (in context of the current state of the process).
         $this->stepper->step($process, $response);
@@ -106,7 +123,9 @@ class ProcessController extends BaseController
     public function invokeAction(string $id): void
     {
         $process = $this->processes->fetch($id);
-        $actor = $this->getActorFromRequest($process);
+        $this->authzForAccount($process);
+
+        $actor = $this->getActorForAccount($process);
 
         $this->triggerManager->invoke($process, null, $actor);
     }
@@ -119,11 +138,11 @@ class ProcessController extends BaseController
     public function deleteAction(string $id): void
     {
         $process = $this->processes->fetch($id);
-
-        $this->getActorFromRequest($process); // Auth
+        $this->authzForAccount($process);
 
         $this->processes->delete($process);
     }
+
 
     /**
      * Get the scenario id from the posted data and fetch the scenario.
@@ -160,38 +179,26 @@ class ProcessController extends BaseController
     }
 
     /**
-     * Check if the actor from the HTTP request is in this process.
+     * Check if the account that signed request is an actor in the process.
      *
      * @param Process $process
      */
-    protected function authActorsFromRequest(Process $process): void
+    protected function authzForAccount(Process $process): void
     {
-        $this->getActorFromRequest($process);
-    }
-
-    /**
-     * Get actor from id or public sign key from the HTTP request.
-     * This method also does authentication.
-     *
-     * @param Process $process
-     * @return Actor
-     */
-    protected function getActorFromRequest(Process $process): Actor
-    {
-        $info = $this->request->getAttribute('identity') ?? $this->request->getAttribute('account');
-
-        if ($info === null) {
-            throw new AuthException('Request not signed or identity not specified', 401);
-        }
-
-        $actor = $info instanceof \LTO\Account
-            ? (new Actor())->set('signkeys', [$info->getPublicSignKey()])
-            : (new Actor())->set('identity', $info);
+        $actor = $this->getActorForAccount();
 
         if (!$process->hasActor($actor)) {
             throw new AuthException("Process doesn't have " . $actor->describe());
         }
+    }
 
-        return $actor;
+    /**
+     * Get actor from id or public sign key from the HTTP request.
+     *
+     * @return Actor
+     */
+    protected function getActorForAccount(): Actor
+    {
+        return (new Actor)->set('signkeys', [$this->account->getPublicSignKey()]);
     }
 }

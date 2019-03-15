@@ -6,6 +6,7 @@ use Jasny\HttpDigest\ServerMiddleware as HttpDigestMiddleware;
 use Jasny\HttpSignature\HttpSignature;
 use Jasny\HttpSignature\ServerMiddleware as HttpSignatureMiddleware;
 use Psr\Container\ContainerInterface;
+use LTO\Account;
 use LTO\Account\ServerMiddleware as AccountMiddleware;
 use LTO\AccountFactory;
 
@@ -24,8 +25,10 @@ return [
         return $middleware->asDoublePass();
     },
     static function (RouterInterface $router, ContainerInterface $container) {
+        $account = $container->get(Account::class);
         $accountFactory = $container->get(AccountFactory::class);
-        $middleware = new AccountMiddleware($accountFactory, 'base58');
+
+        $middleware = (new AccountMiddleware($accountFactory))->withTrustedAccount($account);
 
         return $middleware->asDoublePass();
     },

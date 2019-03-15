@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1eb717b53368bd22070e36fe8e87477c",
+    "content-hash": "bf8fff9111895d87a15a2d4e402f6b02",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -2101,6 +2101,46 @@
             ],
             "description": "Implementation of the IETF HTTP Signatures draft RFC",
             "time": "2019-03-14T05:12:19+00:00"
+        },
+        {
+            "name": "jasny/immutable",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jasny/immutable.git",
+                "reference": "869b54d334c831d577b8f812f051a2e4ebb83e23"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jasny/immutable/zipball/869b54d334c831d577b8f812f051a2e4ebb83e23",
+                "reference": "869b54d334c831d577b8f812f051a2e4ebb83e23",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2.0"
+            },
+            "require-dev": {
+                "jasny/php-code-quality": "^2.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Jasny\\Immutable\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Arnold Daniels",
+                    "email": "arnold@jasny.net",
+                    "homepage": "http://www.jasny.net"
+                }
+            ],
+            "description": "Helper method for immutable objects",
+            "time": "2019-03-15T15:32:10+00:00"
         },
         {
             "name": "jasny/meta",

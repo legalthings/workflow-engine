@@ -199,6 +199,6 @@ class ProcessController extends BaseController
      */
     protected function getActorForAccount(): Actor
     {
-        return (new Actor)->set('signkeys', [$this->account->getPublicSignKey()]);
+        return (new Actor)->set('identity', Identity::fromAccount($this->account));
     }
 }

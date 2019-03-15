@@ -3,7 +3,6 @@
 use Improved as i;
 use Jasny\DB\Entity;
 use Jasny\DB\EntitySet;
-use Jasny\EventDispatcher\EventDispatcher;
 
 /**
  * Stub DI while using static methods.

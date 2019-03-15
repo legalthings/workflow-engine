@@ -35,18 +35,6 @@ class Actor extends BasicEntity implements Meta, Dynamic
      */
     public $identity;
 
-    /**
-     * Actor's name
-     * @var string
-     */
-    public $name;
-
-    /**
-     * Actor's email address
-     * @var string
-     */
-    public $email;
-
 
     /**
      * Describe the actor based on the known properties.
@@ -58,8 +46,7 @@ class Actor extends BasicEntity implements Meta, Dynamic
         return
             $this->title ??
             ($this->key !== null ? "actor '{$this->key}'" : null) ??
-            ($this->identity !== null ? "actor with identity '{$this->identity->getId()}'" : null) ??
-            ($this->signkeys !== [] ? "actor with signkey '" . join("'/'", $this->signkeys) . "'" : null) ??
+            ($this->identity !== null ? "actor with " . $this->identity->describe() : null) ??
             'unknown actor';
     }
 
@@ -72,28 +59,8 @@ class Actor extends BasicEntity implements Meta, Dynamic
     public function matches(Actor $actor): bool
     {
         return
-            ($actor->key !== null || $actor->identity !== null || $actor->signkeys !== []) && // Match at least one of these
+            ($actor->key !== null || $actor->identity !== null) && // Match at least one of these
             ($actor->key === null || $actor->key === $this->key) &&
-            ($actor->identity === null || (isset($this->identity) && $actor->identity->getId() === $this->identity->getId())) &&
-            ($actor->signkeys === [] || array_contains($this->signkeys, $actor->signkeys, true));
-    }
-
-    /**
-     * Convert loaded values to an entity.
-     * Calls the construtor *after* setting the properties.
-     *
-     * @codeCoverageIgnore
-     * @param array|stdClass $values
-     * @return static
-     */
-    public static function fromData($values)
-    {
-        $instance = parent::fromData($values);
-
-        if (isset($instance->identity)) {
-            $instance->identity->expand();
-        }
-
-        return $instance;
+            ($actor->identity === null || ($this->identity !== null && $this->identity->matches($actor->identity)));
     }
 }

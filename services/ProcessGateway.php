@@ -71,6 +71,7 @@ class ProcessGateway implements Gateway
         }
 
         $process->setDispatcher($this->dispatcher);
+        $process->dispatch('fetch');
 
         return $process;
     }
@@ -103,6 +104,7 @@ class ProcessGateway implements Gateway
 
         foreach ($set as $process) {
             $process->setDispatcher($this->dispatcher);
+            $process->dispatch('fetch');
         }
 
         return $set;

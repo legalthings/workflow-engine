@@ -63,8 +63,20 @@ class PrettyProcessDecorator
     {
         unset($actor->key);
 
+        if (isset($actor->identity)) {
+            $actor->identity = $this->decorateIdentity($actor->identity);
+        }
+
         return $actor;
     }
+
+    protected function decorateIdentity(stdClass $identity): stdClass
+    {
+        $this->removeEmptyProperties($identity, ['node', 'signkeys', 'encryptkey']);
+
+        return $identity;
+    }
+
 
     /**
      * Decorate response data

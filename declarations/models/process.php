@@ -1,11 +1,15 @@
 <?php declare(strict_types=1);
 
+use Psr\Container\ContainerInterface;
 use Jasny\Container\AutowireContainerInterface;
 use Jasny\EventDispatcher\EventDispatcher;
 
 return [
-    "process_events" => static function() {
-        return new EventDispatcher();
+    "process_events" => static function(ContainerInterface $container) {
+        $identityGateway = $container->get(IdentityGateway::class);
+
+        return (new EventDispatcher)
+            ->on('fetch', new ExpandIdentities($identityGateway));
     },
     ProcessGateway::class => static function(AutowireContainerInterface $container) {
         return $container->autowire(ProcessGateway::class);

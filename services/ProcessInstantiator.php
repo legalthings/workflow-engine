@@ -82,11 +82,10 @@ class ProcessInstantiator
             $actor = i\type_check(
                 $schema->build(),
                 'object',
-                new InvalidArgumentException("Invalid JSON Schema for actor '$key'; got %s. ")
+                new InvalidArgumentException("Invalid JSON Schema for actor '$key'; got %s.")
             );
 
             $actor->title = $schema->title;
-            $actor->description = $schema->description;
 
             if (isset($schema->signkeys)) {
                 $actor->signkeys = $schema->signkeys;
@@ -97,7 +96,7 @@ class ProcessInstantiator
                 if (!isset($actor->identity)) {
                     throw new Exception("Identity with id {$schema->identity} not found");
                 }
-            }
+            }K
 
             $actors[$key] = $actor;
         }

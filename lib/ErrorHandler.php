@@ -11,7 +11,7 @@ use Monolog\Handler\BrowserConsoleHandler;
 /**
  * The error handler.
  * 
- * This is a dropin replacement for the Monolog error handler
+ * This is a drop-in replacement for the Monolog error handler
  *  - Allows overwriting methods for customization
  *  - Displays a message on fatal errors
  */

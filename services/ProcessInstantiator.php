@@ -96,7 +96,7 @@ class ProcessInstantiator
                 if (!isset($actor->identity)) {
                     throw new Exception("Identity with id {$schema->identity} not found");
                 }
-            }K
+            }
 
             $actors[$key] = $actor;
         }

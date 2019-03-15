@@ -2,11 +2,11 @@ debug: true
 
 lto:
   account:
-    address: 3PLSsSDUn3kZdGe8qWEDak9y8oAjLVecXV1
+    address: 3N2EVaqEToodweg371JNvGTMHxiS6Gsm9AH
     sign:
       secretkey: wJ4WH8dD88fSkNdFQRjaAhjFUZzZhV5yiDLDwNUnp6bYwRXrvWV8MJhQ9HL9uqMDG1n7XpTGZx7PafqaayQV8Rp
       publickey: FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y
     encrypt:
-      secretkey: BnjFJJarge15FiqcxrB7Mzt68nseBXXR4LQ54qFBsWJN
+      secretkey: BnjFJJarge15FiqcxrB7Mzt68nseBXXR4LQ54qFBsWHG
       publickey: BVv1ZuE3gKFa6krwWJQwEmrLYUESuUabNCXgYTmCoBt6
   network: T

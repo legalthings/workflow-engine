@@ -61,7 +61,9 @@ class PrettyProcessDecorator
      */
     protected function decorateActor(stdClass $actor): stdClass
     {
-        return std_object_only_with($actor, ['$schema', 'key', 'title']);
+        unset($actor->key);
+
+        return $actor;
     }
 
     /**

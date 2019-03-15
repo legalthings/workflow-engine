@@ -12,8 +12,8 @@ use PHPUnit\Framework\Assert;
 class Api extends \Codeception\Module
 {
     protected $privateKeys = [
-        'system' => '2DDGtVHrX66Ae8C4shFho4AqgojCBTcE4phbCRTm3qXCKPZZ7reJBXiiwxweQAkJ3Tsz6Xd3r5qgnbA67gdL5fWE',
         'user' => '4hGqYDMDaV2coJWigCtfQUzGbRVv6EjF9tPumxfdsV42KNF3LCpvewg6LXUmN11rjTnsgk32V8yr2Aqs8nRW9q7w',
+        'organization' => '2DDGtVHrX66Ae8C4shFho4AqgojCBTcE4phbCRTm3qXCKPZZ7reJBXiiwxweQAkJ3Tsz6Xd3r5qgnbA67gdL5fWE',
         'node' => '37gsytK7XoJzzhyVNuTTm1rNRVpiXcvTWBM994KXgr5nYDMH6j5GJqcGKEXmqeJ1P93mKeDHAR1x3anS3VbBCgsi',
         'stranger' => '8gMxsaj2YT8HkLCh6k4pnYPUiAXkHtJRA2Bc29c1CMhN7FsMxSQSWjK7rWirHgoP9bkHy6ExwfiGPdQA3yyj1N1',
     ];

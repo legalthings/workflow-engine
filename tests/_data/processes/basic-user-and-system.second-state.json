@@ -5,13 +5,11 @@
     "actors": {
         "user": {
             "$schema" : "https://specs.livecontracts.io/v0.2.0/asset/actor.json#",
-            "key": "user",
             "title": "User"
         },
-        "system": {
+        "organization": {
             "$schema" : "https://specs.livecontracts.io/v0.2.0/asset/actor.json#",
-            "key": "system",
-            "title": "System"
+            "title": "Organization"
         }
     },
     "previous": [
@@ -25,8 +23,8 @@
                 "foo" : "bar"
             },
             "actor": {
-                "key": "system",
-                "title": "System"                
+                "key": "organization",
+                "title": "Organization"
             }
         }
     ],

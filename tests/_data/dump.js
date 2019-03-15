@@ -15,8 +15,8 @@ db.getCollection("scenarios").insert([
                 "title": "User"
             },
             {
-                "key": "system",
-                "title": "System",
+                "key": "organization",
+                "title": "Organization",
                 "signkeys": [
                     "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn"
                 ],
@@ -132,17 +132,11 @@ db.getCollection("processes").insert([
             {
                 "key": "user",
                 "title": "User",
-                "signkeys": {
-                    "user": "AZeQurvj5mFHkPihiFa83nS2Fzxv3M75N7o9m5KQHUmo",
-                    "system": "C47Qse1VRCGnn978WB1kqvkcsd1oG8p9SfJXUbwVZ9vV"
-                }
+                "identity": "e2d54eef-3748-4ceb-b723-23ff44a2512b"
             },
             {
-                "key": "system",
-                "title": "System",
-                "signkeys": {
-                    "system": "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn"
-                },
+                "key": "organization",
+                "title": "Organization",
                 "identity": "6uk7288s-afe4-7398-8dbh-7914ffd930pl"
             }
         ],
@@ -153,7 +147,7 @@ db.getCollection("processes").insert([
                     "schema": "https://specs.livecontracts.io/v0.2.0/action/http/schema.json#",
                     "key": "step1",
                     "title": "Step1",
-                    "actor": "system",
+                    "actor": "organization",
                     "url": "https://www.example.com",
                     "responses": {
                         "ok": { },
@@ -184,18 +178,11 @@ db.getCollection("processes").insert([
             {
                 "key": "user",
                 "title": "User",
-                "signkeys": {
-                    "user": "AZeQurvj5mFHkPihiFa83nS2Fzxv3M75N7o9m5KQHUmo",
-                    "system": "C47Qse1VRCGnn978WB1kqvkcsd1oG8p9SfJXUbwVZ9vV"
-                },
                 "identity": "e2d54eef-3748-4ceb-b723-23ff44a2512b"
             },
             {
-                "key": "system",
-                "title": "System",
-                "signkeys": {
-                    "system": "3UDCFY6MojrPKaayHgAEqrnp99JhviSAiraJX8J1fJ9E"
-                },
+                "key": "organization",
+                "title": "Organization",
                 "identity": "e8a1479e-d40f-4b54-a31d-15f39bdb00f5"
             }
         ],
@@ -214,5 +201,24 @@ db.getCollection("identities").insert([
             "system" : "FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y"
         },
         "encryptkey" : "9fSos8krst114LtaYGHQPjC3h1CQEHUQWEkYdbykrhHv"
+    },
+    {
+        "_id": "e2d54eef-3748-4ceb-b723-23ff44a2512b",
+        "signkeys": {
+            "default": "AZeQurvj5mFHkPihiFa83nS2Fzxv3M75N7o9m5KQHUmo",
+            "system": "C47Qse1VRCGnn978WB1kqvkcsd1oG8p9SfJXUbwVZ9vV"
+        }
+    },
+    {
+        "_id": "6uk7288s-afe4-7398-8dbh-7914ffd930pl",
+        "signkeys": {
+            "default": "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn"
+        }
+    },
+    {
+        "_id": "e8a1479e-d40f-4b54-a31d-15f39bdb00f5",
+        "signkeys": {
+            "system": "3UDCFY6MojrPKaayHgAEqrnp99JhviSAiraJX8J1fJ9E"
+        }
     }
 ]);

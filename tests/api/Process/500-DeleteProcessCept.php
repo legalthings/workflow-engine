@@ -3,7 +3,7 @@
 $I = new ApiTester($scenario);
 $I->wantTo('delete process');
 
-$I->am('system');
+$I->am('organization');
 
 $id = '4527288f-108e-fk69-8d2d-7914ffd93894';
 $I->seeInCollection('processes', ['_id' => $id]);

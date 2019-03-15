@@ -47,12 +47,6 @@ class Actor extends BasicEntity implements Meta, Dynamic
      */
     public $email;
 
-    /**
-     * Public keys of the identity
-     * @var array
-     */
-    public $signkeys = [];
-
 
     /**
      * Describe the actor based on the known properties.

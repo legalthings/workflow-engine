@@ -8,14 +8,14 @@
         },
         "system": {
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "title": "System"
+            "title": "Organization"
         }
     },
     "actions": {
         "step1": {
             "$schema": "https://specs.livecontracts.io/v0.2.0/action/http/schema.json#",
             "title": "Step1",
-            "actor": "system",
+            "actor": "organization",
             "url": "https://www.example.com",
             "responses": {
                 "ok": { },

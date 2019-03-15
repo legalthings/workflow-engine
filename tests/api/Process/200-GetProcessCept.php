@@ -3,7 +3,7 @@
 $I = new ApiTester($scenario);
 $I->wantTo('get a process');
 
-$I->am('system');
+$I->am('organization');
 
 $I->sendGET('/processes/4527288f-108e-fk69-8d2d-7914ffd93894');
 

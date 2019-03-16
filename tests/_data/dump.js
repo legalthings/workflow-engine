@@ -27,7 +27,7 @@ db.getCollection("scenarios").insert([
                 "title": "Step1",
                 "description": "Step1",
                 "label": "Launch step 1",
-                "actors": ["system"],
+                "actors": ["organization"],
                 "url": "https://www.example.com",
                 "responses": {
                     "ok": { },
@@ -42,7 +42,7 @@ db.getCollection("scenarios").insert([
                 "label": "Launch step 2",
                 "trigger_response": "ok",
                 "data": "second response",
-                "actors": ["system", "user"],
+                "actors": ["organization", "user"],
                 "responses": {
                     "ok": { },
                     "error": { }

@@ -3,7 +3,7 @@
 $I = new ApiTester($scenario);
 $I->wantTo('change process state');
 
-$I->am('organization');
+$I->signRequestAs('organization', 'POST', '/responses');
 
 $response = [
     '$schema' => 'https://specs.livecontracts.io/v0.2.0/response/schema.json#',

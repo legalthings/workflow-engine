@@ -17,9 +17,6 @@ db.getCollection("scenarios").insert([
             {
                 "key": "organization",
                 "title": "Organization",
-                "signkeys": [
-                    "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn"
-                ],
                 "identity": "6uk7288s-afe4-7398-8dbh-7914ffd930pl"
             }
         ],

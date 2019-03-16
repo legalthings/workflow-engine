@@ -3,8 +3,9 @@
 $I = new ApiTester($scenario);
 $I->wantTo('add an identity');
 
+$id = '9be1f3ed-94fd-4f6b-ab54-962a7bf7dad3';
 $data = [
-    'id' => '9be1f3ed-94fd-4f6b-ab54-962a7bf7dad3',
+    'id' => $id,
     'node' => 'amqps://localhost',
     'signkeys' => [
         'user' => '5LucyTBFqSeg8qg4e33uuLY93RZqSQZjmrtsUydUNYgg',
@@ -25,4 +26,4 @@ $I->expectTo('see that the new entity has been persisted');
 
 $I->sendGET('/identities/' . $id);
 $I->seeResponseCodeIs(200);
-$I->seeResponseContainsJson($expected);
+$I->seeResponseContainsJson($data);

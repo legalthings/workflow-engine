@@ -71,10 +71,14 @@ class ProcessController extends BaseController
      */
     public function startAction(): void
     {
+        $data = $this->getInput();
+        if (!isset($data['id'])) {
+            throw ValidationException::error('Process id not specified');
+        }
+
         $scenario = $this->getScenarioFromInput();
 
-        $process = $this->instantiator->instantiate($scenario)
-            ->setValues($this->getInput());
+        $process = $this->instantiator->instantiate($scenario)->setValues($data);
         $process->validate()->mustSucceed();
         
         $this->authzForAccount($process);

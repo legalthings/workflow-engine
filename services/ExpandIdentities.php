@@ -39,11 +39,15 @@ class ExpandIdentities
     /**
      * Expand the property.
      *
-     * @param Identity|string $identity
-     * @return Identity
+     * @param Identity|string|null $identity
+     * @return Identity|null
      */
-    protected function expand($identity): Identity
+    protected function expand($identity): ?Identity
     {
+        if (!isset($identity)) {
+            return null;
+        }
+
         if ($identity instanceof Identity && !$identity->isGhost()) {
             return $identity;
         }

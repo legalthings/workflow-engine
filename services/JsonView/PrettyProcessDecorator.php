@@ -77,7 +77,6 @@ class PrettyProcessDecorator
         return $identity;
     }
 
-
     /**
      * Decorate response data
      *
@@ -173,7 +172,7 @@ class PrettyProcessDecorator
     protected function removeEmptyProperties(stdClass $data, array $properties): void
     {
         foreach ($properties as $prop) {
-            $value = $data->$prop;
+            $value = $data->$prop ?? null;
 
             if ($value === null || $value === [] || ($value instanceof stdClass &&  $value == (object)[])) {
                 unset($data->$prop);

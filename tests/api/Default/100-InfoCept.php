@@ -7,5 +7,5 @@ $I->sendGET('/');
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 
-$I->seeResponseContainsJson(['name' => 'legalthings/workflow-engine']);
+$I->seeResponseContainsJson(['name' => 'lto/workflow-engine']);
 $I->seeResponseContainsJson(['env' => 'tests']);

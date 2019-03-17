@@ -309,7 +309,7 @@ class DataPatcherTest extends \Codeception\Test\Unit
         $this->patcher->set($process, 'assets.data', $value);
 
         $expected = [
-            'schema' => 'https://specs.livecontracts.io/v1.0.0/asset/schema.json#',
+            'schema' => 'https://specs.livecontracts.io/v0.2.0/asset/schema.json#',
             'key' => 'data',
             'I' => 'one',
             'II' => 'two',

@@ -37,10 +37,10 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $scenario = new Scenario();
 
-        $manager = new JsonSchema(['$ref' => 'https://specs.livecontracts.io/v0.1.0/actor/schema.json#']);
+        $manager = new JsonSchema(['$ref' => 'https://specs.livecontracts.io/v0.2.0/actor/schema.json#']);
         $scenario->actors['manager'] = $manager;
 
-        $worker = new JsonSchema(['$ref' => 'https://specs.livecontracts.io/v0.1.0/actor/schema.json#']);
+        $worker = new JsonSchema(['$ref' => 'https://specs.livecontracts.io/v0.2.0/actor/schema.json#']);
         $scenario->actors['worker'] = $worker;
 
         $this->assertSame($manager, $scenario->getActor('manager'));
@@ -55,7 +55,7 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $scenario = new Scenario();
 
-        $manager = new JsonSchema(['$ref' => 'https://specs.livecontracts.io/v0.1.0/actor/schema.json#']);
+        $manager = new JsonSchema(['$ref' => 'https://specs.livecontracts.io/v0.2.0/actor/schema.json#']);
         $scenario->actors['manager'] = $manager;
 
         $scenario->getActor('walker');
@@ -763,7 +763,7 @@ class ScenarioTest extends \Codeception\Test\Unit
         $scenario = new Scenario();
 
         $expected = [
-            '$schema' => 'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#',
+            '$schema' => 'https://specs.livecontracts.io/v0.2.0/scenario/schema.json#',
             'id' => null,
             'title' => null,
             'description' => null,

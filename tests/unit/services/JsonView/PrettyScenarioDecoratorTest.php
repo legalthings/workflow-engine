@@ -33,6 +33,8 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
         $decorator = new PrettyScenarioDecorator();
         $result = $decorator($scenario, $data);
 
+        $expected->id = $data->id;
+
         $this->assertEquals($expected, $result);
     }
 
@@ -66,7 +68,7 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
     {
         $scenario = (object)[
             'id' => '2557288f-108e-4398-8d2d-7914ffd93150',
-            '$schema' => 'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#',
+            '$schema' => 'https://specs.livecontracts.io/v0.2.0/scenario/schema.json#',
             'title' => 'Basic system and user',
             'assets' => (object)[],
             'definitions' => (object)[],
@@ -80,10 +82,10 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
                 'key' => 'user',
                 'title' => 'User'
             ],
-            'system' => (object)[
+            'organization' => (object)[
                 '$schema' => 'http://json-schema.org/draft-07/schema#',
-                'key' => 'system',
-                'title' => 'System',
+                'key' => 'organization',
+                'title' => 'Organization',
                 'signkeys' => [
                     '57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn'
                 ],
@@ -106,12 +108,12 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
     {
         return [
             'step1' => (object)[
-                '$schema' => 'https://specs.livecontracts.io/v1.0.0/action/http/schema.json#',
+                '$schema' => 'https://specs.livecontracts.io/v0.2.0/action/http/schema.json#',
                 'key' => 'step1',
                 'title' => 'Step1',
                 'description' => 'Step1',
                 'label' => 'Launch step 1',
-                'actors' => ['system'],
+                'actors' => ['organization'],
                 'url' => 'https://www.example.com',
                 'responses' => [
                     'ok' => [ ],
@@ -119,21 +121,21 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
                 ]
             ],
             'step2' => (object)[
-                '$schema' => 'https://specs.livecontracts.io/v1.0.0/action/nop/schema.json#',
+                '$schema' => 'https://specs.livecontracts.io/v0.2.0/action/nop/schema.json#',
                 'key' => 'step2',
                 'title' => 'Step2',
                 'description' => 'Step2',
                 'label' => 'Launch step 2',
                 'trigger_response' => 'ok',
                 'data' => 'second response',
-                'actors' => ['system', 'user'],
+                'actors' => ['organization', 'user'],
                 'responses' => [
                     'ok' => [ ],
                     'error' => [ ]
                 ]
             ],
             'step3' => (object)[
-                '$schema' => 'https://specs.livecontracts.io/v1.0.0/action/schema.json#',
+                '$schema' => 'https://specs.livecontracts.io/v0.2.0/action/schema.json#',
                 'key' => 'step3',
                 'title' => 'Step3',
                 'description' => 'Step3',

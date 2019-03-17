@@ -144,7 +144,7 @@ class PrettyScenarioDecorator
     protected function removeEmptyProperties(stdClass $data, array $properties): void
     {
         foreach ($properties as $prop) {
-            $value = $data->$prop;
+            $value = $data->$prop ?? null;
 
             if ($value === null || $value === [] || ($value instanceof stdClass &&  $value == (object)[])) {
                 unset($data->$prop);

@@ -6,7 +6,7 @@
             "$schema": "http://json-schema.org/draft-07/schema#",
             "title": "User"
         },
-        "system": {
+        "organization": {
             "$schema": "http://json-schema.org/draft-07/schema#",
             "title": "Organization"
         }
@@ -27,7 +27,7 @@
             "title": "Step2",
             "trigger_response": "ok",
             "data": "second response",
-            "actors": ["system", "user"],
+            "actors": ["organization", "user"],
             "responses": {
                 "ok": { },
                 "error": { }

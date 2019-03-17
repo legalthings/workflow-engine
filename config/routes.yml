@@ -15,7 +15,6 @@
 
 /responses +POST:                          { controller: process, action: handle-response }
 
-/identities +POST:                         { controller: identity, action: add }
+/identities +POST:                         { controller: identity, action: put }
 /identities/* +GET:                        { controller: identity, action: get, id: $2 }
-/identities/* +POST:                       { controller: identity, action: update, id: $2 }
 /identities/* +DELETE:                     { controller: identity, action: delete, id: $2 }

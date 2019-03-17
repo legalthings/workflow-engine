@@ -3,7 +3,7 @@
 $I = new ApiTester($scenario);
 $I->wantTo('start a process, passing scenario id');
 
-$I->am('organization');
+$I->signRequestAs('organization', 'POST', '/processes');
 
 $I->sendPOST('/processes', [
     'id' => '823d1e54-9009-4745-8901-dd62ec46eaf2',
@@ -14,4 +14,4 @@ $I->seeResponseIsJson();
 $I->seeResponseCodeIs(200);
 
 $I->seeResponseContainsJson(['id' => '823d1e54-9009-4745-8901-dd62ec46eaf2']);
-$I->seeResponseIsProcess('basic-user-and-system');
+$I->seeResponseIsProcess('basic-user-and-system', 'no-user-identity');

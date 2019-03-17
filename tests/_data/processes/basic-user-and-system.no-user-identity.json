@@ -6,28 +6,35 @@
         "user": {
             "$schema": "https://specs.livecontracts.io/v0.2.0/asset/actor.json#",
             "title": "User",
-            "identity": {
-                "id": "e2d54eef-3748-4ceb-b723-23ff44a2512b",
-                "signkeys": {
-                    "default": "AZeQurvj5mFHkPihiFa83nS2Fzxv3M75N7o9m5KQHUmo",
-                    "system": "C47Qse1VRCGnn978WB1kqvkcsd1oG8p9SfJXUbwVZ9vV"
-                }
-            }
+            "identity": null
         },
         "organization": {
             "$schema": "https://specs.livecontracts.io/v0.2.0/asset/actor.json#",
             "title": "Organization",
             "identity": {
-                "id": "e8a1479e-d40f-4b54-a31d-15f39bdb00f5",
+                "id": "6uk7288s-afe4-7398-8dbh-7914ffd930pl",
                 "signkeys": {
-                    "system": "3UDCFY6MojrPKaayHgAEqrnp99JhviSAiraJX8J1fJ9E"
+                    "default": "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn"
                 }
             }
         }
     },
     "previous": [],
     "current": {
-        "key": ":success"
+        "key": ":initial",
+        "transitions": [
+            {
+                "action": "step1",
+                "response": "ok",
+                "transition": "second"
+            },
+            {
+                "action": "step1",
+                "response": "error",
+                "transition": ":failed"
+            }
+        ],
+        "action": "step1"
     },
     "meta": {}
 }

@@ -17,9 +17,6 @@ db.getCollection("scenarios").insert([
             {
                 "key": "organization",
                 "title": "Organization",
-                "signkeys": [
-                    "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn"
-                ],
                 "identity": "6uk7288s-afe4-7398-8dbh-7914ffd930pl"
             }
         ],
@@ -30,7 +27,7 @@ db.getCollection("scenarios").insert([
                 "title": "Step1",
                 "description": "Step1",
                 "label": "Launch step 1",
-                "actors": ["system"],
+                "actors": ["organization"],
                 "url": "https://www.example.com",
                 "responses": {
                     "ok": { },
@@ -45,7 +42,7 @@ db.getCollection("scenarios").insert([
                 "label": "Launch step 2",
                 "trigger_response": "ok",
                 "data": "second response",
-                "actors": ["system", "user"],
+                "actors": ["organization", "user"],
                 "responses": {
                     "ok": { },
                     "error": { }

@@ -3,7 +3,7 @@
 $I = new ApiTester($scenario);
 $I->wantTo('start a process, passing scenario id');
 
-$I->am('organization');
+$I->signRequestAs('organization', 'POST', '/processes');
 
 $I->sendPOST('/processes', [
     'id' => '2z4AmxL122aaTLyVy6rhEfXHGJMGuUnViUhw3D7XC4VcycnkEwkHXXdxg73vLb',

@@ -30,7 +30,9 @@ abstract class BaseController extends Jasny\Controller
      */
     public function output($result, $format = 'json')
     {
-        if ($format === 'json') {
+        $usePrettyJson = $this->getRequest()->getAttribute('pretty-json') === true;
+
+        if ($format === 'json' && $usePrettyJson) {
             if ($this instanceof ScenarioController) {
                 return $this->outputPrettyJson($result, 'scenario');
             } elseif($this instanceof ProcessController) {

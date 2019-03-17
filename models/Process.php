@@ -298,4 +298,17 @@ class Process extends MongoDocument
     {
         return [':success', ':failed', ':cancelled'];
     }
+    
+    /**
+     * Prepare json serialization
+     *
+     * @return stdClass
+     */
+    public function jsonSerialize(): stdClass
+    {
+        $object = parent::jsonSerialize();
+        $object = object_rename_key($object, 'schema', '$schema');
+
+        return $object;
+    }
 }

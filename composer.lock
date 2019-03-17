@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bf8fff9111895d87a15a2d4e402f6b02",
+    "content-hash": "bbbf19af34ca80252789ec4e30dffe98",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -1957,16 +1957,16 @@
         },
         {
             "name": "jasny/http-digest",
-            "version": "v1.1.0",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jasny/http-digest.git",
-                "reference": "3570946831de42518289d68001fcf68ba2fdbdc0"
+                "reference": "22311599552dd373a3753df1769e9d49925bafdd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jasny/http-digest/zipball/3570946831de42518289d68001fcf68ba2fdbdc0",
-                "reference": "3570946831de42518289d68001fcf68ba2fdbdc0",
+                "url": "https://api.github.com/repos/jasny/http-digest/zipball/22311599552dd373a3753df1769e9d49925bafdd",
+                "reference": "22311599552dd373a3753df1769e9d49925bafdd",
                 "shasum": ""
             },
             "require": {
@@ -2000,7 +2000,7 @@
                     "homepage": "http://www.jasny.net"
                 }
             ],
-            "time": "2019-03-13T04:23:44+00:00"
+            "time": "2019-03-17T02:50:30+00:00"
         },
         {
             "name": "jasny/http-message",
@@ -6361,16 +6361,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "7.5.6",
+            "version": "7.5.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "09c85e14994df92e5ff1f5ec0b481bdb7d3d3df9"
+                "reference": "eb343b86753d26de07ecba7868fa983104361948"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/09c85e14994df92e5ff1f5ec0b481bdb7d3d3df9",
-                "reference": "09c85e14994df92e5ff1f5ec0b481bdb7d3d3df9",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/eb343b86753d26de07ecba7868fa983104361948",
+                "reference": "eb343b86753d26de07ecba7868fa983104361948",
                 "shasum": ""
             },
             "require": {
@@ -6388,7 +6388,7 @@
                 "phpunit/php-code-coverage": "^6.0.7",
                 "phpunit/php-file-iterator": "^2.0.1",
                 "phpunit/php-text-template": "^1.2.1",
-                "phpunit/php-timer": "^2.0",
+                "phpunit/php-timer": "^2.1",
                 "sebastian/comparator": "^3.0",
                 "sebastian/diff": "^3.0",
                 "sebastian/environment": "^4.0",
@@ -6441,7 +6441,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-02-18T09:24:50+00:00"
+            "time": "2019-03-16T07:31:17+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",

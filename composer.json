@@ -1,6 +1,6 @@
 {
-    "name": "legalthings/workflow-engine",
-    "description": "Workflow Engine",
+    "name": "lto/workflow-engine",
+    "description": "LTO Network - Workflow Engine",
     "license": "MIT",
     "repositories": [
         {

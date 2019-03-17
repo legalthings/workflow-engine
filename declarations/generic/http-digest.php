@@ -6,10 +6,10 @@ use Jasny\HttpDigest\ClientMiddleware;
 use Jasny\HttpDigest\Negotiation\DigestNegotiator;
 
 return [
-    HttpDigest::class => function (ContainerInterface $container) {
-        return new HttpDigest(new DigestNegotiator(), 'SHA-256');
+    HttpDigest::class => static function () {
+        return new HttpDigest('SHA-256');
     },
-    ClientMiddleware::class => function(ContainerInterface $container) {
+    ClientMiddleware::class => static function(ContainerInterface $container) {
         $service = $container->get(HttpDigest::class);
 
         return new ClientMiddleware($service);

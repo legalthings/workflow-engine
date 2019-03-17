@@ -27,19 +27,19 @@ class ActorTest extends \Codeception\Test\Unit
      */
     public function describeProvider()
     {
-        $identity = $this->createConfiguredMock(Identity::class, ['getId' => 'a']);
+        $identity = $this->createConfiguredMock(Identity::class, ['describe' => "identity 'a'"]);
+
         $values = [
             'title' => 'John Doe',
             'key' => 'john_doe',
-            'identity' => $identity,
-            'signkeys' => ['foo', 'bar']
+            'identity' => $identity
         ];
 
         return [
+            [[], "unknown actor"],
             [array_only($values, ['title']), 'John Doe'],
             [array_only($values, ['key']), "actor 'john_doe'"],
             [array_only($values, ['identity']), "actor with identity 'a'"],
-            [array_only($values, ['signkeys']), "actor with signkey 'foo'/'bar'"],
             [$values, 'John Doe'],
             [array_without($values, ['title']), "actor 'john_doe'"],
             [array_without($values, ['title', 'key']), "actor with identity 'a'"]
@@ -67,18 +67,20 @@ class ActorTest extends \Codeception\Test\Unit
      */
     public function matchesProvider()
     {
-        $identity1 = $this->createConfiguredMock(Identity::class, ['getId' => 'a']);
-        $identity2 = $this->createConfiguredMock(Identity::class, ['getId' => 'b']);
+        $identity1 = $this->createMock(Identity::class);
+        $identity2 = $this->createMock(Identity::class);
+        $identity3 = $this->createMock(Identity::class);
+
+        $identity1->expects($this->any())->method('matches')
+            ->withConsecutive([$identity2], [$identity3])->willReturnOnConsecutiveCalls(true, false);
 
         return [
             [['key' => 'foo'], ['key' => 'foo'], true],
             [['key' => 'foo'], ['key' => 'bar'], false],
-            [['identity' => $identity1], ['identity' => $identity1], true],
-            [['identity' => $identity1], ['identity' => $identity2], false],
+            [['identity' => $identity1], ['identity' => $identity2], true],
+            [['identity' => $identity1], ['identity' => $identity3], false],
             [['identity' => $identity1], ['identity' => null], false],
             [['identity' => null], ['identity' => $identity1], false],
-            [['signkeys' => ['foo', 'bar', 'baz']], ['signkeys' => ['foo', 'baz']], true],
-            [['signkeys' => ['foo', 'bar', 'baz']], ['signkeys' => ['foo', 'baz', 'zet']], false],
             [[], [], false]
         ];
     }

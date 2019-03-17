@@ -15,11 +15,9 @@ class ProcessInstantiatorTest extends \Codeception\Test\Unit
         $scenario->actors['manager'] = new JsonSchema([
             '$schema' => 'http://json-schema.org/draft-07/schema#',
             'title' => 'Manager',
-            'description' => 'The manager of the organization',
             'type' => 'object',
             'properties' => [
                 'title' => ['type' => 'string'],
-                'description' => ['type' => 'string'],
                 'name' => ['type' => 'string'],
                 'email' => ['type' => 'string', 'format' => 'email'],
             ]
@@ -156,7 +154,6 @@ class ProcessInstantiatorTest extends \Codeception\Test\Unit
         $this->assertArrayHasKey('manager', $actors->getArrayCopy());
         $this->assertInstanceOf(Actor::class, $actors['manager']);
         $this->assertAttributeEquals('Manager', 'title', $actors['manager']);
-        $this->assertAttributeEquals('The manager of the organization', 'description', $actors['manager']);
         $this->assertAttributeSame(null, 'name', $actors['manager']);
         $this->assertAttributeSame(null, 'email', $actors['manager']);
         $this->assertAttributeSame(null, 'identity', $actors['manager']);

@@ -16,9 +16,10 @@ class ScenarioController extends BaseController
     /**
      * @param ScenarioGateway $scenarios
      */
-    public function __construct(ScenarioGateway $scenarios)
+    public function __construct(ScenarioGateway $scenarios, JsonView $jsonView)
     {
         $this->scenarios = $scenarios;
+        $this->jsonView = $jsonView;
     }
 
     /**

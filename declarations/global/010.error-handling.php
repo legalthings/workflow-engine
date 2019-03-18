@@ -22,7 +22,7 @@ return static function(ContainerInterface $container) {
     expect_type($logger, Logger::class);
 
     if ((bool)($config->debug ?? false)) {
-        error_reporting(E_ALL & ~E_STRICT);
+        error_reporting(E_ALL & ~E_STRICT & ~E_USER_DEPRECATED);
 
         $display_errors = $config->display_errors ?? $_SERVER['HTTP_X_DISPLAY_ERRORS'] ?? null;
 

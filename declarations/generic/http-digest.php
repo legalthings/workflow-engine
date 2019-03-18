@@ -3,7 +3,6 @@
 use Psr\Container\ContainerInterface;
 use Jasny\HttpDigest\HttpDigest;
 use Jasny\HttpDigest\ClientMiddleware;
-use Jasny\HttpDigest\Negotiation\DigestNegotiator;
 
 return [
     HttpDigest::class => static function () {

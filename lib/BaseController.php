@@ -8,19 +8,9 @@ abstract class BaseController extends Jasny\Controller
     use Jasny\Controller\RouteAction;
 
     /**
-     * Set the services that the controller depends on.
-     *
-     * @param array $services
+     * @var JsonView|null
      */
-    protected function setServices(array $services): void
-    {
-        $names = get_method_args_names(get_class($this), '__construct');
-
-        for ($i = 0; $i < count($services); $i++) { 
-            $name = $names[$i];
-            $this->$name = $services[$i];
-        }
-    }
+    protected $jsonView;
 
     /**
      * Output data as json
@@ -30,33 +20,26 @@ abstract class BaseController extends Jasny\Controller
      */
     public function output($result, $format = 'json')
     {
-        $usePrettyJson = $this->getRequest()->getAttribute('pretty-json') === true;
-
-        if ($format === 'json' && $usePrettyJson) {
-            if ($this instanceof ScenarioController) {
-                return $this->outputPrettyJson($result, 'scenario');
-            } elseif($this instanceof ProcessController) {
-                return $this->outputPrettyJson($result, 'process');
-            }
+        if ($format === 'json' && $this->jsonView !== null) {
+            $this->viewJson($result);
         }
 
-        return parent::output($result, $format);
+        parent::output($result, $format);
     }
 
     /**
-     * Outout prettyfied json
+     * Outout json using json view.
      *
      * @param mixed $data
-     * @return 
      */
-    protected function outputPrettyJson($data, string $decorator)
+    protected function viewJson($data): void
     {
-        $allDecorators = [
-            'scenario' => new JsonView\PrettyScenarioDecorator(),
-            'process' => new JsonView\PrettyProcessDecorator()
-        ];
+        $view = $this->jsonView;
+        $pretty = (bool)$this->getRequest()->getAttribute('pretty-json');
 
-        $view = (new JsonView($allDecorators))->withDecorator($decorator);
+        if ($pretty && ($data instanceof Scenario || $data instanceof Process)) {
+            $view = $view->withDecorator('pretty.' . strtolower(get_class($data)));
+        }
 
         $view->output($this->getResponse(), $data);
     }

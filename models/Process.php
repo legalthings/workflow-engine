@@ -1,5 +1,6 @@
 <?php declare(strict_types=1);
 
+use Improved as i;
 use Improved\IteratorPipeline\Pipeline;
 use Jasny\DB\EntitySet;
 use Jasny\ValidationResult;
@@ -158,6 +159,37 @@ class Process extends MongoDocument
         return $this;
     }
 
+    /**
+     * Set the values of
+     *
+     * @param array|\stdClass $values
+     * @return self
+     */
+    public function setValues($values)
+    {
+        if (!$this->actors instanceof EntitySet) {
+            return parent::setValues($values);
+        }
+
+        $values = arrayify($values);
+
+        $actorsValues = $values['actors'] ?? [];
+        unset($values['actors']);
+
+        parent::setValues($values);
+
+        foreach ($actorsValues as $key => $actorValues) {
+            $key = $actorValues['key'] ?? $key;
+            if (!isset($this->actors[$key])) {
+                continue;
+            }
+
+            $this->actors[$key]->setValues($actorsValues);
+        }
+
+        return $this;
+    }
+
 
     /**
      * Find any actors that matches the given one.
@@ -184,6 +216,18 @@ class Process extends MongoDocument
     public function hasActor($match): bool
     {
         return $this->getMatchingActors($match)->count() > 0;
+    }
+
+    /**
+     * Check if the process has any actor with an identity.
+     *
+     * @return bool
+     */
+    public function hasKnownActors(): bool
+    {
+        return i\iterable_has_any($this->actors, static function(Actor $actor) {
+            return $actor->identity !== null;
+        });
     }
 
     /**

@@ -2,9 +2,9 @@
 
 return [
     JsonView::class => static function() {
-        return new JsonSchemaFactory([
-            'process:pretty' => new JsonView\PrettyProcessDecorator(),
-            'scenario:pretty' => new JsonView\PrettyScenarioDecorator(),
+        return new JsonView([
+            'pretty.process' => new JsonView\PrettyProcessDecorator(),
+            'pretty.scenario' => new JsonView\PrettyScenarioDecorator(),
         ]);
     },
 ];

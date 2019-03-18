@@ -49,9 +49,15 @@ class ProcessController extends BaseController
         ScenarioGateway $scenarios,
         ProcessInstantiator $instantiator,
         ProcessStepper $stepper,
-        TriggerManager $triggerManager
+        TriggerManager $triggerManager,
+        JsonView $jsonView
     ) {
-        $this->setServices(func_get_args());
+        $this->processes = $processes;
+        $this->scenarios = $scenarios;
+        $this->instantiator = $instantiator;
+        $this->stepper = $stepper;
+        $this->triggerManager = $triggerManager;
+        $this->jsonView = $jsonView;
     }
 
     /**
@@ -71,19 +77,14 @@ class ProcessController extends BaseController
      */
     public function startAction(): void
     {
-        $data = $this->getInput();
-        if (!isset($data['id'])) {
-            throw ValidationException::error('Process id not specified');
-        }
-
         $scenario = $this->getScenarioFromInput();
 
-        $process = $this->instantiator->instantiate($scenario)->setValues($data);
+        $process = $this->instantiator->instantiate($scenario)->setValues($this->getInput());
         $process->validate()->mustSucceed();
-        
+
         $this->authzForAccount($process);
 
-        $process->save();
+        $this->processes->save($process);
 
         $this->output($process);
     }
@@ -189,9 +190,13 @@ class ProcessController extends BaseController
      */
     protected function authzForAccount(Process $process): void
     {
+        if ($this->account === null) {
+            return;
+        }
+
         $actor = $this->getActorForAccount();
 
-        if (!$process->hasActor($actor)) {
+        if (!$process->hasActor($actor) && $process->hasKnownActors()) {
             throw new AuthException("Process doesn't have " . $actor->describe());
         }
     }

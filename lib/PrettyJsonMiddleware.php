@@ -20,7 +20,7 @@ class PrettyJsonMiddleware
     public function __invoke(ServerRequest $request, Response $response, callable $next): Response
     {
         $accept = $request->getHeaderLine('Accept');
-        preg_match('|;view=([^, ]+)|i', $accept, $view);
+        preg_match('|;\s*view=([^, ]+)|i', $accept, $view);
 
         $usePretty = !isset($view[1]) || $view[1] === 'pretty';
         $request = $request->withAttribute('pretty-json', $usePretty);

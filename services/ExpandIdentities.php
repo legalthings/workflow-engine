@@ -1,7 +1,5 @@
 <?php declare(strict_types=1);
 
-use Jasny\DB\Entity\Identifiable;
-
 /**
  * Expand identities on fetch event of a process.
  * To be used with the event dispatcher.
@@ -32,6 +30,10 @@ class ExpandIdentities
     public function __invoke(Process $process): void
     {
         foreach ($process->actors as $actor) {
+            if ($actor->identity === null) {
+                continue;
+            }
+
             $actor->identity = $this->expand($actor->identity);
         }
     }

@@ -26,8 +26,8 @@ bin/codecept build
 
 ## Tests
 
-Test use the [Codeception test framework](https://codeception.com/). The project contains unit and api tests. Code in the
-controllers is only covered by the api tests.
+Test use the [Codeception test framework](https://codeception.com/). The project contains unit and api tests. Code in
+the controllers is only covered by the api tests.
 
 ### Run tests
 
@@ -41,7 +41,8 @@ For more options see https://codeception.com/docs/reference/Commands#run
 
 ### HTTP Mock
 
-External services MUST be mocked. For api tests use `$I->expectHttpRequest()` to mock and assert external http calls done by Guzzle.
+External services MUST be mocked. For api tests use `$I->expectHttpRequest()` to mock and assert external http calls
+done by Guzzle.
 
 ```php
 $I->expectHttpRequest(function (Request $request) use ($I) {
@@ -59,11 +60,11 @@ $I->expectHttpRequest(function (Request $request) use ($I) {
 To serve the project on localhost run
 
 ```
-php -S localhost:4000 -t www
+php -S localhost:4001 -t www
 ```
 
-_Note, it's preferable to work TDD and use tests when developing. This means you would hardly ever need to run this service
-localy._
+_Note, it's preferable to work TDD and use tests when developing. This means you would hardly ever need to run this
+service locally._
 
 
 ## JSON REST API
@@ -115,4 +116,3 @@ Key            | Value  | Description
 "field (none)" | array  | None of the values are part of the field
 
 To filter between two values, use both `(min)` and `(max)`.
-

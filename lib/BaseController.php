@@ -22,6 +22,7 @@ abstract class BaseController extends Jasny\Controller
     {
         if ($format === 'json' && $this->jsonView !== null) {
             $this->viewJson($result);
+            return;
         }
 
         parent::output($result, $format);

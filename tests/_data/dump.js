@@ -16,8 +16,7 @@ db.getCollection("scenarios").insert([
             },
             {
                 "key": "organization",
-                "title": "Organization",
-                "identity": "6uk7288s-afe4-7398-8dbh-7914ffd930pl"
+                "title": "Organization"
             }
         ],
         "actions": [

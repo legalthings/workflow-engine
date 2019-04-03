@@ -173,18 +173,28 @@ class Process extends MongoDocument
 
         $values = arrayify($values);
 
-        $actorsValues = $values['actors'] ?? [];
-        unset($values['actors']);
+        if (isset($values['actors']) && is_array($values['actors'])) {
+            $actorsValues = $values['actors'] ?? [];
+            unset($values['actors']);
+        }
 
         parent::setValues($values);
 
-        foreach ($actorsValues as $key => $actorValues) {
-            $key = $actorValues['key'] ?? $key;
-            if (!isset($this->actors[$key])) {
-                continue;
-            }
-
-            $this->actors[$key]->setValues($actorsValues);
+        if (isset($actorsValues)) {
+            Pipeline::with($actorsValues)
+                ->mapKeys(static function($vals, $key) {
+                    return $vals['key'] ?? $key;
+                })
+                ->filter(function ($_, $key) {
+                    return isset($this->actors[$key]);
+                })
+                ->map(static function($vals) {
+                    return is_string($vals) ? ['identity' => $vals] : (array)$vals;
+                })
+                ->apply(function(array $vals, $key) {
+                    $this->actors[$key]->setValues($vals);
+                })
+                ->walk();
         }
 
         return $this;

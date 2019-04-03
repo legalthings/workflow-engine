@@ -15,7 +15,7 @@ $response = [
 ];
 
 $I->haveHttpHeader('Content-Type', 'application/json');
-$I->sendPOST('/responses', $response);
+$I->sendPOST('/processes/-/response', $response);
 
 $I->seeResponseIsJson();
 $I->seeResponseCodeIs(200);

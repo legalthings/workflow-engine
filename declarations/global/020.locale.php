@@ -25,11 +25,4 @@ return static function(ContainerInterface $container) {
     putenv("LANG=$localeCharset");
     putenv("LANGUAGE=$localeCharset");
     putenv("LC_ALL=$localeCharset");
-
-    if ($container->has('config.locale') && $container->get('config.translate')) {
-        bindtextdomain("messages", 'locale');
-        textdomain("messages");
-    } elseif (function_exists('textdomain')) {
-        textdomain("-");
-    }
 };

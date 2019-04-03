@@ -14,11 +14,6 @@ class ProcessInstantiator
     protected $gateway;
 
     /**
-     * @var IdentityGateway
-     **/
-    protected $identityGateway;
-
-    /**
      * @var StateInstantiator
      */
     protected $stateInstantiator;
@@ -32,13 +27,10 @@ class ProcessInstantiator
      */
     public function __construct(
         ProcessGateway $gateway, 
-        StateInstantiator $stateInstantiator, 
-        IdentityGateway $identityGateway
-    )
-    {
+        StateInstantiator $stateInstantiator
+    ) {
         $this->gateway = $gateway;
-        $this->identityGateway = $identityGateway;
-        $this->stateInstantiator = $stateInstantiator;        
+        $this->stateInstantiator = $stateInstantiator;
     }
 
 
@@ -82,21 +74,10 @@ class ProcessInstantiator
             $actor = i\type_check(
                 $schema->build(),
                 'object',
-                new InvalidArgumentException("Invalid JSON Schema for actor '$key'; got %s.")
+                new InvalidArgumentException("Invalid JSONSchema for actor '$key'; unexpected type %s.")
             );
 
             $actor->title = $schema->title;
-
-            if (isset($schema->signkeys)) {
-                $actor->signkeys = $schema->signkeys;
-            }
-            if (isset($schema->identity)) {
-                $actor->identity = $this->identityGateway->fetch($schema->identity);
-
-                if (!isset($actor->identity)) {
-                    throw new Exception("Identity with id {$schema->identity} not found");
-                }
-            }
 
             $actors[$key] = $actor;
         }

@@ -1,6 +1,6 @@
 locale: en_US
-translate: true
-noauth: false
+debug: false
+digest: required
 
 triggers:
   nop:

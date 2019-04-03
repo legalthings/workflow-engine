@@ -311,6 +311,11 @@ class Process extends MongoDocument
     public function validate(): ValidationResult
     {
         $validation = parent::validate();
+
+        if (!$this->hasKnownActors()) {
+            $validation->addError('no known actors');
+        }
+
         $validation = $this->dispatcher->trigger('validate', $this, $validation);
 
         return $validation;

@@ -24,11 +24,7 @@ class ProcessInstantiatorTest extends \Codeception\Test\Unit
         ]);
         $scenario->actors['client'] = new JsonSchema([
             'title' => 'Client', 
-            'type' => 'object',
-            'signkeys' => [
-                '57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn'
-            ],
-            'identity' => '6uk7288s-afe4-7398-8dbh-7914ffd930pl'
+            'type' => 'object'
         ]);
 
         $scenario->states[':initial'] = new State();
@@ -90,19 +86,13 @@ class ProcessInstantiatorTest extends \Codeception\Test\Unit
         $dispatcher->expects($this->once())->method('trigger')
             ->with('instantiate', $this->identicalTo($process));
 
-        $identity = $this->createMock(Identity::class);
-        $identityGateway = $this->createMock(IdentityGateway::class);
-        $identityGateway->expects($this->once())->method('fetch')
-            ->with('6uk7288s-afe4-7398-8dbh-7914ffd930pl')->willReturn($identity);
-
-        $instantiator = new ProcessInstantiator($processGateway, $stateInstatiator, $identityGateway);
+        $instantiator = new ProcessInstantiator($processGateway, $stateInstatiator);
 
         $process = $instantiator->instantiate($scenario);
 
         $this->assertAttributeSame($scenario, 'scenario', $process);
         $this->assertAttributeEquals('Do the test', 'title', $process);
 
-        $this->assertActors($process->actors, $identity);
         $this->assertAssets($process->assets);
 
         // Definitions should be a clone from scenario
@@ -110,36 +100,6 @@ class ProcessInstantiatorTest extends \Codeception\Test\Unit
         $this->assertNotSame($scenario->definitions->getArrayCopy(), $process->definitions->getArrayCopy());
 
         $this->assertAttributeSame($currentState, 'current', $process);
-    }
-
-    /**
-     * Test 'instantiate' method, if identity is not found
-     *
-     * @expectedException Exception
-     * @expectedExceptionMessage Identity with id 6uk7288s-afe4-7398-8dbh-7914ffd930pl not found
-     */
-    public function testInstantiateIdentityNotFound()
-    {
-        $scenario = $this->createScenario();
-
-        $dispatcher = $this->createMock(EventDispatcher::class);
-        $process = new Process();
-        $process->setDispatcher($dispatcher);
-
-        $processGateway = $this->createMock(ProcessGateway::class);
-        $processGateway->expects($this->once())->method('create')->willReturn($process);
-
-        $stateInstatiator = $this->createMock(StateInstantiator::class);
-
-        $dispatcher->expects($this->never())->method('trigger');
-
-        $identityGateway = $this->createMock(IdentityGateway::class);
-        $identityGateway->expects($this->once())->method('fetch')
-            ->with('6uk7288s-afe4-7398-8dbh-7914ffd930pl')->willReturn(null);
-
-        $instantiator = new ProcessInstantiator($processGateway, $stateInstatiator, $identityGateway);
-
-        $instantiator->instantiate($scenario);
     }
 
     /**
@@ -154,15 +114,12 @@ class ProcessInstantiatorTest extends \Codeception\Test\Unit
         $this->assertArrayHasKey('manager', $actors->getArrayCopy());
         $this->assertInstanceOf(Actor::class, $actors['manager']);
         $this->assertAttributeEquals('Manager', 'title', $actors['manager']);
-        $this->assertAttributeSame(null, 'name', $actors['manager']);
-        $this->assertAttributeSame(null, 'email', $actors['manager']);
         $this->assertAttributeSame(null, 'identity', $actors['manager']);
 
         $this->assertArrayHasKey('client', $actors->getArrayCopy());
         $this->assertInstanceOf(Actor::class, $actors['client']);
         $this->assertAttributeEquals('Client', 'title', $actors['client']);
-        $this->assertAttributeEquals(['57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn'], 'signkeys', $actors['client']);
-        $this->assertAttributeEquals($identity, 'identity', $actors['client']);
+        $this->assertAttributeSame(null, 'identity', $actors['client']);
     }
 
     /**

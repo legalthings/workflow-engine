@@ -105,9 +105,9 @@ class ProcessController extends BaseController
     /**
      * Handle a new response.
      */
-    public function handleResponseAction(): void
+    public function handleResponseAction(string $id = '-'): void
     {
-        $process = $this->getProcessFromInput();
+        $process = $this->getProcessFromInput($id);
         $this->authzForAccount($process);
 
         $response = (new Response)
@@ -127,7 +127,7 @@ class ProcessController extends BaseController
      */
     public function invokeAction(string $id): void
     {
-        $process = $this->processes->fetch($id);
+        $process = $this->getProcessFromInput($id);
         $this->authzForAccount($process);
 
         $actor = $this->getActorForAccount($process);
@@ -169,15 +169,20 @@ class ProcessController extends BaseController
     /**
      * Get the process id from the posted data and fetch the process.
      *
+     * @param string|null $idFromPath
      * @return Process
      */
-    protected function getProcessFromInput(): Process
+    protected function getProcessFromInput(?string $idFromPath): Process
     {
         $input = $this->getInput();
-        $processId = $input['process']['id'] ?? $input['process'] ?? null;
+        $processId = $input['process']['id'] ?? $input['process'] ?? $idFromPath ?? null;
 
-        if (!is_string($processId)) {
+        if (!is_string($processId) || $processId === '-') {
             throw ValidationException::error('Process not specified');
+        }
+
+        if ($idFromPath !== '-' && $processId !== $idFromPath) {
+            throw ValidationException::error('Incorrect process id');
         }
 
         return $this->processes->fetch($processId);

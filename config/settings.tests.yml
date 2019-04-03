@@ -1,11 +1,10 @@
-debug: true
-display_errors: true
+digest: optional
 
 triggers:
   nop:
-    schema: https://specs.livecontracts.io/v1.0.0/action/nop/schema.json#
+    schema: https://specs.livecontracts.io/v0.2.0/action/nop/schema.json#
   http:
-    schema: https://specs.livecontracts.io/v1.0.0/action/http/schema.json#
+    schema: https://specs.livecontracts.io/v0.2.0/action/http/schema.json#
 
 db:
   default:

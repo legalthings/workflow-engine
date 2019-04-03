@@ -3,6 +3,7 @@
 use Improved as i;
 use Jasny\ValidationResult;
 use Jasny\ValidationException;
+use LTO\Account;
 
 /**
  * Handle a response and step through a process.
@@ -33,36 +34,12 @@ class ProcessStepper
      */
     public function step(Process $process, Response $response): void
     {
-        $this->setInitialActor($process, $response);
         $this->validate($process, $response)->mustSucceed();
 
         $process->current->response = $this->expandResponse($process, $response);
         $this->processUpdater->update($process)->mustSucceed();
 
         $process->dispatch('step');
-    }
-
-    /**
-     * Set the identity of the actor for a process that is in the ':initial' state and doesn't have any known actors.
-     *
-     * @param Process  $process
-     * @param Response $response
-     */
-    protected function setInitialActor(Process $process, Response $response): void
-    {
-        if ($process->current->key !== ':initial' || $process->hasKnownActors()) {
-            return;
-        }
-
-        $current = $process->current;
-        $actionKey = i\type_check($response->action ?? null, Action::class)->key;
-
-        if (!isset($current->actions[$actionKey]) || count($current->actions[$actionKey]->actors) > 1) {
-            return;
-        }
-
-        $initialActor = $process->actors[reset($current->actions[$actionKey]->actors)];
-        $initialActor->identity = $response->actor->identity;
     }
 
     /**

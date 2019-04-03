@@ -14,7 +14,7 @@ return [
     static function (RouterInterface $router, ContainerInterface $container) {
         $service = $container->get(HttpDigest::class);
         $middleware = (new HttpDigestMiddleware($service))
-            ->withOptionalDigest((bool)$container->get('config.debug'));
+            ->withOptionalDigest($container->get('config.digest') === 'optional');
 
         return $middleware->asDoublePass();
     },

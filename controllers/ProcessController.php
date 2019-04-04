@@ -132,7 +132,18 @@ class ProcessController extends BaseController
 
         $actor = $this->getActorForAccount($process);
 
-        $this->triggerManager->invoke($process, null, $actor);
+        // Todo; this continues stepping, but doesn't add events to the chain
+        do {
+            $response = $this->triggerManager->invoke($process, null, $actor);
+
+            if ($response === null) {
+                break;
+            }
+
+            $this->stepper->step($process, $response);
+        } while (true);
+
+        $this->noContent();
     }
 
     /**

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bbbf19af34ca80252789ec4e30dffe98",
+    "content-hash": "2d6fe42f97b80a18aa4b299e989024d9",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -1865,6 +1865,51 @@
                 "query"
             ],
             "time": "2016-07-01T13:42:21+00:00"
+        },
+        {
+            "name": "jasny/dummy-middleware",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jasny/dummy-middleware.git",
+                "reference": "fc0db74828849dc81c11a1d05ee31be294e2721c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jasny/dummy-middleware/zipball/fc0db74828849dc81c11a1d05ee31be294e2721c",
+                "reference": "fc0db74828849dc81c11a1d05ee31be294e2721c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2.0",
+                "psr/http-message": "^1.0",
+                "psr/http-server-middleware": "^1.0"
+            },
+            "require-dev": {
+                "guzzlehttp/guzzle": "^6.3",
+                "jasny/php-code-quality": "^2.3",
+                "php-http/client-common": "^2.0",
+                "php-http/mock-client": "^1.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Jasny\\Dummy\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Arnold Daniels",
+                    "email": "arnold@jasny.net",
+                    "homepage": "http://www.jasny.net"
+                }
+            ],
+            "description": "Dummy client and server middleware for PSR-7 requests",
+            "time": "2019-03-13T00:08:30+00:00"
         },
         {
             "name": "jasny/error-handler",

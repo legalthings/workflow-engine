@@ -18,7 +18,7 @@ abstract class BaseController extends Jasny\Controller
      * @param mixed $result
      * @param string $format  Mime or content format
      */
-    public function output($result, $format = 'json')
+    public function output($result, $format = 'json'): void
     {
         if ($format === 'json' && $this->jsonView !== null) {
             $this->viewJson($result);
@@ -29,7 +29,7 @@ abstract class BaseController extends Jasny\Controller
     }
 
     /**
-     * Outout json using json view.
+     * Output json using json view.
      *
      * @param mixed $data
      */
@@ -42,7 +42,8 @@ abstract class BaseController extends Jasny\Controller
             $view = $view->withDecorator('pretty.' . strtolower(get_class($data)));
         }
 
-        $view->output($this->getResponse(), $data);
+        $response = $view->output($this->getResponse(), $data);
+        $this->setResponse($response);
     }
 
     /**

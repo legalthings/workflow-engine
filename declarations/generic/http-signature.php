@@ -10,7 +10,7 @@
 
 use Psr\Container\ContainerInterface;
 use Jasny\HttpSignature\HttpSignature;
-use Jasny\HttpSignature\ClientMiddleware;
+use Jasny\HttpSignature\ClientMiddleware as HttpSignatureMiddleware;
 use LTO\Account;
 use LTO\AccountFactory;
 use LTO\Account\SignCallback;
@@ -25,7 +25,7 @@ return [
             ['ed25519', 'ed25519-sha256'],
             new SignCallback($node),
             function() { return true; }
-            // Temporary disable verification, until whole httpSignature is fixed
+            // TODO; temporary disable verification, until whole httpSignature is fixed
             // new VerifyCallback($factory)
         );
 
@@ -37,7 +37,7 @@ return [
             ->withRequiredHeaders('POST', $requiredWriteHeaders)
             ->withRequiredHeaders('PUT', $requiredWriteHeaders);
     },
-    ClientMiddleware::class => function(ContainerInterface $container) {
+    HttpSignatureMiddleware::class => function(ContainerInterface $container) {
         return new HttpSignatureMiddleware($container->get(HttpSignature::class));
     }
 ];

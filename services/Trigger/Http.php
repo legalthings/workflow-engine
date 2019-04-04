@@ -114,7 +114,7 @@ class Http extends AbstractTrigger
     protected function sendSingleRequest(\Action $action, $info): ?\Response
     {
         $method = strtoupper($info->method ?? $this->method);
-        $url = strtoupper($info->url ?? $this->url);
+        $url = $info->url ?? $this->url;
         $options = $this->getRequestOptions(
             array_merge($this->headers, (array)($info->headers ?? [])),
             array_merge($this->query, (array)($info->query ?? [])),

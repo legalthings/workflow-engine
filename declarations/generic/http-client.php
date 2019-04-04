@@ -9,7 +9,7 @@ use Jasny\HttpDigest\ClientMiddleware as HttpDigestMiddleware;
 use Jasny\HttpSignature\ClientMiddleware as HttpSignatureMiddleware;
 
 return [
-    HandlerStack::class => function(ContainerInterface $container) {
+    HandlerStack::class => static function(ContainerInterface $container) {
         $stack = HandlerStack::create();
         $stack->setHandler(new CurlHandler());
 
@@ -21,9 +21,12 @@ return [
 
         return $stack;
     },
-    ClientInterface::class => function (ContainerInterface $container) {
+    ClientInterface::class => static function (ContainerInterface $container) {
         $stack = $container->get(HandlerStack::class);
 
         return new Client(['handler' => $stack, 'timeout' => 20]);
+    },
+    Client::class => static function (ContainerInterface $container) {
+        return $container->get(ClientInterface::class); // Alias
     }
 ];

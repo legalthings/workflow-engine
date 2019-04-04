@@ -51,7 +51,8 @@
         "jasny/http-digest": "^1.1",
         "lto/api": "^0.2.1",
         "ramsey/uuid": "^3.8",
-        "jasny/immutable": "^1.0"
+        "jasny/immutable": "^1.0",
+        "jasny/dummy-middleware": "^1.1"
     },
     "require-dev" : {
         "jasny/php-code-quality" : "^2.0.0",

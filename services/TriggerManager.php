@@ -110,7 +110,7 @@ class TriggerManager
             throw ValidationException::error("Unknown %s", $givenActor->describe());
         }
 
-        $actor = $process->getActorForAction($action->key, $givenActor);
+        $actor = $action !== null ? $process->getActorForAction($action->key, $givenActor) : null;
 
         if ($action !== null && $actor !== null) {
             // ok :-)

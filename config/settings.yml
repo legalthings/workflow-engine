@@ -1,6 +1,7 @@
 locale: en_US
 debug: false
 digest: required
+noauth: false
 
 triggers:
   nop:

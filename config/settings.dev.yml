@@ -1,5 +1,12 @@
 debug: true
 digest: optional
+noauth: true
+
+triggers:
+  nop:
+    schema: https://specs.livecontracts.io/v0.2.0/action/nop/schema.json#
+  http:
+    schema: https://specs.livecontracts.io/v0.2.0/action/http/schema.json#
 
 lto:
   account:

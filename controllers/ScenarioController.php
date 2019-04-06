@@ -30,7 +30,10 @@ class ScenarioController extends BaseController
         $scenario = $this->scenarios->create()->setValues($this->getInput());
         $scenario->validate()->mustSucceed();
 
-        $this->scenarios->save($scenario);
+        $exists = isset($scenario->id) && $this->scenarios->exists($scenario->id);
+        if (!$exists) {
+            $this->scenarios->save($scenario);
+        }
 
         $this->output($scenario);
     }

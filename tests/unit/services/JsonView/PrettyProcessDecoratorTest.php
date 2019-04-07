@@ -60,6 +60,42 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
     }
 
     /**
+     * Provide data for testing '__invoke' method, when current state is one of implicit states
+     *
+     * @return array
+     */
+    public function invokeCurrentImplicitStateProvider()
+    {
+        return [
+            [':success'],
+            [':failed'],
+            [':cancelled']
+        ];
+    }
+
+    /**
+     * Test '__invoke' method, when current state is one of implicit states
+     *
+     * @dataProvider invokeCurrentImplicitStateProvider
+     */
+    public function testInvokeCurrentImplicitState($key)
+    {
+        $data = $this->getData();
+        $expected = $this->getExpectedProcess('basic-user-and-system.second-state');
+        $process = $this->createMock(Process::class);
+
+        $data->current->key = $key;
+
+        $expected->id = $data->id;
+        $expected->current = (object)['key' => $key];
+
+        $decorator = new PrettyProcessDecorator();
+        $result = $decorator($process, $data);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
      * Get expected process data
      *
      * @return stdClass

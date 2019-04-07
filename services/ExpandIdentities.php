@@ -30,7 +30,7 @@ class ExpandIdentities
     public function __invoke(Process $process): void
     {
         foreach ($process->actors as $actor) {
-            if ($actor->identity === null) {
+            if (!isset($actor->identity)) {
                 continue;
             }
 
@@ -46,10 +46,6 @@ class ExpandIdentities
      */
     protected function expand($identity): ?Identity
     {
-        if (!isset($identity)) {
-            return null;
-        }
-
         if ($identity instanceof Identity && !$identity->isGhost()) {
             return $identity;
         }
@@ -59,8 +55,6 @@ class ExpandIdentities
         try {
             return $this->gateway->fetch($id);
         } catch (EntityNotFoundException $exception) {
-            trigger_error($exception, E_USER_WARNING);
-
             return $identity instanceof Identity ? $identity : Identity::lazyload(['id' => $identity]);
         }
     }

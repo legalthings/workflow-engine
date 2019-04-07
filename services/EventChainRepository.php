@@ -91,7 +91,7 @@ class EventChainRepository
         $err = null;
         $data = json_decode($json);
 
-        if ($json === false) {
+        if (!isset($data)) {
             $err = json_last_error_msg();
         } elseif (!isset($data->id)) {
             $err = "'id' property is missing";

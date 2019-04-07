@@ -15,5 +15,6 @@
 
 /config/settings.local.yml
 /config/settings.*.local.yml
+/config/local/
 
 /www/bower_components

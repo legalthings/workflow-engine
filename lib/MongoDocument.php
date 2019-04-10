@@ -59,4 +59,19 @@ abstract class MongoDocument extends Mongo\Document implements Enrichable
 
         return array_intersect_key($data, ['_id' => null] + object_get_properties($this, true));
     }
+
+    /**
+     * Get type cast object
+     *
+     * @return Mongo\TypeCast
+     */
+    protected function typeCast($value)
+    {
+        $typecast = TypeCast::value($value);
+
+        $typecast->alias('self', get_class($this));
+        $typecast->alias('static', get_class($this));
+
+        return $typecast;
+    }
 }

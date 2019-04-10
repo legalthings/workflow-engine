@@ -5,6 +5,7 @@ use Improved\IteratorPipeline\Pipeline;
 use Jasny\DB\Entity\Dynamic;
 use Jasny\EventDispatcher\EventDispatcher;
 use Jasny\ValidationResult;
+use Jasny\ValidationException;
 
 /**
  * A scenario is the blueprint of a process.
@@ -125,6 +126,8 @@ class Scenario extends MongoDocument implements Dynamic
      */
     public function cast()
     {
+        $this->validateTypesBeforeCast();
+
         parent::cast();
 
         $this->castJsonSchemas($this->actors);
@@ -142,6 +145,25 @@ class Scenario extends MongoDocument implements Dynamic
         }
 
         return $this;
+    }
+
+    /**
+     * Validate values types before type casting
+     */
+    protected function validateTypesBeforeCast()
+    {
+        try {
+            foreach (['actors', 'actions', 'states', 'assets', 'definitions'] as $field) {
+                i\type_check($this->$field, 'iterable');
+            }
+
+            type_check_iterable($this->actors, ['array', stdClass::class, Actor::class, JsonSchema::class]);
+            type_check_iterable($this->assets, ['array', stdClass::class, Asset::class, JsonSchema::class]);
+            type_check_iterable($this->actions, ['array', stdClass::class, Action::class]);
+            type_check_iterable($this->states, ['array', stdClass::class, State::class]);
+        } catch (TypeError $exception) {
+            throw ValidationException::error($exception->getMessage());
+        }
     }
 
     /**
@@ -233,6 +255,11 @@ class Scenario extends MongoDocument implements Dynamic
     public function validate(): ValidationResult
     {
         $validation = new ValidationResult();
+
+        $isSchemaValid = is_schema_link_valid($this->schema, 'scenario');
+        if (!$isSchemaValid) {
+            $validation->addError("schema property value is not valid");
+        }
 
         $actionPrefix = $validation->translate("action '%s'");
         foreach ($this->actions as $key => $action) {

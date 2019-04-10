@@ -25,6 +25,8 @@ class BadRequestMiddleware
             return $this->badRequest($response, $exception->getCode() === 401 ? 401 : 403, $exception->getMessage());
         } catch (EntityNotFoundException $exception) {
             return $this->badRequest($response, 404, $exception->getMessage());
+        } catch (TypeCastException $exception) {
+            return $this->badRequest($response, 400, $exception->getMessage());
         } catch (ValidationException $exception) {
             return $this->badRequest($response, 400, $exception->getErrors());
         }

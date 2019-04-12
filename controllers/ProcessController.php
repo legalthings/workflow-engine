@@ -42,6 +42,11 @@ class ProcessController extends BaseController
     protected $account;
 
     /**
+     * @var EventChainRepository
+     **/
+    protected $eventChainRepository;
+
+    /**
      * Class constructor for DI.
      */
     public function __construct(
@@ -50,7 +55,8 @@ class ProcessController extends BaseController
         ProcessInstantiator $instantiator,
         ProcessStepper $stepper,
         TriggerManager $triggerManager,
-        JsonView $jsonView
+        JsonView $jsonView,
+        EventChainRepository $eventChainRepository
     ) {
         $this->processes = $processes;
         $this->scenarios = $scenarios;
@@ -58,6 +64,7 @@ class ProcessController extends BaseController
         $this->stepper = $stepper;
         $this->triggerManager = $triggerManager;
         $this->jsonView = $jsonView;
+        $this->eventChainRepository = $eventChainRepository;
     }
 
     /**
@@ -132,18 +139,15 @@ class ProcessController extends BaseController
 
         $actor = $this->getActorForAccount($process);
 
-        // Todo; this continues stepping, but doesn't add events to the chain
-        do {
-            $response = $this->triggerManager->invoke($process, null, $actor);
+        $this->eventChainRepository->fetch($process->chain);
 
-            if ($response === null) {
-                break;
-            }
+        $response = $this->triggerManager->invoke($process, null, $actor);
 
-            $this->stepper->step($process, $response);
-        } while (true);
-
-        $this->noContent();
+        if ($response->data instanceof LTO\Event) {
+            $this->output($response->data, 'json');
+        } else {
+            $this->noContent();            
+        }
     }
 
     /**

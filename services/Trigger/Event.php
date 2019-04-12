@@ -56,6 +56,8 @@ class Event extends AbstractTrigger
     public function apply(\Action $action): ?\Response
     {
         $info = $this->project($action);
+        $info->chain = $action->process->chain;
+
         $this->assert($info);
 
         $chain = $this->repository->get($info->chain);
@@ -93,9 +95,6 @@ class Event extends AbstractTrigger
      */
     protected function createResponse(LTO\Event $event): \Response
     {
-        $data = $event->jsonSerialize();
-        unset($data->body);
-
-        return (new \Response)->setValues(['data' => $data, 'key' => 'ok']);
+        return (new \Response)->setValues(['data' => $event, 'key' => 'ok']);
     }
 }

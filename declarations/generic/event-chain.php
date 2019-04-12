@@ -18,7 +18,7 @@ return [
 
         $options = [
             'base_uri' => $container->get('config.event_chain.url'),
-            'signature_key_id' => $container->get(Account::class)->getPublicKey(),
+            'signature_key_id' => $container->get(Account::class)->getPublicSignKey(),
         ];
 
         return $reconfigure($container->get(HttpClient::class), $options);

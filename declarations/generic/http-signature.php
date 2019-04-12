@@ -10,7 +10,7 @@
 
 use Psr\Container\ContainerInterface;
 use Jasny\HttpSignature\HttpSignature;
-use Jasny\HttpSignature\ClientMiddleware as HttpSignatureMiddleware;
+use Jasny\HttpSignature\ClientMiddleware;
 use LTO\Account;
 use LTO\AccountFactory;
 use LTO\Account\SignCallback;
@@ -37,7 +37,10 @@ return [
             ->withRequiredHeaders('POST', $requiredWriteHeaders)
             ->withRequiredHeaders('PUT', $requiredWriteHeaders);
     },
-    HttpSignatureMiddleware::class => function(ContainerInterface $container) {
-        return new HttpSignatureMiddleware($container->get(HttpSignature::class));
+    ClientMiddleware::class => function(ContainerInterface $container) {
+        $node = $container->get(Account::class);
+        $service = $container->get(HttpSignature::class);
+
+        return new ClientMiddleware($service->withAlgorithm('ed25519'), $node->getPublicSignKey());
     }
 ];

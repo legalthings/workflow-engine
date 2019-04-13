@@ -26,7 +26,9 @@ return [
     EventChainRepository::class => static function(ContainerInterface $container) {
         /** @var HttpClient $client */
         $client = $container->get('event-chain.http-client');
+        $createEvent = $container->get('event.create');
+        $account = $container->get(Account::class);
 
-        return new EventChainRepository($client);
+        return new EventChainRepository($createEvent, $account, $client);
     },
 ];

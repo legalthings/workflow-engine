@@ -80,6 +80,7 @@ class TriggerManager
         };
 
         $result->action = $action;
+        $result->process = $process->id;
         $result->actor = clone $action->actor;
         unset($result->action->actor);
 

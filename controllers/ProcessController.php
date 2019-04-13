@@ -134,19 +134,19 @@ class ProcessController extends BaseController
      */
     public function invokeAction(string $id): void
     {
-        $process = $this->getProcessFromInput($id);
+        $process = $this->getProcessFromInput($id);        
         $this->authzForAccount($process);
-
-        $actor = $this->getActorForAccount($process);
 
         $this->eventChainRepository->fetch($process->chain);
 
+        $actor = $this->getActorForAccount($process);
         $response = $this->triggerManager->invoke($process, null, $actor);
 
-        if ($response->data instanceof LTO\Event) {
-            $this->output($response->data, 'json');
+        if (!isset($response)) {
+            $this->noContent();
         } else {
-            $this->noContent();            
+            $event = $this->eventChainRepository->addResponse($process->chain, $response);
+            $this->output($event, 'json');            
         }
     }
 

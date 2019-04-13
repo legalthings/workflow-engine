@@ -4,6 +4,7 @@ namespace Trigger;
 
 use EventChainRepository;
 use LTO;
+use LegalThings\DataEnricher;
 
 /**
  * Create and add an event to the event chain.
@@ -27,6 +28,11 @@ class Event extends AbstractTrigger
     protected $account;
 
     /**
+     * @var DataEnricher
+     **/
+    protected $dataEnricher;
+
+    /**
      * Event trigger constructor.
      *
      * @param callable             $createEvent
@@ -38,11 +44,13 @@ class Event extends AbstractTrigger
         callable $createEvent,
         EventChainRepository $repository,
         LTO\Account $account,
-        callable $jmespath
+        callable $jmespath,
+        DataEnricher $dataEnricher
     ) {
         $this->repository = $repository;
         $this->createEvent = $createEvent;
         $this->account = $account;
+        $this->dataEnricher = $dataEnricher;
 
         parent::__construct($jmespath);
     }
@@ -60,12 +68,13 @@ class Event extends AbstractTrigger
 
         $this->assert($info);
 
+        $this->dataEnricher->applyTo($info->body, $action->process);
+
         $chain = $this->repository->get($info->chain);
-
         $newEvent = ($this->createEvent)($info->body, $chain->getLatestHash())->signWith($this->account);
-        $chain->add($newEvent);
+        // $chain->add($newEvent);
 
-        $this->repository->update($chain);
+        // $this->repository->update($chain);
 
         return $this->createResponse($newEvent);
     }

@@ -20,3 +20,6 @@ lto:
       secretkey: 3R2rpsEQqifWTt1BdLTbQv5vzXPQ91onH8Z3sVnkfPu7
       publickey: EGG47VCK3ZnJYZAZpwG7u3SbDkC7QgDfLDrpGTdydURd
   network: T
+
+event_chain:
+  url: http://localhost/

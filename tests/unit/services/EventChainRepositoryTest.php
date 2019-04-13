@@ -9,12 +9,31 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use LTO\Event;
 use LTO\EventChain;
+use LTO\Account;
 
 /**
  * @covers \EventChainRepository
  */
 class EventChainRepositoryTest extends \Codeception\Test\Unit
 {
+    /**
+     * @var callable
+     **/
+    protected $createEvent;
+
+    /**
+     * @var LTO\Account
+     **/
+    protected $account;
+
+    /**
+     * Perform some actions before each test
+     */
+    public function _before()
+    {
+        $this->createEvent = function() {};
+        $this->account = $this->createMock(Account::class);
+    }
     /**
      * Create a Guzzle mock handler
      *
@@ -69,7 +88,7 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
 
         $chain = $this->createEventChainMock();
 
-        $repository = new EventChainRepository($client);
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
         $repository->register($chain);
 
         $result = $repository->get($chain->id);
@@ -102,7 +121,7 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
             new HttpResponse(200, ['Content-Type' => 'application/json'], json_encode($chainResponseBody))
         ], $history);
 
-        $repository = new EventChainRepository($client);
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
 
         $chain = $repository->$method('JEKNVnkbo3jqSHT8tfiAKK4tQTFK7jbx8t18wEEnygya');
 
@@ -131,7 +150,7 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
             new HttpResponse(200, ['Content-Type' => 'application/json'], '{"id": "JEKNVnkbo3jqSHT8tfiAKK4tQTFK7')
         ], $history);
 
-        $repository = new EventChainRepository($client);
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
         $repository->fetch('JEKNVnkbo3jqSHT8tfiAKK4tQTFK7jbx8t18wEEnygya');
     }
 
@@ -151,7 +170,7 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
             new HttpResponse(200, ['Content-Type' => 'application/json'], json_encode($chainResponseBody))
         ], $history);
 
-        $repository = new EventChainRepository($client);
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
         $repository->fetch('JEKNVnkbo3jqSHT8tfiAKK4tQTFK7jbx8t18wEEnygya');
     }
 
@@ -171,7 +190,7 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
             new HttpResponse(200, ['Content-Type' => 'application/json'], json_encode($chainResponseBody))
         ], $history);
 
-        $repository = new EventChainRepository($client);
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
         $repository->fetch('JEKNVnkbo3jqSHT8tfiAKK4tQTFK7jbx8t18wEEnygya');
     }
 
@@ -180,7 +199,7 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
         $client = $this->createMock(HttpClient::class);
         $client->expects($this->never())->method($this->anything());
 
-        $repository = new EventChainRepository($client);
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
 
         $chain = $this->createEventChainMock(2);
         $repository->register($chain);
@@ -208,7 +227,7 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
         $client = $this->createMock(HttpClient::class);
         $client->expects($this->never())->method($this->anything());
 
-        $repository = new EventChainRepository($client);
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
 
         $chain = $this->createEventChainMock(2);
         $repository->update($chain);        
@@ -220,7 +239,7 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
             new HttpResponse(201)
         ], $history);
 
-        $repository = new EventChainRepository($client);
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
 
         $chain = $this->createEventChainMock(2);
         $repository->register($chain);
@@ -269,7 +288,7 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
         $client = $this->createMock(HttpClient::class);
         $client->expects($this->never())->method($this->anything());
 
-        $repository = new EventChainRepository($client);
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
 
         $partialChain = $this->createEventChainMock(2);
         $partialChain->events = [];
@@ -292,7 +311,7 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
             new HttpResponse(201),
         ], $history);
 
-        $repository = new EventChainRepository($client);
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
 
         $chains = [];
 
@@ -355,7 +374,7 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
         $client = $this->createMock(HttpClient::class);
         $client->expects($this->never())->method($this->anything());
 
-        $repository = new EventChainRepository($client);
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
 
         $chain = $this->createEventChainMock(2);
         $repository->persist($chain->id);        

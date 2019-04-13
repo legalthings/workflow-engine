@@ -64,7 +64,7 @@ class Event extends AbstractTrigger
     public function apply(\Action $action): ?\Response
     {
         $info = $this->project($action);
-        $info->chain = $action->process->chain;
+        $info->chain = $action->process->chain ?? null;
 
         $this->assert($info);
 

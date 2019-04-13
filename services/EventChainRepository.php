@@ -66,17 +66,18 @@ class EventChainRepository
      *
      * @param string $id
      * @param Response $response 
-     * @return LTO\Event
+     * @return LTO\EventChain
      */
     public function addResponse(string $id, Response $response)
     {
         $chain = $this->get($id);        
-        $event = ($this->createEvent)($response, $chain->getLatestHash())->signWith($this->account);
 
+        $event = ($this->createEvent)($response, $chain->getLatestHash())->signWith($this->account);
         $chain->add($event);
+
         $this->update($chain);
 
-        return $event;
+        return $chain;
     }
 
     /**

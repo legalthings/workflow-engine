@@ -115,6 +115,81 @@ db.getCollection("scenarios").insert([
                 ]
             }
         ]
+    },
+    {
+        "_id": "5gh893dv-108e-4398-8d2d-7914ffd934g8",
+        "schema": "https://specs.livecontracts.io/v0.2.0/scenario/schema.json#",
+        "title": "Simple event trigger scenario",
+        "actors": [
+            {
+                "key": "user",
+                "title": "User"
+            },
+            {
+                "key": "organization",
+                "title": "Organization"
+            }
+        ],
+        "definitions": [
+            {
+                "schema": "https://specs.livecontracts.io/v0.2.0/asset/schema.json#",
+                "key": "foo_identity",
+                "node": "localhost",
+                "signkeys" : {
+                    "user" : "foo",
+                    "system" : "bar"
+                }
+            }
+        ],
+        "actions": [
+            {
+                "schema": "https://specs.livecontracts.io/v0.2.0/action/event/schema.json#",
+                "actors": ["organization"],
+                "key": "step1",
+                "body": {
+                    "\\u0024schema": "https://specs.livecontracts.io/v0.2.0/identity/schema.json#",
+                    "key": {
+                        "<ref>": "definitions.foo_identity.key"
+                    },
+                    "node": {
+                        "<ref>": "definitions.foo_identity.node"
+                    },
+                    "signkeys": {
+                        "<ref>": "definitions.foo_identity.signkeys"
+                    }
+                },
+                "responses": {
+                    "ok": {
+                        "display": "always"
+                    },
+                    "error": {
+                        "display": "always",
+                        "title": "Failed to add foo identity"
+                    }
+                }
+            }
+        ],
+        "states": [
+            {
+                "key": ":initial",
+                "actions": ["step1"],
+                "title": "Initial state",
+                "description": "Initial state",
+                "instructions": [],
+                "transitions": [
+                    {
+                        "action": "step1",
+                        "response": "ok",
+                        "transition": ":success"
+                    },
+                    {
+                        "action": "step1",
+                        "response": "error",
+                        "transition": ":failed"
+                    }
+                ]
+            }
+        ]
     }
 ]);
 
@@ -156,6 +231,79 @@ db.getCollection("processes").insert([
                     "action": "step1",
                     "response": "ok",
                     "transition": "second"
+                },
+                {
+                    "action": "step1",
+                    "response": "error",
+                    "transition": ":failed"
+                }
+            ]
+        }        
+    },
+    {
+        "_id": "98kgh356-108e-fk69-8d2d-7914ffddf45h",
+        "schema": "https://specs.livecontracts.io/v0.2.0/process/schema.json#",           
+        "title": "Simple event trigger",
+        "scenario": "5gh893dv-108e-4398-8d2d-7914ffd934g8",
+        "chain": "2c83KDmRCJwaKWky1jmtTRYmsgXAhmuDC8P12KpqqbrQKkY6UMECmKeZE5m8Rx",
+        "actors": [
+            {
+                "key": "user",
+                "title": "User",
+                "identity": "e2d54eef-3748-4ceb-b723-23ff44a2512b"
+            },
+            {
+                "key": "organization",
+                "title": "Organization",
+                "identity": "6uk7288s-afe4-7398-8dbh-7914ffd930pl"
+            }
+        ],
+        "definitions": [
+            {
+                "schema": "https://specs.livecontracts.io/v0.2.0/asset/schema.json#",
+                "key": "foo_identity",
+                "node": "localhost",
+                "signkeys" : {
+                    "user" : "foo",
+                    "system" : "bar"
+                }
+            }
+        ],
+        "current": {
+            "key": ":initial",
+            "actions": [
+                {
+                    "schema": "https://specs.livecontracts.io/v0.2.0/action/event/schema.json#",
+                    "actors": ["organization"],
+                    "key": "step1",
+                    "body": {
+                        "\\u0024schema": "https://specs.livecontracts.io/v0.2.0/identity/schema.json#",
+                        "key": {
+                            "<ref>": "definitions.foo_identity.key"
+                        },
+                        "node": {
+                            "<ref>": "definitions.foo_identity.node"
+                        },
+                        "signkeys": {
+                            "<ref>": "definitions.foo_identity.signkeys"
+                        }
+                    },
+                    "responses": {
+                        "ok": {
+                            "display": "always"
+                        },
+                        "error": {
+                            "display": "always",
+                            "title": "Failed to add foo identity"
+                        }
+                    }
+                }
+            ],
+            "transitions": [
+                {
+                    "action": "step1",
+                    "response": "ok",
+                    "transition": ":success"
                 },
                 {
                     "action": "step1",

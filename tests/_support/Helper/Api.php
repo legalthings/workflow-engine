@@ -5,6 +5,7 @@ use Faker;
 use Jasny\HttpSignature\HttpSignature;
 use Jasny\HttpMessage\ServerRequest;
 use PHPUnit\Framework\Assert;
+use Codeception\PHPUnit\Constraint\JsonContains;
 
 // here you can define custom actions
 // all public methods declared in helper class will be available in $I
@@ -107,6 +108,32 @@ class Api extends \Codeception\Module
 
         $request = $module->client->getBaseRequest()->withAttribute('account', $account);
         $module->client->setBaseRequest($request);
+    }
+    
+    /**
+     * Set responses for Guzzle mock
+     * 
+     * @param callable|\GuzzleHttp\Psr7\Response $response
+     */
+    public function expectHttpRequest($response)
+    {
+        $module = $this->getJasnyModule();
+        
+        $mock = $module->container->get(\GuzzleHttp\Handler\MockHandler::class);
+        $mock->append($response);
+    }
+
+    /**
+     * Get entity data from json file
+     *
+     * @param string $name
+     * @return array
+     */
+    public function getEntityDump(string $folder, string $name): array
+    {
+        $scenario = file_get_contents("tests/_data/$folder/$name.json");
+
+        return json_decode($scenario, true);
     }
     
     /**
@@ -333,6 +360,58 @@ class Api extends \Codeception\Module
     }
 
     /**
+     * See if given event body equals given data
+     *
+     * @param int $idx
+     * @param array $data
+     */
+    public function seeResponseChainEventHasBody(int $idx, array $data)
+    {
+        $body = $this->getDecodedEventBodyFromResponseChain($idx);
+
+        Assert::assertEquals($data, $body);
+    }
+
+    /**
+     * See if given event of event-chain contains data
+     *
+     * @param int $idx
+     * @param array $data
+     */
+    public function seeResponseChainEventContainsJson(int $idx, array $data)
+    {
+        $body = $this->getDecodedEventBodyFromResponseChain($idx);
+
+        Assert::assertThat(json_encode($body), new JsonContains($data));
+    }
+
+    /**
+     * See if response event chain contains given number of events
+     *
+     * @param int $count
+     */
+    public function seeResponseChainEventsCount(int $count)
+    {
+        $json = $this->getResponseJson();
+
+        Assert::assertSame($count, count($json->events));
+    }
+
+    /**
+     * Get decoded body for given event from response event chain
+     *
+     * @param int $idx
+     * @return array
+     */
+    protected function getDecodedEventBodyFromResponseChain(int $idx)
+    {
+        $json = $this->getResponseJson();
+        $body = $json->events[$idx]->body;
+
+        return $this->decodeEventBody($body);
+    }
+
+    /**
      * Check if the response JSON matches a process from the data directory.
      *
      * @param string $name    Process filename (without ext)
@@ -382,21 +461,42 @@ class Api extends \Codeception\Module
     }
 
     /**
+     * Decode event body
+     * @param  string $body  Encoded event body
+     * @return array
+     */
+    public function decodeEventBody($body): array
+    {
+        $data = base58_decode($body);        
+
+        return json_decode($data, true);
+    }
+
+    /**
      * Assert response equals the contents of a JSON file.
      *
      * @param string $path
      */
     protected function assertResponseJsonEqualsFile(string $path): void
     {
-        $json = $this->getModule('REST')->grabResponse();
-
-        Assert::assertJson($json);
-
         $expected = json_decode(file_get_contents($path));
-        $actual = json_decode($json);
+        $actual = $this->getResponseJson();
 
         unset($actual->id);
 
         Assert::assertEquals($expected, $actual);
+    }
+
+    /**
+     * Get response json data
+     *
+     * @return stdClass
+     */
+    protected function getResponseJson(): \stdClass
+    {
+        $json = $this->getModule('REST')->grabResponse();
+        Assert::assertJson($json);
+
+        return json_decode($json);
     }
 }

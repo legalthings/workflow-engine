@@ -5,6 +5,8 @@ triggers:
     schema: https://specs.livecontracts.io/v0.2.0/action/nop/schema.json#
   http:
     schema: https://specs.livecontracts.io/v0.2.0/action/http/schema.json#
+  event:
+    schema: https://specs.livecontracts.io/v0.2.0/action/event/schema.json#
 
 db:
   default:
@@ -22,4 +24,4 @@ lto:
   network: T
 
 event_chain:
-  url: http://localhost/
+  url: http://foo-event-chain-service/

@@ -65,16 +65,18 @@ class Event extends AbstractTrigger
     {
         $info = $this->project($action);
         $info->chain = $action->process->chain ?? null;
-
         $this->assert($info);
+
+        // data enricher requires objects, not arrays
+        $info->body = json_decode(json_encode($info->body));
 
         $this->dataEnricher->applyTo($info->body, $action->process);
 
         $chain = $this->repository->get($info->chain);
         $newEvent = ($this->createEvent)($info->body, $chain->getLatestHash())->signWith($this->account);
-        // $chain->add($newEvent);
+        $chain->add($newEvent);
 
-        // $this->repository->update($chain);
+        $this->repository->update($chain);
 
         return $this->createResponse($newEvent);
     }

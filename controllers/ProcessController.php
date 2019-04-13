@@ -145,8 +145,8 @@ class ProcessController extends BaseController
         if (!isset($response)) {
             $this->noContent();
         } else {
-            $event = $this->eventChainRepository->addResponse($process->chain, $response);
-            $this->output($event, 'json');            
+            $partial = $this->eventChainRepository->addResponse($process->chain, $response);
+            $this->output($partial, 'json');            
         }
     }
 

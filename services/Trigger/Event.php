@@ -69,16 +69,39 @@ class Event extends AbstractTrigger
 
         // data enricher requires objects, not arrays
         $info->body = json_decode(json_encode($info->body));
-
         $this->dataEnricher->applyTo($info->body, $action->process);
 
-        $chain = $this->repository->get($info->chain);
-        $newEvent = ($this->createEvent)($info->body, $chain->getLatestHash())->signWith($this->account);
-        $chain->add($newEvent);
+        $events = $this->createEvents($info->body, $info->chain);
+
+        return $this->createResponse($events);
+    }
+
+    /**
+     * Create events from action data
+     *
+     * @param stdClass|array $eventsData
+     * @param string $chainId 
+     * @return array
+     */
+    protected function createEvents($eventsData, string $chainId): array
+    {
+        $chain = $this->repository->get($chainId);
+
+        if (!is_array($eventsData)) {
+            $eventsData = [$eventsData];
+        }
+
+        $events = [];
+        foreach ($eventsData as $body) {
+            $event = ($this->createEvent)($body, $chain->getLatestHash())->signWith($this->account);
+            $chain->add($event);
+
+            $events[] = $event;
+        }
 
         $this->repository->update($chain);
 
-        return $this->createResponse($newEvent);
+        return $events;
     }
 
     /**
@@ -101,11 +124,11 @@ class Event extends AbstractTrigger
     /**
      * Create response for an event.
      *
-     * @param LTO\Event $event
+     * @param array $events
      * @return \Response
      */
-    protected function createResponse(LTO\Event $event): \Response
+    protected function createResponse(array $events): \Response
     {
-        return (new \Response)->setValues(['data' => $event, 'key' => 'ok']);
+        return (new \Response)->setValues(['data' => $events, 'key' => 'ok']);
     }
 }

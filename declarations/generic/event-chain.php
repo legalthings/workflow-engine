@@ -18,7 +18,7 @@ return [
 
         $options = [
             'base_uri' => $container->get('config.event_chain.url'),
-            'signature_key_id' => $container->get(Account::class)->getPublicKey(),
+            'signature_key_id' => $container->get(Account::class)->getPublicSignKey(),
         ];
 
         return $reconfigure($container->get(HttpClient::class), $options);
@@ -26,7 +26,9 @@ return [
     EventChainRepository::class => static function(ContainerInterface $container) {
         /** @var HttpClient $client */
         $client = $container->get('event-chain.http-client');
+        $createEvent = $container->get('event.create');
+        $account = $container->get(Account::class);
 
-        return new EventChainRepository($client);
+        return new EventChainRepository($createEvent, $account, $client);
     },
 ];

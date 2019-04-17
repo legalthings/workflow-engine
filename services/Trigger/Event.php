@@ -4,6 +4,7 @@ namespace Trigger;
 
 use EventChainRepository;
 use LTO;
+use LegalThings\DataEnricher;
 
 /**
  * Create and add an event to the event chain.
@@ -27,6 +28,11 @@ class Event extends AbstractTrigger
     protected $account;
 
     /**
+     * @var DataEnricher
+     **/
+    protected $dataEnricher;
+
+    /**
      * Event trigger constructor.
      *
      * @param callable             $createEvent
@@ -38,11 +44,13 @@ class Event extends AbstractTrigger
         callable $createEvent,
         EventChainRepository $repository,
         LTO\Account $account,
-        callable $jmespath
+        callable $jmespath,
+        DataEnricher $dataEnricher
     ) {
         $this->repository = $repository;
         $this->createEvent = $createEvent;
         $this->account = $account;
+        $this->dataEnricher = $dataEnricher;
 
         parent::__construct($jmespath);
     }
@@ -56,16 +64,44 @@ class Event extends AbstractTrigger
     public function apply(\Action $action): ?\Response
     {
         $info = $this->project($action);
+        $info->chain = $action->process->chain ?? null;
         $this->assert($info);
 
-        $chain = $this->repository->get($info->chain);
+        // data enricher requires objects, not arrays
+        $info->body = json_decode(json_encode($info->body));
+        $this->dataEnricher->applyTo($info->body, $action->process);
 
-        $newEvent = ($this->createEvent)($info->body, $chain->getLatestHash())->signWith($this->account);
-        $chain->add($newEvent);
+        $events = $this->createEvents($info->body, $info->chain);
+
+        return $this->createResponse($events);
+    }
+
+    /**
+     * Create events from action data
+     *
+     * @param stdClass|array $eventsData
+     * @param string $chainId 
+     * @return array
+     */
+    protected function createEvents($eventsData, string $chainId): array
+    {
+        $chain = $this->repository->get($chainId);
+
+        if (!is_array($eventsData)) {
+            $eventsData = [$eventsData];
+        }
+
+        $events = [];
+        foreach ($eventsData as $body) {
+            $event = ($this->createEvent)($body, $chain->getLatestHash())->signWith($this->account);
+            $chain->add($event);
+
+            $events[] = $event;
+        }
 
         $this->repository->update($chain);
 
-        return $this->createResponse($newEvent);
+        return $events;
     }
 
     /**
@@ -88,14 +124,11 @@ class Event extends AbstractTrigger
     /**
      * Create response for an event.
      *
-     * @param LTO\Event $event
+     * @param array $events
      * @return \Response
      */
-    protected function createResponse(LTO\Event $event): \Response
+    protected function createResponse(array $events): \Response
     {
-        $data = $event->jsonSerialize();
-        unset($data->body);
-
-        return (new \Response)->setValues(['data' => $data, 'key' => 'ok']);
+        return (new \Response)->setValues(['data' => $events, 'key' => 'ok']);
     }
 }

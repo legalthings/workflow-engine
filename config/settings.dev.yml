@@ -7,6 +7,8 @@ triggers:
     schema: https://specs.livecontracts.io/v0.2.0/action/nop/schema.json#
   http:
     schema: https://specs.livecontracts.io/v0.2.0/action/http/schema.json#
+  event:
+    schema: https://specs.livecontracts.io/v0.2.0/action/event/schema.json#
 
 lto:
   account:
@@ -18,3 +20,6 @@ lto:
       secretkey: BnjFJJarge15FiqcxrB7Mzt68nseBXXR4LQ54qFBsWHG
       publickey: BVv1ZuE3gKFa6krwWJQwEmrLYUESuUabNCXgYTmCoBt6
   network: T
+
+event_chain:
+  url: http://localhost:4002/

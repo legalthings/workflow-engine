@@ -6,6 +6,7 @@ use Jasny\TestHelper;
 use Trigger\Event as EventTrigger;
 use LTO;
 use Psr\Container\ContainerInterface;
+use LegalThings\DataEnricher;
 
 /**
  * @covers Trigger\Event
@@ -17,13 +18,13 @@ class EventTest extends \Codeception\Test\Unit
     public function actionProvider()
     {
         $action = (new \Action)->setValues([
-            'chain' => 'abcdefg',
             'body' => ['foo' => 42],
+            'process' => (object)['chain' => 'abcdefg']
         ]);
 
         $customAction = (new \Action)->setValues([
-            'chain' => 'abcdefg',
             'answer' => 42,
+            'process' => (object)['chain' => 'abcdefg']
         ]);
 
         return [
@@ -59,7 +60,9 @@ class EventTest extends \Codeception\Test\Unit
             ? $this->createCallbackMock($this->never())
             : $this->createCallbackMock($this->once(), [$projection, $this->identicalTo($action)], $projectedAction);
 
-        $trigger = new EventTrigger($createEvent, $repository, $account, $jmespath);
+        $enricher = $this->createMock(DataEnricher::class);
+
+        $trigger = new EventTrigger($createEvent, $repository, $account, $jmespath, $enricher);
 
         if ($projection !== null) {
             $container = $this->createMock(ContainerInterface::class);
@@ -75,7 +78,7 @@ class EventTest extends \Codeception\Test\Unit
     public function badActionProvider()
     {
         return [
-            [(new \Action)->setValues(['chain' => 'abcdefg']), 'body is unkown'],
+            [(new \Action)->setValues(['process' => (object)['chain' => 'abcdefg']]), 'body is unkown'],
             [(new \Action)->setValues(['body' => ['foo' => 42]]), 'chain is unkown'],
         ];
     }
@@ -97,8 +100,9 @@ class EventTest extends \Codeception\Test\Unit
         $repository->expects($this->never())->method('get');
 
         $jmespath = $this->createCallbackMock($this->never());
+        $enricher = $this->createMock(DataEnricher::class);
 
-        $trigger = new EventTrigger($createEvent, $repository, $account, $jmespath);
+        $trigger = new EventTrigger($createEvent, $repository, $account, $jmespath, $enricher);
 
         $trigger->apply($action);
     }

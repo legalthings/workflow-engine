@@ -42,6 +42,11 @@ class ProcessController extends BaseController
     protected $account;
 
     /**
+     * @var EventChainRepository
+     **/
+    protected $eventChainRepository;
+
+    /**
      * Class constructor for DI.
      */
     public function __construct(
@@ -50,7 +55,8 @@ class ProcessController extends BaseController
         ProcessInstantiator $instantiator,
         ProcessStepper $stepper,
         TriggerManager $triggerManager,
-        JsonView $jsonView
+        JsonView $jsonView,
+        EventChainRepository $eventChainRepository
     ) {
         $this->processes = $processes;
         $this->scenarios = $scenarios;
@@ -58,6 +64,7 @@ class ProcessController extends BaseController
         $this->stepper = $stepper;
         $this->triggerManager = $triggerManager;
         $this->jsonView = $jsonView;
+        $this->eventChainRepository = $eventChainRepository;
     }
 
     /**
@@ -127,23 +134,20 @@ class ProcessController extends BaseController
      */
     public function invokeAction(string $id): void
     {
-        $process = $this->getProcessFromInput($id);
+        $process = $this->getProcessFromInput($id);        
         $this->authzForAccount($process);
 
+        $this->eventChainRepository->fetch($process->chain);
+
         $actor = $this->getActorForAccount($process);
+        $response = $this->triggerManager->invoke($process, null, $actor);
 
-        // Todo; this continues stepping, but doesn't add events to the chain
-        do {
-            $response = $this->triggerManager->invoke($process, null, $actor);
-
-            if ($response === null) {
-                break;
-            }
-
-            $this->stepper->step($process, $response);
-        } while (true);
-
-        $this->noContent();
+        if (!isset($response)) {
+            $this->noContent();
+        } else {
+            $partial = $this->eventChainRepository->addResponse($process->chain, $response);
+            $this->output($partial, 'json');            
+        }
     }
 
     /**

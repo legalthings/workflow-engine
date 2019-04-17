@@ -4,6 +4,7 @@ use Improved\IteratorPipeline\Pipeline;
 use GuzzleHttp\ClientInterface as HttpClient;
 use GuzzleHttp\Promise;
 use LTO\EventChain;
+use LTO\Event;
 
 /**
  * Service to register, load and persist event chains.
@@ -26,15 +27,27 @@ class EventChainRepository
      */
     protected $latestHashes;
 
+    /**
+     * @var callable
+     */
+    protected $createEvent;
+
+    /**
+     * Account to sign new events (our account).
+     * @var LTO\Account
+     */
+    protected $account;
 
     /**
      * Class constructor.
      *
      * @param HttpClient $client
      */
-    public function __construct(HttpClient $client)
+    public function __construct(callable $createEvent, LTO\Account $account, HttpClient $client)
     {
         $this->client = $client;
+        $this->createEvent = $createEvent;
+        $this->account = $account;
     }
 
     /**
@@ -46,6 +59,25 @@ class EventChainRepository
     {
         $this->chains[$chain->id] = clone $chain;
         $this->latestHashes[$chain->id] = $chain->getLatestHash();
+    }
+
+    /**
+     * Add response as event to given chain
+     *
+     * @param string $id
+     * @param Response $response 
+     * @return LTO\EventChain
+     */
+    public function addResponse(string $id, Response $response)
+    {
+        $chain = $this->get($id);        
+
+        $event = ($this->createEvent)($response, $chain->getLatestHash())->signWith($this->account);
+        $chain->add($event);
+
+        $this->update($chain);
+
+        return $chain;
     }
 
     /**

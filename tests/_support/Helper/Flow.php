@@ -32,6 +32,7 @@ class Flow extends \Codeception\Module
         'data-enricher',
         'data-patcher',
         'env',
+        'event-chain',
         'json-schema',
         'lto-accounts',
         'reflection',

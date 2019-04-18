@@ -3,12 +3,18 @@
 use Improved as i;
 use function Jasny\object_get_properties;
 
-function get_dynamic_propeties($object)
+/**
+ * Get name of properties that an object has, but aren't defined by the class.
+ *
+ * @param object $object
+ * @return array
+ */
+function get_dynamic_properties($object)
 {
     $allProps = get_object_vars($object);
     $classProps = get_object_vars(get_class($object));
 
-    return array_diff_key($allProps, $classProps);
+    return array_diff(array_keys($allProps), array_keys($classProps));
 }
 
 /**

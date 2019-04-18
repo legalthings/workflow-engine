@@ -49,7 +49,19 @@ class UpdateInstruction extends BasicEntity implements Meta, Validation
     {
         $this->cast();
     }
-    
+
+    /**
+     * @inheritDoc
+     */
+    public function cast()
+    {
+        if (is_associative_array($this->data)) {
+            $this->data = objectify($this->data);
+        }
+
+        return parent::cast();
+    }
+
     /**
      * Validate the update instruction
      * 

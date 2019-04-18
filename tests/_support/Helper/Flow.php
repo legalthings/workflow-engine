@@ -17,6 +17,8 @@ use Improved as i;
 use Improved\IteratorPipeline\Pipeline;
 use Jasny\Container\Container;
 use Jasny\Container\Loader\EntryLoader;
+use IdentityGateway;
+use Identity;
 
 // here you can define custom actions
 // all public methods declared in helper class will be available in $I
@@ -35,7 +37,7 @@ class Flow extends \Codeception\Module
         'event-chain',
         'json-schema',
         'lto-accounts',
-        'reflection',
+        'reflection'
     ];
 
     /**
@@ -117,6 +119,20 @@ class Flow extends \Codeception\Module
         return new HttpClient(['handler' => $handler]);
     }
 
+    /**
+     * Create mock for IdentityGateway instance
+     *
+     * @return IdentityGateway
+     */
+    protected function createIdentityGatewayMock()
+    {
+        return new class() extends IdentityGateway {
+            public function fetch($id, array $opts = []): ?Identity
+            {
+                return (new Identity)->setValues(['id' => $id]);
+            }
+        };
+    }
 
     /**
      * Initialize the global application container.
@@ -127,12 +143,15 @@ class Flow extends \Codeception\Module
 
         $httpClient = $this->createHttpMock();
         $extraEntries = [
-            HttpClient::class => static function () use ($httpClient) {
+            HttpClient::class => static function() use ($httpClient) {
                 return $httpClient;
             },
+            IdentityGateway::class => function() {
+                return $this->createIdentityGatewayMock();
+            }
         ];
 
-        return new Container(i\iterable_to_array($basicEntries, true) + $extraEntries);
+        return new Container(array_merge($basicEntries, $extraEntries));
     }
 
     /**
@@ -165,6 +184,13 @@ class Flow extends \Codeception\Module
         App::setContainer(new Container([]));
     }
 
+    /**
+     * Set the current actor
+     */
+    public function am(string $actor)
+    {
+        $this->setActor($actor);
+    }
 
     /**
      * Set the current user.

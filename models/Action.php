@@ -89,6 +89,12 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
             $this->actors = [$this->actors];
         }
 
+        foreach (get_dynamic_propeties($this) as $prop => $value) {
+            if (is_associative_array($value)) {
+                $this->$prop = (object)$value;
+            }
+        }
+
         return parent::cast();
     }
 

@@ -3,6 +3,14 @@
 use Improved as i;
 use function Jasny\object_get_properties;
 
+function get_dynamic_propeties($object)
+{
+    $allProps = get_object_vars($object);
+    $classProps = get_object_vars(get_class($object));
+
+    return array_diff_key($allProps, $classProps);
+}
+
 /**
  * Flatten an array, concatenating the keys
  * 

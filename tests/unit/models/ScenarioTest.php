@@ -2,12 +2,28 @@
 
 use Jasny\ValidationResult;
 use Jasny\EventDispatcher\EventDispatcher;
+use Jasny\DB\EntitySet;
 
 /**
  * @covers Scenario
  */
 class ScenarioTest extends \Codeception\Test\Unit
 {
+    use Jasny\TestHelper;
+
+    /**
+     * @var Scenario
+     **/
+    protected $scenario;
+
+    /**
+     * Execute actions before each test case
+     */
+    public function _before()
+    {
+        $this->scenario = new Scenario();
+    }
+
     public function testConstruction()
     {
         $scenario = new Scenario();
@@ -475,6 +491,8 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $scenario = new Scenario();
 
+        $scenario->schema = 'bar';
+
         $scenario->actions['foo'] = $this->createMock(Action::class);
         $scenario->actions['foo']
             ->expects($this->once())
@@ -491,6 +509,7 @@ class ScenarioTest extends \Codeception\Test\Unit
         $errors = $validation->getErrors();
 
         $expected = [
+            "schema property value is not valid",
             "scenario must have an ':initial' state",
             "action 'foo': 'ok' response is required",
             "state 'one': state is invalid",
@@ -760,8 +779,6 @@ class ScenarioTest extends \Codeception\Test\Unit
 
     public function testJsonSerializeBlank()
     {
-        $scenario = new Scenario();
-
         $expected = [
             '$schema' => 'https://specs.livecontracts.io/v0.2.0/scenario/schema.json#',
             'id' => null,
@@ -776,7 +793,152 @@ class ScenarioTest extends \Codeception\Test\Unit
             'meta' => [],
         ];
 
-        $serialized = json_encode($scenario);
+        $serialized = json_encode($this->scenario);
         $this->assertEquals($expected, json_decode($serialized, true));
+    }
+
+    /**
+     * Test 'dispatch' method
+     */
+    public function testDispatch()
+    {
+        $event = 'foo';
+        $payload = ['foo' => 'bar'];
+        $expected = 'baz';
+
+        $dispatcher = $this->createMock(EventDispatcher::class);
+        $dispatcher->expects($this->once())->method('trigger')->with(
+            $event,
+            $this->identicalTo($this->scenario),
+            $payload
+        )->willReturn($expected);
+
+        $this->setPrivateProperty($this->scenario, 'dispatcher', $dispatcher);
+        $result = $this->scenario->dispatch($event, $payload);
+
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Provide data for testing 'getActionsForState' method, using state key
+     *
+     * @return array
+     */
+    public function getActionsForStateByKeyProvider()
+    {
+        $actions = [
+            'step1' => $this->createMock(Action::class),
+            'step2' => $this->createMock(Action::class),
+            'step3' => $this->createMock(Action::class),
+            'step4' => $this->createMock(Action::class)
+        ];
+
+        $actions['step1']->key = 'step1';
+        $actions['step2']->key = 'step2';
+        $actions['step3']->key = 'step3';
+        $actions['step4']->key = 'step4';
+
+        return [
+            [
+                $actions, 
+                [], 
+                ['step1', 'step4', 'step5'], 
+                [
+                    'step1' => $actions['step1'],
+                    'step4' => $actions['step4']
+                ]
+            ],
+            [
+                $actions, 
+                ['step1', 'step4', 'step5'], 
+                [], 
+                [
+                    'step1' => $actions['step1'],
+                    'step4' => $actions['step4']
+                ]
+            ],
+            [
+                $actions, 
+                ['step1', 'step4', 'step5'], 
+                ['step1', 'step2', 'step4'], 
+                [
+                    'step1' => $actions['step1'],
+                    'step2' => $actions['step2'],
+                    'step4' => $actions['step4']
+                ]
+            ],
+            [
+                $actions, 
+                ['step5'], 
+                [], 
+                []
+            ],
+            [
+                $actions, 
+                [], 
+                [], 
+                []
+            ],
+            [
+                [], 
+                ['step1'], 
+                ['step1'], 
+                []
+            ],
+        ];
+    }
+
+    /**
+     * Test 'getActionsForState' method, using state key
+     *
+     * @dataProvider getActionsForStateByKeyProvider
+     */
+    public function testGetActionsForStateByKey($actions, $stateActions, $allowActions, $expected)
+    {
+        $this->scenario->actions = $actions;
+        $this->scenario->allow_actions = $allowActions;
+        $this->scenario->states = [
+            'foo' => $this->createMock(State::class),
+            'bar' => $this->createMock(State::class)
+        ];
+
+        $this->scenario->states['bar']->actions = $stateActions;
+
+        $result = $this->scenario->getActionsForState('bar');
+        $asArray = $result->getArrayCopy();
+
+        $this->assertInstanceOf(EntitySet::class, $result);
+        $this->assertEquals($expected, $asArray);
+    }
+
+    /**
+     * Test 'getActionsForState' method, using state object
+     *
+     * @dataProvider getActionsForStateByKeyProvider
+     */
+    public function testGetActionsForStateByValue($actions, $stateActions, $allowActions, $expected)
+    {
+        $this->scenario->actions = $actions;
+        $this->scenario->allow_actions = $allowActions;
+
+        $state = $this->createMock(State::class);
+        $state->actions = $stateActions;
+
+        $result = $this->scenario->getActionsForState($state);
+        $asArray = $result->getArrayCopy();
+
+        $this->assertInstanceOf(EntitySet::class, $result);
+        $this->assertEquals($expected, $asArray);
+    }
+
+    /**
+     * Test 'getActionsForState' method, if state is not found
+     *
+     * @expectedException OutOfBoundsException
+     * @expectedExceptionMessage Scenario doesn't have a 'foo' state
+     */
+    public function testGetActionsForStateNotFound()
+    {
+        $this->scenario->getActionsForState('foo');
     }
 }

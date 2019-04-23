@@ -218,8 +218,8 @@ class Scenario extends MongoDocument implements Dynamic
 
         $actions = Pipeline::with(array_merge($state->actions, $this->allow_actions))
             ->unique()
-            ->map(function($key) {
-                return $this->actions[$key] ?? null;
+            ->map(function($name) {
+                return $this->actions[$name] ?? null;
             })
             ->cleanup();
 

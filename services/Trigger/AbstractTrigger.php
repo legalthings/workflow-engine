@@ -25,9 +25,8 @@ abstract class AbstractTrigger
      */
     protected $projection;
 
-
     /**
-     * DataPatcher constructor.
+     * Trigger constructor.
      *
      * @param callable $jmespath  "jmespath"
      */
@@ -35,7 +34,6 @@ abstract class AbstractTrigger
     {
         $this->jmespath = $jmespath;
     }
-
 
     /**
      * Create a configured clone.
@@ -74,7 +72,6 @@ abstract class AbstractTrigger
         return $clone;
     }
 
-
     /**
      * Project the input based on jmespath.
      *
@@ -95,7 +92,6 @@ abstract class AbstractTrigger
 
         return i\type_cast($output, 'object');
     }
-
 
     /**
      * Apply trigger to an action.

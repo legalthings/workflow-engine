@@ -42,14 +42,6 @@ class UpdateInstruction extends BasicEntity implements Meta, Validation
     public $projection;
     
     /**
-     * Class constructor
-     */
-    public function __construct()
-    {
-        $this->cast();
-    }
-
-    /**
      * @inheritDoc
      */
     public function cast()
@@ -58,8 +50,8 @@ class UpdateInstruction extends BasicEntity implements Meta, Validation
             $this->data = objectify($this->data);
         }
 
-        return parent::cast();
     }
+        return parent::cast();
 
     /**
      * Validate the update instruction

@@ -34,18 +34,6 @@ class InvalidScenarioDataCest
     {
         return [
             [
-                'field' => 'title', 
-                'value' => ['foo'], 
-                'message' => 'Unable to cast Scenario::title from an array to a string',
-                'code' => 400
-            ],
-            [
-                'field' => 'description', 
-                'value' => ['foo'], 
-                'message' => 'Unable to cast Scenario::description from an array to a string',
-                'code' => 400
-            ],
-            [
                 'field' => '$schema', 
                 'value' => 'foo', 
                 'message' => ['schema property value is not valid'], 

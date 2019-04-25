@@ -14,6 +14,8 @@ use Monolog\Handler\BrowserConsoleHandler;
  * This is a drop-in replacement for the Monolog error handler
  *  - Allows overwriting methods for customization
  *  - Displays a message on fatal errors
+ *
+ * @codeCoverageIgnore
  */
 class ErrorHandler
 {
@@ -56,7 +58,6 @@ class ErrorHandler
      * @var int
      */
     protected $reservedMemory;
-
     
     /**
      * @var array
@@ -69,7 +70,6 @@ class ErrorHandler
      * @var array
      */
     protected static $unrecoverableErrors = [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR];
-
     
     /**
      * Class constructor
@@ -78,8 +78,7 @@ class ErrorHandler
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
-    }
-   
+    }   
     
     /**
      * Registers a new ErrorHandler for a given Logger

@@ -39,7 +39,8 @@ abstract class BaseController extends Jasny\Controller
         $pretty = (bool)$this->getRequest()->getAttribute('pretty-json');
 
         if ($pretty && ($data instanceof Scenario || $data instanceof Process)) {
-            $view = $view->withDecorator('pretty.' . strtolower(get_class($data)));
+            $type = $data instanceof Scenario ? 'scenario' : 'process';
+            $view = $view->withDecorator('pretty.' . $type);
         }
 
         $response = $view->output($this->getResponse(), $data);

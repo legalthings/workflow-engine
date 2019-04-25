@@ -2,6 +2,8 @@
 
 /**
  * Authentication or authorization exception.
+ *
+ * @codeCoverageIgnore
  */
 class AuthException extends RuntimeException
 {

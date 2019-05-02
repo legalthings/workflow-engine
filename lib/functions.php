@@ -12,7 +12,7 @@ use function Jasny\object_get_properties;
 function get_dynamic_properties($object)
 {
     $allProps = get_object_vars($object);
-    $classProps = get_object_vars(get_class($object));
+    $classProps = get_class_vars(get_class($object));
 
     return array_diff(array_keys($allProps), array_keys($classProps));
 }

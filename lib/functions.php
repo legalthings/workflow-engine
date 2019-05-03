@@ -1,20 +1,20 @@
-<?php
+<?php declare(strict_types=1);
 
 use Improved as i;
 use function Jasny\object_get_properties;
 
 /**
- * Get name of properties that an object has, but aren't defined by the class.
+ * Get names of properties that an object has, but aren't defined by the class.
  *
  * @param object $object
  * @return array
  */
-function get_dynamic_properties($object)
+function get_dynamic_properties($object): array
 {
     $allProps = get_object_vars($object);
     $classProps = get_class_vars(get_class($object));
 
-    return array_diff(array_keys($allProps), array_keys($classProps));
+    return array_values(array_diff(array_keys($allProps), array_keys($classProps)));
 }
 
 /**
@@ -25,7 +25,7 @@ function get_dynamic_properties($object)
  * @param string $to
  * @return array
  */
-function array_rename_key(array $array, string $from, string $to)
+function array_rename_key(array $array, string $from, string $to): array
 {
     if (array_key_exists($from, $array)) {
         $array[$to] = $array[$from];
@@ -41,7 +41,7 @@ function array_rename_key(array $array, string $from, string $to)
  * @param object $object
  * @param string $from
  * @param string $to
- * @return array
+ * @return object
  */
 function object_rename_key($object, string $from, string $to)
 {
@@ -84,7 +84,7 @@ function object_copy_properties($from, $to)
  * @param  array    $with
  * @return stdClass
  */
-function std_object_only_with(stdClass $object, array $with)
+function std_object_only_with(stdClass $object, array $with): stdClass
 {
     $object = array_only((array)$object, $with);
 
@@ -97,7 +97,7 @@ function std_object_only_with(stdClass $object, array $with)
  * @param  string  $type
  * @return boolean
  */
-function is_schema_link_valid(string $link, string $type)
+function is_schema_link_valid(string $link, string $type): bool
 {
     $pattern = '|https://specs\.livecontracts\.io/v\d+\.\d+\.\d+/' . preg_quote($type) . '/schema\.json#|';
 

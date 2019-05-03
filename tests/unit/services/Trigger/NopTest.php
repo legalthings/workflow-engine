@@ -76,7 +76,7 @@ class NopTest extends \Codeception\Test\Unit
         $response = ($this->trigger)($process, $action);
 
         $this->assertInstanceOf(\Response::class, $response);
-        $this->assertAttributeEquals($data, 'data', $response);
+        $this->assertAttributeEquals((object)$data, 'data', $response);
     }
 
     public function testWithConfig()
@@ -116,7 +116,7 @@ class NopTest extends \Codeception\Test\Unit
 
         $this->assertInstanceOf(\Response::class, $response);
         $this->assertAttributeEquals('yo', 'key', $response);
-        $this->assertAttributeEquals($data, 'data', $response);
+        $this->assertAttributeEquals((object)$data, 'data', $response);
     }
 
     /**

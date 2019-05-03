@@ -50,8 +50,8 @@ class UpdateInstruction extends BasicEntity implements Meta, Validation
             $this->data = objectify($this->data);
         }
 
-    }
         return parent::cast();
+    }
 
     /**
      * Validate the update instruction

@@ -128,4 +128,24 @@ class FunctionsTest extends \Codeception\Test\Unit
 
         $this->assertEquals((object)['foo' => 'bar', 'test' => 'rest'], $result);
     }
+
+    /**
+     * Test 'get_dynamic_properties' function
+     */
+    public function testGetDynamicProperties()
+    {
+        $object = new class() {
+            public $foo = 'foo_value';
+            public $bar = 'bar_value';
+            protected $zoo = 'zoo_value';
+            private $baz = 'baz_value';
+        };
+
+        $object->teta = 'teta_value';
+
+        $result = get_dynamic_properties($object);
+        $expected = ['teta'];
+
+        $this->assertEquals($expected, $result);
+    }
 }

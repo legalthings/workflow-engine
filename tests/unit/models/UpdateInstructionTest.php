@@ -41,4 +41,26 @@ class UpdateInstructionTest extends \Codeception\Test\Unit
             $this->assertCount(0, $errors);
         }
     }
+
+    /**
+     * Test 'cast' method
+     */
+    public function testCast()
+    {
+        $instruction = new UpdateInstruction();
+        $instruction->data = [
+            'foo' => 'bar', 
+            'zoo' => ['zoos' => 'boos']
+        ];
+
+        $expected = (object)[
+            'foo' => 'bar', 
+            'zoo' => (object)['zoos' => 'boos']
+        ];
+
+        $result = $instruction->cast();
+
+        $this->assertSame($instruction, $result);
+        $this->assertEquals($expected, $result->data);
+    }
 }

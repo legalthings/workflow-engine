@@ -345,7 +345,7 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         $patcher->expects($this->exactly(2))->method('project')
             ->withConsecutive(
                 [['name' => 'Jane', 'age' => 42], 'name'],
-                [['first_name' => 'John'], 'first_name']
+                [(object)['first_name' => 'John'], 'first_name']
             )
             ->willReturnOnConsecutiveCalls('Jane', 'John');
         $patcher->expects($this->exactly(3))->method('set')

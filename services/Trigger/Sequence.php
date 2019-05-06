@@ -4,7 +4,9 @@ namespace Trigger;
 
 use Improved\IteratorPipeline\Pipeline;
 use Psr\Container\ContainerInterface;
+use Improved as i;
 use Response;
+use InvalidArgumentException;
 
 /**
  * Perform a number of triggers in sequence.
@@ -17,6 +19,14 @@ class Sequence implements Trigger
     protected $triggers = [];
 
     /**
+     * Trigger constructor
+     */
+    public function __construct()
+    {
+
+    }
+
+    /**
      * Create a configured clone.
      *
      * @param object|array       $settings
@@ -25,10 +35,10 @@ class Sequence implements Trigger
      */
     public function withConfig($settings, ContainerInterface $container)
     {
-        $settings = type_cast($settings, 'object');
+        $settings = i\type_cast($settings, 'object');
 
         if (!isset($settings->triggers)) {
-            \trigger_error("Sequence trigger config should have 'triggers' setting", \E_USER_WARNING);
+            throw new InvalidArgumentException("Sequence trigger config should have 'triggers' setting");
         }
 
         $clone = clone $this;
@@ -36,7 +46,8 @@ class Sequence implements Trigger
         // Similar logic as in `TriggerManager` declaration.
         $clone->triggers = Pipeline::with($settings->triggers ?? [])
             ->map(static function($entry) use ($container) {
-                $container->get(($entry->type ?? 'unknown') . '_trigger')->withConfig($entry);
+                return $container->get(($entry->type ?? 'unknown') . '_trigger')
+                    ->withConfig($entry, $container);
             })
             ->toArray();
 
@@ -44,7 +55,7 @@ class Sequence implements Trigger
     }
 
     /**
-     * Invoke for the trigger.
+     * Invoke for the action
      *
      * @param \Process $process
      * @param \Action $action
@@ -52,7 +63,7 @@ class Sequence implements Trigger
      */
     public function __invoke(\Process $process, \Action $action): \Response
     {
-        $response = (new \Response)->setValue([
+        $response = (new Response)->setValues([
             'action' => $action,
             'key' => $action->default_response,
         ]);

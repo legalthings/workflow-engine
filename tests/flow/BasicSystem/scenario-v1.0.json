@@ -1,13 +1,19 @@
 {
-    "$schema": "https://specs.livecontracts.io/v1.0.0/scenario/schema.json#",
+    "$schema": "https://specs.livecontracts.io/v0.2.0/scenario/schema.json#",
     "actors": {
         "system": {
-            "title": "System"
+            "title": "System",
+            "properties": {
+                "identity": {
+                    "type": "string",
+                    "default": "bar_id"
+                }
+            }
         }
     },
     "actions": {
         "step1": {
-            "$schema": "https://specs.livecontracts.io/v1.0.0/action/http/schema.json#",
+            "$schema": "https://specs.livecontracts.io/v0.2.0/action/http/schema.json#",
             "display": true,
             "title": "Step1",
             "url": "https://www.example.com",
@@ -18,7 +24,7 @@
             }
         },
         "step2": {
-            "$schema": "https://specs.livecontracts.io/v1.0.0/action/nop/schema.json#",
+            "$schema": "https://specs.livecontracts.io/v0.2.0/action/nop/schema.json#",
             "display": true,
             "title": "Step2",
             "trigger_response": "ok",

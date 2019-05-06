@@ -212,10 +212,6 @@ class ProcessController extends BaseController
      */
     protected function authzForAccount(Process $process): void
     {
-        if ($this->account === null) {
-            return;
-        }
-
         $actor = $this->getActorForAccount();
 
         if (!$process->hasActor($actor) && $process->hasKnownActors()) {

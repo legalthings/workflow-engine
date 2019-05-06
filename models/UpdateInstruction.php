@@ -41,7 +41,6 @@ class UpdateInstruction extends BasicEntity implements Meta, Validation
      */
     public $projection;
     
-    
     /**
      * Class constructor
      */

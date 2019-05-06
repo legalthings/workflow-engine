@@ -81,6 +81,9 @@ class AppConfig extends Config
         }
         
         $parts = explode('.', $env);
+        for ($i = 0; $i < count($parts); $i++) { 
+            $parts[$i] = trim($parts[$i]);
+        }
         
         for ($i = 1, $m = count($parts); $i <= $m; $i++) {
             $file = "config/settings." . join('.', array_slice($parts, 0, $i)) . "{$suffix}.yml";

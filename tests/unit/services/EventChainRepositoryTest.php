@@ -16,6 +16,8 @@ use LTO\Account;
  */
 class EventChainRepositoryTest extends \Codeception\Test\Unit
 {
+    use Jasny\TestHelper;
+
     /**
      * @var callable
      **/
@@ -378,5 +380,38 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
 
         $chain = $this->createEventChainMock(2);
         $repository->persist($chain->id);        
+    }
+
+    /**
+     * Test 'addResponse' method
+     */
+    public function testAddResponse()
+    {
+        $latestHash = 'bar';
+        $chainId = 'foo';
+        $chain = $this->createMock(EventChain::class);
+        $account = $this->createMock(Account::class);
+        $response = $this->createMock(Response::class);
+
+        $event = $this->createMock(Event::class);
+        $signedEvent = $this->createMock(Event::class);
+        $createEvent = $this->createCallbackMock($this->once(), [
+            $this->identicalTo($response),
+            $latestHash
+        ], $event);
+        $event->expects($this->once())->method('signWith')->with($this->identicalTo($account))->willReturn($signedEvent);
+
+        $repository = $this->createPartialMock(EventChainRepository::class, ['get', 'update']);
+        $this->setPrivateProperty($repository, 'createEvent', $createEvent);
+        $this->setPrivateProperty($repository, 'account', $account);
+
+        $repository->expects($this->once())->method('get')->with($chainId)->willReturn($chain);
+        $chain->expects($this->once())->method('getLatestHash')->willReturn($latestHash);
+        $chain->expects($this->once())->method('add')->with($this->identicalTo($signedEvent));
+        $repository->expects($this->once())->method('update')->with($this->identicalTo($chain));
+
+        $result = $repository->addResponse($chainId, $response);
+
+        $this->assertSame($chain, $result);
     }
 }

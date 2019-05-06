@@ -7,9 +7,11 @@ use Jasny\EventDispatcher\EventDispatcher;
 return [
     "process_events" => static function(ContainerInterface $container) {
         $identityGateway = $container->get(IdentityGateway::class);
+        $expandIdentities = new ExpandIdentities($identityGateway);
 
         return (new EventDispatcher)
-            ->on('fetch', new ExpandIdentities($identityGateway));
+            ->on('fetch', $expandIdentities)
+            ->on('instantiate', $expandIdentities);
     },
     ProcessGateway::class => static function(AutowireContainerInterface $container) {
         return $container->autowire(ProcessGateway::class);

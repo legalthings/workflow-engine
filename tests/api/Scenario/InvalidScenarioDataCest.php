@@ -34,18 +34,6 @@ class InvalidScenarioDataCest
     {
         return [
             [
-                'field' => 'title', 
-                'value' => ['foo'], 
-                'message' => 'Unable to cast Scenario::title from an array to a string',
-                'code' => 400
-            ],
-            [
-                'field' => 'description', 
-                'value' => ['foo'], 
-                'message' => 'Unable to cast Scenario::description from an array to a string',
-                'code' => 400
-            ],
-            [
                 'field' => '$schema', 
                 'value' => 'foo', 
                 'message' => ['schema property value is not valid'], 
@@ -78,49 +66,7 @@ class InvalidScenarioDataCest
                 'field' => 'id', 
                 'value' => '2557288f-108e-4398-8d2d-7914ffd93150', // id of existing scenario
                 'code' => 200
-            ],
-            [
-                'field' => 'actors', 
-                'value' => 'foo', 
-                'message' => ['Expected iterable, string(3) "foo" given'],
-                'code' => 400
-            ],
-            [
-                'field' => 'actions', 
-                'value' => 'foo', 
-                'message' => ['Expected iterable, string(3) "foo" given'],
-                'code' => 400
-            ],
-            [
-                'field' => 'states', 
-                'value' => 'foo', 
-                'message' => ['Expected iterable, string(3) "foo" given'],
-                'code' => 400
-            ],
-            [
-                'field' => 'assets', 
-                'value' => 'foo', 
-                'message' => ['Expected iterable, string(3) "foo" given'],
-                'code' => 400
-            ],
-            [
-                'field' => 'actors', 
-                'value' => ['foo'], 
-                'message' => ['Expected array,instance of stdClass,instance of Actor or instance of JsonSchema, string(3) "foo" given'],
-                'code' => 400
-            ],
-            [
-                'field' => 'actions', 
-                'value' => ['foo'], 
-                'message' => ['Expected array,instance of stdClass or instance of Action, string(3) "foo" given'],
-                'code' => 400
-            ],
-            [
-                'field' => 'states', 
-                'value' => ['foo'], 
-                'message' => ['Expected array,instance of stdClass or instance of State, string(3) "foo" given'],
-                'code' => 400
-            ],
+            ]
             // [
             //     'field' => 'actors', 
             //     'value' => [

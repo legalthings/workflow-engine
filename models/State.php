@@ -113,9 +113,7 @@ class State extends BasicEntity implements Validation
         $data = object_get_properties($this);
 
         foreach ($data as $key => &$item) {
-            if ($item instanceof Identifiable) {
-                $item = $item->getId();
-            } elseif ($item instanceof Data) {
+            if ($item instanceof Data) {
                 $item = $item->toData($opts);
             }
         }

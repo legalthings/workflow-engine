@@ -520,6 +520,7 @@ db.getCollection("processes").insert([
         "schema": "https://specs.livecontracts.io/v0.2.0/process/schema.json#",
         "title": "Basic system and user",
         "scenario": "2557288f-108e-4398-8d2d-7914ffd93150",
+        "chain": "2c83KDmRCJwaKWky1jmtTRYmsgXAhmuDC8P12KpqqbrQKkY6UMECmKeZE5m8Rx",
         "actors": [
             {
                 "key": "user",

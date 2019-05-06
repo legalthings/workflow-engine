@@ -128,7 +128,6 @@ class Process extends MongoDocument
         return $this->dispatcher->trigger($event, $this, $payload);
     }
 
-
     /**
      * Cast properties
      *
@@ -160,19 +159,20 @@ class Process extends MongoDocument
     }
 
     /**
-     * Set the values of
+     * Set the values of process
      *
      * @param array|\stdClass $values
      * @return self
      */
     public function setValues($values)
     {
-        if (!$this->actors instanceof EntitySet) {
+        if (!$this->actors instanceof AssocEntitySet) {
             return parent::setValues($values);
         }
 
         $values = arrayify($values);
 
+        $actorsValues = null;
         if (isset($values['actors']) && is_array($values['actors'])) {
             $actorsValues = $values['actors'] ?? [];
             unset($values['actors']);
@@ -181,25 +181,34 @@ class Process extends MongoDocument
         parent::setValues($values);
 
         if (isset($actorsValues)) {
-            Pipeline::with($actorsValues)
-                ->mapKeys(static function($vals, $key) {
-                    return $vals['key'] ?? $key;
-                })
-                ->filter(function ($_, $key) {
-                    return isset($this->actors[$key]);
-                })
-                ->map(static function($vals) {
-                    return is_string($vals) ? ['identity' => $vals] : (array)$vals;
-                })
-                ->apply(function(array $vals, $key) {
-                    $this->actors[$key]->setValues($vals);
-                })
-                ->walk();
+            $this->updateActors($actorsValues);
         }
 
         return $this;
     }
 
+    /**
+     * Update current process actors
+     *
+     * @param array $actorsValues
+     */
+    protected function updateActors(array $actorsValues): void
+    {
+        Pipeline::with($actorsValues)
+            ->mapKeys(static function($vals, $key) {
+                return $vals['key'] ?? $key;
+            })
+            ->filter(function ($_, $key) {
+                return isset($this->actors[$key]);
+            })
+            ->map(static function($vals) {
+                return is_string($vals) ? ['identity' => $vals] : (array)$vals;
+            })
+            ->apply(function(array $vals, $key) {
+                $this->actors[$key]->setValues($vals);
+            })
+            ->walk();
+    }
 
     /**
      * Find any actors that matches the given one.
@@ -245,11 +254,11 @@ class Process extends MongoDocument
      *
      * @param string|Actor $match  Actor or actor key.
      * @return Actor
-     * @throws OutOfBoundsException
+     * @throws RangeException
      */
     public function getActor($match): Actor
     {
-        return $this->getMatchingActors($match, true)->first();
+        return $this->getMatchingActors($match)->first(true);
     }
 
     /**
@@ -294,7 +303,7 @@ class Process extends MongoDocument
     public function getAvailableAction(string $actionKey): Action
     {
         if (!isset($this->current->actions[$actionKey])) {
-            $msg = "Action '%s' is not available in state '%s' for process '%s";
+            $msg = "Action '%s' is not available in state '%s' for process '%s'";
             throw new OutOfBoundsException(sprintf($msg, $actionKey, $this->current->key, $this->id));
         }
 
@@ -339,13 +348,11 @@ class Process extends MongoDocument
      */
     public function getPreviousResponse(): ?Response
     {
-        $length = count($this->previous);
+        $count = count($this->previous);
         
-        if (!$length) {
-            return null;
-        }
-        
-        return $this->previous[$length - 1];
+        return $count > 0 ? 
+            $this->previous[$count - 1] :
+            null;
     }
 
     /**

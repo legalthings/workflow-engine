@@ -1,7 +1,7 @@
 {
     "name": "lto/workflow-engine",
     "description": "LTO Network - Workflow Engine",
-    "license": "MIT",
+    "license": "GPL-3.0-or-later",
     "repositories": [
         {
             "type": "vcs",

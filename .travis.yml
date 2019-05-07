@@ -3,36 +3,31 @@ php:
   - 7.2
   - 7.3
 
-# Add your branch here to have it tested and deployed
+dist: xenial
+addons:
+  apt:
+    packages:
+    - libsodium-dev
+
+services: mongodb
+
+# Add your branch here to have it tested
 branches:
   only:
   - master
   - /^v\d+\.\d+\.\d+$/
 
-# Add mongodb
-services: mongodb
-
 before_install:
-# Install libsodium
-- sudo add-apt-repository ppa:ondrej/php -y
-- sudo apt-get -qq update
-- sudo apt-get install php-sodium
-
-# Install MongoDB PHP extension
+- pecl install libsodium
 - pecl install mongodb
 
 install:
-# Install composer packages
 - composer install
-
-# Download scrutinizer ocular
-- test "$RUN_TESTS" == "false" || wget https://scrutinizer-ci.com/ocular.phar -O "$HOME/ocular.phar"
+- wget https://scrutinizer-ci.com/ocular.phar -O "$HOME/ocular.phar"
 
 before_script:
-# Generate codecept build classes
 - php bin/codecept build
 
 script:
-# Run tests
 - php bin/codecept run --coverage --coverage-xml
 

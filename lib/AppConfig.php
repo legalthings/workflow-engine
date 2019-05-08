@@ -84,10 +84,10 @@ class AppConfig extends Config
         for ($i = 0; $i < count($parts); $i++) { 
             $parts[$i] = trim($parts[$i]);
         }
-        
+
         for ($i = 1, $m = count($parts); $i <= $m; $i++) {
-            $file = "config/settings." . join('.', array_slice($parts, 0, $i)) . "{$suffix}.yml";
-            
+            $file = $path . "/settings." . join('.', array_slice($parts, 0, $i)) . "{$suffix}.yml";
+
             if (file_exists($file)) {
                 parent::load($file);
             }

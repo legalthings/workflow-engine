@@ -1,7 +1,6 @@
 language: php
 php:
   - 7.2
-  - 7.3
 
 addons:
   apt:
@@ -19,8 +18,8 @@ branches:
   - /^v\d+\.\d+\.\d+$/
 
 before_install:
-- pecl install libsodium --soft
-- pecl install mongodb --soft
+- pecl install --soft libsodium || true
+- pecl install --soft mongodb || true
 
 install:
 - composer install

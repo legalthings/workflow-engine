@@ -3,9 +3,10 @@ php:
   - 7.2
   - 7.3
 
-dist: xenial
 addons:
   apt:
+    sources:
+    - sourceline: ppa:ondrej/php
     packages:
     - libsodium-dev
 
@@ -18,8 +19,8 @@ branches:
   - /^v\d+\.\d+\.\d+$/
 
 before_install:
-- pecl install libsodium
-- pecl install mongodb
+- pecl install libsodium --soft
+- pecl install mongodb --soft
 
 install:
 - composer install

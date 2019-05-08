@@ -1,4 +1,4 @@
-FROM legalthings/apache-php
+FROM legalthings/apache-php:7.2
 
 ADD . /app
 WORKDIR /app

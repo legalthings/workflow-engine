@@ -42,14 +42,6 @@ class UpdateInstruction extends BasicEntity implements Meta, Validation
     public $projection;
     
     /**
-     * Class constructor
-     */
-    public function __construct()
-    {
-        $this->cast();
-    }
-
-    /**
      * @inheritDoc
      */
     public function cast()

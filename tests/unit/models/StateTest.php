@@ -106,11 +106,11 @@ class StateTest extends \Codeception\Test\Unit
     }
 
     /**
-     * Provide data for testing 'fromData' method
+     * Provide data for testing 'fromData' method for 'actions' property
      *
      * @return array
      */
-    public function fromDataProvider()
+    public function fromDataActionsProvider()
     {
         return [
             [['action' => 'foo']],
@@ -121,15 +121,30 @@ class StateTest extends \Codeception\Test\Unit
     }
 
     /**
-     * Test 'fromData' method
+     * Test 'fromData' method for `actions` property
      *
-     * @dataProvider fromDataProvider
+     * @dataProvider fromDataActionsProvider
      */
-    public function testFromData($data)
+    public function testFromDataActions($data)
     {
         $result = State::fromData($data);
 
         $this->assertEquals(['foo'], $result->actions);
         $this->assertFalse(isset($result->action));
+    }
+
+    /**
+     * Test 'fromData' method for `transitions` property
+     */
+    public function testFromDataTransitions()
+    {
+        $data = ['transition' => 'foo'];
+        $result = State::fromData($data);
+
+        $this->assertInstanceOf(EntitySet::class, $result->transitions);
+        $transitions = $result->transitions->getArrayCopy();
+
+        $this->assertCount(1, $result->transitions);
+        $this->assertSame('foo', $result->transitions[0]->transition);
     }
 }

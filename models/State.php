@@ -72,7 +72,11 @@ class State extends BasicEntity implements Validation
      */
     public function cast()
     {
-        if (is_array($this->transitions)) {
+        if (is_string($this->transitions)) {
+            $this->transitions = [['transition' => $this->transitions]];
+        }
+
+        if (is_array($this->transitions)) {            
             $this->transitions = EntitySet::forClass(
                 StateTransition::class,
                 $this->transitions,
@@ -132,6 +136,7 @@ class State extends BasicEntity implements Validation
     public static function fromData($values)
     {
         $values = array_rename_key((array)$values, 'action', 'actions');
+        $values = array_rename_key($values, 'transition', 'transitions');
 
         return parent::fromData($values);
     }

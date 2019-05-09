@@ -67,7 +67,7 @@ class TriggerManagerTest extends \Codeception\Test\Unit
         $process->actors['client'] = Actor::fromData(['title' => 'Client']);
 
         $process->current = new CurrentState();
-        $process->current->key = ':initial';
+        $process->current->key = 'initial';
 
         $process->current->actions['foo'] = Action::fromData([
             'schema' => 'https://example.com/foo',
@@ -177,7 +177,7 @@ class TriggerManagerTest extends \Codeception\Test\Unit
 
     /**
      * @expectedException \Jasny\ValidationException
-     * @expectedExceptionMessage Action 'other' is not allowed in state ':initial'
+     * @expectedExceptionMessage Action 'other' is not allowed in state 'initial'
      */
     public function testActionNotAllowedInState()
     {

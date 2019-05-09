@@ -91,7 +91,7 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
 
     /**
      * @expectedException RuntimeException
-     * @expectedExceptionMessage Failed to instantiate state ':initial' for process '00000000-0000-0000-0000-000000000000': some error
+     * @expectedExceptionMessage Failed to instantiate state 'initial' for process '00000000-0000-0000-0000-000000000000': some error
      */
     public function testInstantiateException()
     {
@@ -99,7 +99,7 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
         $process->id = '00000000-0000-0000-0000-000000000000';
 
         $state = new State();
-        $state->key = ':initial';
+        $state->key = 'initial';
 
         $this->enricher->expects($this->once())->method('applyTo')
             ->with($state, $this->identicalTo($process))
@@ -113,16 +113,16 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
     {
         $scenario = new Scenario();
 
-        $scenario->states[':initial'] = new State();
-        $scenario->states[':initial']->actions = ['foo', 'bar'];
-        $scenario->states[':initial']->transitions[0] = StateTransition::fromData(['transition' => ':success']);
-        $scenario->states[':initial']->transitions[1] = StateTransition::fromData(['transition' => ':failed']);
+        $scenario->states['initial'] = new State();
+        $scenario->states['initial']->actions = ['foo', 'bar'];
+        $scenario->states['initial']->transitions[0] = StateTransition::fromData(['transition' => ':success']);
+        $scenario->states['initial']->transitions[1] = StateTransition::fromData(['transition' => ':failed']);
 
         $scenario->actions['foo'] = Action::fromData(['title' => 'Foo']);
         $scenario->actions['bar'] = Action::fromData(['title' => 'Bar']);
 
         $current = new CurrentState();
-        $current->key = ':initial';
+        $current->key = 'initial';
         $current->actions['foo'] = new Action();
         $current->actions['bar'] = new Action();
 
@@ -154,8 +154,8 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
 
         $this->enricher->expects($this->exactly(2))->method('applyTo')
             ->withConsecutive(
-                [$scenario->states[':initial']->transitions[0], $this->identicalTo($process)],
-                [$scenario->states[':initial']->transitions[1], $this->identicalTo($process)]
+                [$scenario->states['initial']->transitions[0], $this->identicalTo($process)],
+                [$scenario->states['initial']->transitions[1], $this->identicalTo($process)]
             );
 
         $this->stateInstantiator->recalcTransitions($process);

@@ -52,7 +52,7 @@ class ProcessInstantiator
         $process->assets = $this->instantiateAssets($scenario);
         $process->definitions = clone $scenario->definitions;
 
-        $initialState = $scenario->getState(':initial');
+        $initialState = $scenario->getState('initial');
         $process->current = $this->stateInstantiator->instantiate($initialState, $process);
 
         $process->dispatch('instantiate');

@@ -15,7 +15,7 @@ class ProcessSimulatorTest extends \Codeception\Test\Unit
         $scenario = new Scenario();
         $scenario->title = 'Do the test';
 
-        $scenario->states[':initial'] = State::fromData([
+        $scenario->states['initial'] = State::fromData([
             'title' => 'Initial',
             'actions' => ['first'],
             'transitions' => [
@@ -88,7 +88,7 @@ class ProcessSimulatorTest extends \Codeception\Test\Unit
         $process->actors['client'] = new Actor();
 
         $process->current = new CurrentState();
-        $process->current->key = ':initial';
+        $process->current->key = 'initial';
 
         return $process;
     }

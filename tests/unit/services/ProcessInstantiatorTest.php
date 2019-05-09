@@ -27,7 +27,7 @@ class ProcessInstantiatorTest extends \Codeception\Test\Unit
             'type' => 'object'
         ]);
 
-        $scenario->states[':initial'] = new State();
+        $scenario->states['initial'] = new State();
         $scenario->states['step1'] = new State();
         $scenario->states['step2'] = new State();
 
@@ -81,7 +81,7 @@ class ProcessInstantiatorTest extends \Codeception\Test\Unit
         $currentState = $this->createMock(CurrentState::class);
         $stateInstatiator = $this->createMock(StateInstantiator::class);
         $stateInstatiator->expects($this->once())->method('instantiate')
-            ->with($scenario->states[':initial'])->willReturn($currentState);
+            ->with($scenario->states['initial'])->willReturn($currentState);
 
         $dispatcher->expects($this->once())->method('trigger')
             ->with('instantiate', $this->identicalTo($process));

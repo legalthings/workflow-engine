@@ -19,4 +19,4 @@ $I->sendPOST('/responses', $response);
 $I->seeResponseIsJson();
 $I->seeResponseCodeIs(400);
 
-$I->seeResponseContainsJson(["Action 'step2' isn't allowed in state ':initial'"]);
+$I->seeResponseContainsJson(["Action 'step2' isn't allowed in state 'initial'"]);

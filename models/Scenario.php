@@ -245,8 +245,8 @@ class Scenario extends MongoDocument implements Dynamic
             $validation->add($action->validate(), sprintf($actionPrefix, $key) . ':');
         }
         
-        if (!isset($this->states[':initial'])) {
-            $validation->addError("scenario must have an ':initial' state");
+        if (!isset($this->states['initial'])) {
+            $validation->addError("scenario must have an 'initial' state");
         }
         
         $statePrefix = $validation->translate("state '%s'");
@@ -304,7 +304,7 @@ class Scenario extends MongoDocument implements Dynamic
         // Remove implicit states
         $object->states = (object)Pipeline::with((array)$object->states->jsonSerialize())
             ->filter(function(stdClass $state, string $key) {
-                return !str_starts_with($key, ':') || $key === ':initial';
+                return !str_starts_with($key, ':');
             })
             ->toArray();
 

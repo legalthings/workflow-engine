@@ -62,7 +62,7 @@ db.getCollection("scenarios").insert([
         ],
         "states": [
             {
-                "key": ":initial",
+                "key": "initial",
                 "actions": ["step1"],
                 "title": "Initial state",
                 "description": "Initial state",
@@ -171,7 +171,7 @@ db.getCollection("scenarios").insert([
         ],
         "states": [
             {
-                "key": ":initial",
+                "key": "initial",
                 "actions": ["step1"],
                 "title": "Initial state",
                 "description": "Initial state",
@@ -273,7 +273,7 @@ db.getCollection("scenarios").insert([
         ],
         "states": [
             {
-                "key": ":initial",
+                "key": "initial",
                 "actions": ["step1"],
                 "title": "Initial state",
                 "description": "Initial state",
@@ -314,7 +314,7 @@ db.getCollection("processes").insert([
             }
         ],
         "current": {
-            "key": ":initial",
+            "key": "initial",
             "actions": [
                 {
                     "schema": "https://specs.livecontracts.io/v0.2.0/action/http/schema.json#",
@@ -372,7 +372,7 @@ db.getCollection("processes").insert([
             }
         ],
         "current": {
-            "key": ":initial",
+            "key": "initial",
             "actions": [
                 {
                     "schema": "https://specs.livecontracts.io/v0.2.0/action/event/schema.json#",
@@ -455,7 +455,7 @@ db.getCollection("processes").insert([
             }
         ],
         "current": {
-            "key": ":initial",
+            "key": "initial",
             "actions": [
                 {
                     "schema": "https://specs.livecontracts.io/v0.2.0/action/event/schema.json#",

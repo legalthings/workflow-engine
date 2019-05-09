@@ -107,7 +107,7 @@ class ScenarioTest extends \Codeception\Test\Unit
         $scenario = new Scenario();
 
         $initial = new State();
-        $scenario->states[':initial'] = $initial;
+        $scenario->states['initial'] = $initial;
 
         $foo = new State();
         $scenario->states['foo'] = $foo;
@@ -115,7 +115,7 @@ class ScenarioTest extends \Codeception\Test\Unit
         $bar = new State();
         $scenario->states['bar'] = $bar;
 
-        $this->assertSame($initial, $scenario->getState(':initial'));
+        $this->assertSame($initial, $scenario->getState('initial'));
         $this->assertSame($foo, $scenario->getState('foo'));
         $this->assertSame($bar, $scenario->getState('bar'));
     }
@@ -293,10 +293,10 @@ class ScenarioTest extends \Codeception\Test\Unit
         $this->assertAttributeInstanceOf(AssocEntitySet::class, 'states', $scenario);
         $this->assertEquals(State::class, $scenario->states->getEntityClass());
 
-        $this->assertArrayHasKey(':initial', $scenario->states->getArrayCopy());
-        $this->assertInstanceOf(State::class, $scenario->states[':initial']);
-        $this->assertAttributeEquals('First', 'title', $scenario->states[':initial']);
-        $this->assertAttributeEquals(['foo'], 'actions', $scenario->states[':initial']);
+        $this->assertArrayHasKey('initial', $scenario->states->getArrayCopy());
+        $this->assertInstanceOf(State::class, $scenario->states['initial']);
+        $this->assertAttributeEquals('First', 'title', $scenario->states['initial']);
+        $this->assertAttributeEquals(['foo'], 'actions', $scenario->states['initial']);
     }
 
     protected function assertScenarioActors(Scenario $scenario)
@@ -363,7 +363,7 @@ class ScenarioTest extends \Codeception\Test\Unit
             ],
             'allow_actions' => ['bar'],
             'states' => [
-                ':initial' => [
+                'initial' => [
                     'title' => 'First',
                     'actions' => ['foo'],
                     'transitions' => [
@@ -426,7 +426,7 @@ class ScenarioTest extends \Codeception\Test\Unit
             'allow_actions' => ['bar'],
             'states' => [
                 [
-                    'key' => ':initial',
+                    'key' => 'initial',
                     'title' => 'First',
                     'action' => 'foo',
                     'transitions' => [
@@ -510,7 +510,7 @@ class ScenarioTest extends \Codeception\Test\Unit
 
         $expected = [
             "schema property value is not valid",
-            "scenario must have an ':initial' state",
+            "scenario must have an 'initial' state",
             "action 'foo': 'ok' response is required",
             "state 'one': state is invalid",
         ];
@@ -569,7 +569,7 @@ class ScenarioTest extends \Codeception\Test\Unit
                     'display' => 'always',
                 ],
                 [
-                    'key' => ':initial',
+                    'key' => 'initial',
                     'title' => 'First',
                     'actions' => ['foo'],
                     'transitions' => [
@@ -637,8 +637,8 @@ class ScenarioTest extends \Codeception\Test\Unit
         $scenario->actions['bar']->expects($this->atLeastOnce())->method('toData')
             ->willReturn(['title' => "Bar", 'responses' => [['key' => 'ok', 'transition' => ':success']]]);
 
-        $scenario->states[':initial'] = $this->createMock(State::class);
-        $scenario->states[':initial']->expects($this->atLeastOnce())->method('toData')
+        $scenario->states['initial'] = $this->createMock(State::class);
+        $scenario->states['initial']->expects($this->atLeastOnce())->method('toData')
             ->willReturn([
                 'title' => "First",
                 'actions' => ['foo'],
@@ -707,8 +707,8 @@ class ScenarioTest extends \Codeception\Test\Unit
         $scenario->actors['manager']->expects($this->once())->method('jsonSerialize')
             ->willReturn(['title' => "Operational manager"]);
 
-        $scenario->states[':initial'] = $this->createMock(State::class);
-        $scenario->states[':initial']->expects($this->once())->method('jsonSerialize')
+        $scenario->states['initial'] = $this->createMock(State::class);
+        $scenario->states['initial']->expects($this->once())->method('jsonSerialize')
             ->willReturn([
                 'title' => "First",
                 'actions' => ['foo'],
@@ -743,7 +743,7 @@ class ScenarioTest extends \Codeception\Test\Unit
                 ]
             ],
             'states' => [
-                ':initial' => [
+                'initial' => [
                     'title' => 'First',
                     'actions' => ['foo'],
                     'instructions' => [],

@@ -157,8 +157,8 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
     protected function getStatesData()
     {
         return [
-            ':initial' => (object)[
-                'key' => ':initial',
+            'initial' => (object)[
+                'key' => 'initial',
                 'actions' => ['step1'],
                 'title' => 'First state',
                 'description' => 'First state',

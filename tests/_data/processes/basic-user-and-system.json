@@ -27,7 +27,7 @@
     },
     "previous": [],
     "current": {
-        "key": ":initial",
+        "key": "initial",
         "transitions": [
             {
                 "action": "step1",

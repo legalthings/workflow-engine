@@ -254,7 +254,7 @@ class DataPatcherTest extends \Codeception\Test\Unit
                     'I' => 'uno',
                 ],
             ],
-            'current' => ['key' => ':initial'],
+            'current' => ['key' => 'initial'],
         ]);
     }
 
@@ -356,7 +356,7 @@ class DataPatcherTest extends \Codeception\Test\Unit
             '{current: current.key, manager: actors.manager.name, content: assets.document.content}'
         );
 
-        $this->assertEquals(['current' => ':initial', 'manager' => 'Jane Black', 'content' => 'Foo bar'], $result);
+        $this->assertEquals(['current' => 'initial', 'manager' => 'Jane Black', 'content' => 'Foo bar'], $result);
     }
 
     /**

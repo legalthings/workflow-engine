@@ -23,7 +23,7 @@ $scenario = [
         ]
     ],
     'states' => [
-        ':initial' => [
+        'initial' => [
             'action' => 'step1',
             'transition' => ':success'
         ],

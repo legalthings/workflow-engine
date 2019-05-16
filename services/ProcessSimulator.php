@@ -33,7 +33,7 @@ class ProcessSimulator
     }
 
     /**
-     * Walk over the process to get the next states.
+     * Walk over the process to get the next default states chain
      *
      * @param Process $process
      * @return EntitySet&iterable<NextState>

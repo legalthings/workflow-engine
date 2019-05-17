@@ -1,0 +1,37 @@
+{
+    "$schema": "https://specs.livecontracts.io/v0.2.0/scenario/schema.json#",
+    "title": "A proper introduction",
+    "actors": {
+        "initiator": {
+            "$schema": "http://json-schema.org/schema#",
+            "title": "Initiator",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "organization": {
+                    "type": "string"
+                },
+                "identity": {
+                    "type": "string",
+                    "default": "foo_id"
+                }
+            }
+        }
+    },
+    "actions": {
+        "introduction": {
+            "actor": "initiator",
+            "update": {
+                "select": "actors.initiator"
+            }
+        }
+    },
+    "states": {
+        "initial": {
+            "action": "introduction",
+            "transition": ":success"
+        }
+    }
+}

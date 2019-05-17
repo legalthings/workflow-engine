@@ -57,26 +57,13 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
      * Available responses on the action.
      * @var AvailableResponse[]|AssocEntitySet
      */
-    public $responses;
+    public $responses = ['ok' => []];
 
     /**
      * Default response used for golden flow
      * @var string|null
      */
     public $default_response = 'ok';
-
-    /**
-     * Action constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-
-        if (!isset($this->responses)) {
-            $this->responses = AssocEntitySet::forClass(AvailableResponse::class);
-            $this->responses['ok'] = new AvailableResponse();
-        }
-    }
 
     /**
      * Cast entity properties.
@@ -201,7 +188,12 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
         $responseValues = array_only($values, ['display', 'update']);
         $values = array_without($values, ['display', 'update']);
 
-        if ($responseValues !== [] && isset($values['responses'])) {
+        if (!isset($values['responses'])) {
+            $values['responses'] = [];
+            $values['responses']['ok'] = [];
+        }
+
+        if ($responseValues !== []) {
             foreach ($values['responses'] as &$response) {
                 $response += $responseValues;
             }

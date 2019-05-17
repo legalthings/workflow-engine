@@ -24,7 +24,7 @@ class UpdateInstruction extends BasicEntity implements Meta, Validation
      * Whether patch or replace existing objects or array.
      * @var boolean
      */
-    public $patch = false;
+    public $patch = true;
     
     /**
      * Use explicit data instead of response data

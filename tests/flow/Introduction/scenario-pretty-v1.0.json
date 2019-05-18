@@ -1,0 +1,88 @@
+{
+    "$schema": "https://specs.livecontracts.io/v0.2.0/scenario/schema.json#",
+    "title": "A proper introduction",
+    "actors": {
+        "initiator": {
+            "$schema": "http://json-schema.org/schema#",
+            "title": "Initiator",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "organization": {
+                    "type": "string"
+                },
+                "identity": {
+                    "type": "string",
+                    "default": "foo_id"
+                }
+            }
+        },
+        "recipient": {
+            "$schema": "http://json-schema.org/schema#",
+            "title": "Recipient",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "organization": {
+                    "type": "string"
+                },
+                "identity": {
+                    "type": "string",
+                    "default": "bar_id"
+                }
+            }
+        }
+    },
+    "actions": {
+        "introduce_initiator": {
+            "actor": "initiator",
+            "update": [
+                "actors.initiator",
+                "assets.initiator_info"
+            ]
+        },
+        "introduce_recipient": {
+            "actor": "recipient",
+            "update": "actors.recipient"
+        },
+        "save_meeting_data": {
+            "actor": "initiator",
+            "update": [
+                "assets.archive",
+                {
+                    "select": "assets.meeting_data",
+                    "projection": "{date: meeting.date}"
+                }
+            ]
+        }
+    },
+    "states": {
+        "initial": {
+            "action": "introduce_initiator",
+            "transition": "wait_on_recipient"
+        },
+        "wait_on_recipient": {
+            "action": "introduce_recipient",
+            "transition": "wait_on_meeting_data"
+        },
+        "wait_on_meeting_data": {
+            "action": "save_meeting_data",
+            "transition": ":success"
+        }
+    },
+    "assets": {
+        "initiator_info": {
+
+        },
+        "meeting_data": {
+
+        },
+        "archive": {
+
+        }
+    }
+}

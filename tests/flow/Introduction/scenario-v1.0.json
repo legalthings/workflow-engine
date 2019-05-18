@@ -18,19 +18,46 @@
                     "default": "foo_id"
                 }
             }
+        },
+        "recipient": {
+            "$schema": "http://json-schema.org/schema#",
+            "title": "Recipient",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "organization": {
+                    "type": "string"
+                },
+                "identity": {
+                    "type": "string",
+                    "default": "bar_id"
+                }
+            }
         }
     },
     "actions": {
-        "introduction": {
+        "introduce_initiator": {
             "actor": "initiator",
             "update": {
                 "select": "actors.initiator"
+            }
+        },
+        "introduce_recipient": {
+            "actor": "recipient",
+            "update": {
+                "select": "actors.recipient"
             }
         }
     },
     "states": {
         "initial": {
-            "action": "introduction",
+            "action": "introduce_initiator",
+            "transition": "wait_on_recipient"
+        },
+        "wait_on_recipient": {
+            "action": "introduce_recipient",
             "transition": ":success"
         }
     }

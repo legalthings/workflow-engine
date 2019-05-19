@@ -37,7 +37,11 @@ class Flow extends \Codeception\Module
         'event-chain',
         'json-schema',
         'lto-accounts',
-        'reflection'
+        'reflection',
+        'identity',
+        'process',
+        'scenario',
+        'triggers'
     ];
 
     /**
@@ -93,15 +97,11 @@ class Flow extends \Codeception\Module
      */
     protected function getContainerEntries(): EntryLoader
     {
-        $genericFiles = i\iterable_map(self::$loadDeclarations, function ($item) {
-            return 'declarations/generic/' . $item . '.php';
+        $servicesFiles = i\iterable_map(self::$loadDeclarations, function ($item) {
+            return 'declarations/services/' . $item . '.php';
         });
 
-        $modelFiles = glob('declarations/models/*.php');
-
-        $files = array_merge(i\iterable_to_array($genericFiles), $modelFiles);
-
-        return new EntryLoader(i\iterable_to_iterator($files));
+        return new EntryLoader(i\iterable_to_iterator(i\iterable_to_array($servicesFiles)));
     }
 
     /**

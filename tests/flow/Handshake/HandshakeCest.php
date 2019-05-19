@@ -131,7 +131,7 @@ class HandshakeCest
         // Step
         $I->amGoingTo("do the 'elaborate' action, stepping to 'expect_sympathy'");
         $I->am('recipient');
-        $I->doAction('elaborate', 'ok', 'My cat is stealing my boyfriend.');
+        $I->doAction('elaborate', null, 'My cat is stealing my boyfriend.');
 
         $I->comment('verify the process after stepping');
         $I->seeCurrentStateIs('expect_sympathy');
@@ -169,7 +169,7 @@ class HandshakeCest
         // Step
         $I->amGoingTo("do the 'elaborate' action, stepping to 'expect_sympathy'");
         $I->am('recipient');
-        $I->doAction('elaborate', 'ok', 'She always comes in to cuddle with him.');
+        $I->doAction('elaborate', null, 'She always comes in to cuddle with him.');
 
         $I->comment('verify the process after stepping');
         $I->seeCurrentStateIs('expect_sympathy');
@@ -216,7 +216,7 @@ class HandshakeCest
         // Step
         $I->amGoingTo("do the 'elaborate' action, stepping to 'expect_sympathy'");
         $I->am('recipient');
-        $I->doAction('elaborate', 'ok', 'Misty has a mean purr. I know it\'s to taunt me.');
+        $I->doAction('elaborate', null, 'Misty has a mean purr. I know it\'s to taunt me.');
 
         $I->comment('verify the process after stepping');
         $I->seeCurrentStateIs('expect_sympathy');
@@ -241,7 +241,7 @@ class HandshakeCest
         // Step
         $I->amGoingTo("do the 'complete' action, stepping to ':success'");
         $I->am('initiator');
-        $I->doAction('complete', 'ok', 'I understand');
+        $I->doAction('complete', null, 'I understand');
 
         $I->comment('verify the process after stepping');
         $I->seeCurrentStateIs(':success');

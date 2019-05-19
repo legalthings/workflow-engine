@@ -6,6 +6,7 @@ use Jasny\HttpSignature\HttpSignature;
 use Jasny\HttpMessage\ServerRequest;
 use PHPUnit\Framework\Assert;
 use Codeception\PHPUnit\Constraint\JsonContains;
+use Jasny\DotKey;
 
 // here you can define custom actions
 // all public methods declared in helper class will be available in $I
@@ -473,6 +474,20 @@ class Api extends \Codeception\Module
     }
 
     /**
+     * See that response process contains json
+     *
+     * @param string $property
+     * @param array $expected 
+     */
+    public function seeResponseProcessHas(string $property, array $expected)
+    {
+        $response = $this->getResponseJson(true);
+        $actual = DotKey::on($response)->get($property);
+
+        Assert::assertEquals($expected, $actual);
+    }
+
+    /**
      * Assert response equals the contents of a JSON file.
      *
      * @param string $path
@@ -490,13 +505,14 @@ class Api extends \Codeception\Module
     /**
      * Get response json data
      *
+     * @param bool $asArray
      * @return stdClass
      */
-    protected function getResponseJson(): \stdClass
+    protected function getResponseJson($asArray = false)
     {
         $json = $this->getModule('REST')->grabResponse();
         Assert::assertJson($json);
 
-        return json_decode($json);
+        return json_decode($json, $asArray);
     }
 }

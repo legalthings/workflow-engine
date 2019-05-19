@@ -16,7 +16,7 @@ class AvailableResponseTest extends \Codeception\Test\Unit
     public function castMultiProvider()
     {
         $update = [
-            ['select' => 'foo', 'patch' => true, 'data' => 'foo_data'],
+            ['select' => 'foo', 'patch' => false, 'data' => 'foo_data'],
             ['select' => 'bar', 'data' => 'bar_data']
         ];
 
@@ -50,11 +50,11 @@ class AvailableResponseTest extends \Codeception\Test\Unit
         $this->assertCount(2, $update);
         
         $this->assertSame('foo', $update[0]->select);
-        $this->assertSame(true, $update[0]->patch);
+        $this->assertSame(false, $update[0]->patch);
         $this->assertSame('foo_data', $update[0]->data);
 
         $this->assertSame('bar', $update[1]->select);
-        $this->assertSame(false, $update[1]->patch);
+        $this->assertSame(true, $update[1]->patch);
         $this->assertSame('bar_data', $update[1]->data);
     }
 

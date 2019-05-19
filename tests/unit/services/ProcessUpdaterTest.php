@@ -319,7 +319,7 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
                 UpdateInstruction::fromData([
                     'select' => 'actors.manager.name',
                     'projection' => 'name',
-                    'patch' => true,
+                    'patch' => false,
                 ]),
                 UpdateInstruction::fromData([
                     'select' => 'actors.client.name',
@@ -350,8 +350,8 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
             ->willReturnOnConsecutiveCalls('Jane', 'John');
         $patcher->expects($this->exactly(3))->method('set')
             ->withConsecutive(
-                [$this->identicalTo($process), 'assets.data', ['name' => 'Jane', 'age' => 42], false],
-                [$this->identicalTo($process), 'actors.manager.name', 'Jane', true],
+                [$this->identicalTo($process), 'assets.data', ['name' => 'Jane', 'age' => 42], true],
+                [$this->identicalTo($process), 'actors.manager.name', 'Jane', false],
                 [$this->identicalTo($process), 'actors.client.name', 'John', true]
             )
             ->willReturnOnConsecutiveCalls(

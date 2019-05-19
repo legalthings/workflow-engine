@@ -48,8 +48,7 @@ class AvailableResponse extends BasicEntity implements Meta, Validation
     {
         if (isset($this->update) && !$this->update instanceof EntitySet) {
             // check if update is multidimensional, then make an entity set out of it
-            $isMulti = is_array($this->update) && (!in_array(false, array_map('is_object', $this->update)) ||
-                    !in_array(false, array_map('is_array', $this->update)));
+            $isMulti = is_numeric_array($this->update);
 
             $this->update = EntitySet::forClass(
                 UpdateInstruction::class,

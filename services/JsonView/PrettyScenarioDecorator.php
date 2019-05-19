@@ -84,10 +84,58 @@ class PrettyScenarioDecorator
         }
 
         foreach ($action->responses as &$response) {
-            $response = (object)[];
+            $response = $this->decorateResponse($response);            
         }
 
         return $action;
+    }
+
+    /**
+     * Decorate response
+     *
+     * @param stdClass $response
+     * @return stdClass
+     */
+    protected function decorateResponse(stdClass $response): stdClass
+    {
+        unset($response->key);
+        if (isset($response->display) && $response->display === 'always') {
+            unset($response->display);
+        }
+
+        foreach ($response->update ?? [] as $key => $update) {            
+            $response->update[$key] = $this->decorateUpdateInstruction($update);
+        }
+
+        if (isset($response->update) && count($response->update) === 1 && is_string($response->update[0])) {
+            $response->update = $response->update[0];
+        }
+
+        $this->removeEmptyProperties($response, ['title', 'update']);
+
+        return $response;
+    }
+
+    /**
+     * Decorate update instruction
+     *
+     * @param stdClass $update
+     * @return stdClass|string
+     */
+    protected function decorateUpdateInstruction(stdClass $update)
+    {
+        $prettify = !empty($update->select) &&
+            (!isset($update->patch) || (bool)$update->patch === true) &&
+            !isset($update->data) &&
+            !isset($update->projection);
+
+        $update = $prettify ? $update->select : $update;
+
+        if (!is_string($update)) {
+            $this->removeEmptyProperties($update, ['data', 'projection']);
+        }
+
+        return $update;
     }
 
     /**
@@ -146,7 +194,7 @@ class PrettyScenarioDecorator
         foreach ($properties as $prop) {
             $value = $data->$prop ?? null;
 
-            if ($value === null || $value === [] || ($value instanceof stdClass &&  $value == (object)[])) {
+            if ($value === null || $value === [] || ($value instanceof stdClass && $value == (object)[])) {
                 unset($data->$prop);
             }
         }

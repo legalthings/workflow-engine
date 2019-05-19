@@ -117,6 +117,144 @@ db.getCollection("scenarios").insert([
         ]
     },
     {
+        "_id": "rt5yh683-108e-5673-8d2d-7914ffd23e5t",
+        "schema": "https://specs.livecontracts.io/v0.2.0/scenario/schema.json#",
+        "title": "Basic system and user with update instructions",
+        "actors": [
+            {
+                "key": "user",
+                "title": "User"
+            },
+            {
+                "key": "organization",
+                "title": "Organization"
+            }
+        ],
+        "actions": [
+            {
+                "schema": "https://specs.livecontracts.io/v0.2.0/action/http/schema.json#",
+                "key": "step1",
+                "title": "Step1",
+                "description": "Step1",
+                "label": "Launch step 1",
+                "actors": ["organization"],
+                "url": "https://www.example.com",
+                "responses": {
+                    "ok": {
+                        "update": [
+                            {
+                                "select": "foo"
+                            },
+                            {
+                                "select": "baz", 
+                                "patch": true
+                            },
+                            {
+                                "select": "bar",
+                                "patch": false
+                            }
+                        ]
+                    },
+                    "error": { }
+                }
+            },
+            {
+                "schema": "https://specs.livecontracts.io/v0.2.0/action/nop/schema.json#",
+                "key": "step2",
+                "title": "Step2",
+                "description": "Step2",
+                "label": "Launch step 2",
+                "trigger_response": "ok",
+                "data": "second response",
+                "actors": ["organization", "user"],
+                "responses": {
+                    "ok": {
+                        "update": [
+                            {
+                                "select": "bar"
+                            }
+                        ]
+                    },
+                    "error": { }
+                }
+            },
+            {
+                "schema": "https://specs.livecontracts.io/v0.2.0/action/schema.json#",
+                "key": "step3",
+                "title": "Step3",
+                "description": "Step3",
+                "label": "Launch step 3",
+                "actors": ["user"],
+                "responses": {
+                    "ok": {
+                        "update": [
+                            {
+                                "select": "bar",
+                                "projection": "{id: test}"
+                            }
+                        ]
+                    },
+                    "cancel": { }
+                }
+            }
+        ],
+        "states": [
+            {
+                "key": "initial",
+                "actions": ["step1"],
+                "title": "Initial state",
+                "description": "Initial state",
+                "instructions": [],
+                "timeout": "P1D",
+                "transitions": [
+                    {
+                        "action": "step1",
+                        "response": "ok",
+                        "transition": "second"
+                    },
+                    {
+                        "action": "step1",
+                        "response": "error",
+                        "transition": ":failed"
+                    }
+                ]
+            },
+            {
+                "key": "second",
+                "actions": ["step2"],
+                "title": "Second state",
+                "description": "Second state",
+                "instructions": [],
+                "timeout": "P1D",
+                "transitions": [
+                    {
+                        "action": "step2",
+                        "response": "ok",
+                        "transition": "third"
+                    },
+                    {
+                        "action": "step2",
+                        "response": "error",
+                        "transition": ":failed"
+                    }
+                ]
+            },
+            {
+                "key": "third",
+                "actions": ["step3"],
+                "title": "Third state",
+                "description": "Third state",
+                "instructions": [],
+                "timeout": "P1D",
+                "transitions": [
+                    {
+                        "transition": ":success"
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "_id": "5gh893dv-108e-4398-8d2d-7914ffd934g8",
         "schema": "https://specs.livecontracts.io/v0.2.0/scenario/schema.json#",
         "title": "Simple event trigger scenario",

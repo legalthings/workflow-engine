@@ -1,0 +1,113 @@
+{
+    "$schema": "https://specs.livecontracts.io/v0.2.0/scenario/schema.json#",
+    "title": "Basic system and user with update instructions",
+    "actors": {
+        "user": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "title": "User"
+        },
+        "organization": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "title": "Organization"
+        }
+    },
+    "actions": {
+        "step1": {
+            "$schema": "https://specs.livecontracts.io/v0.2.0/action/http/schema.json#",
+            "title": "Step1",
+            "actor": "organization",
+            "url": "https://www.example.com",
+            "responses": {
+                "ok": {
+                    "update": [
+                        {
+                            "select": "foo",
+                            "patch": true
+                        },
+                        {
+                            "select": "baz",
+                            "patch": true
+                        },
+                        {
+                            "select": "bar",
+                            "patch": false
+                        }
+                    ]
+                },
+                "error": { }
+            }
+        },
+        "step2": {
+            "$schema": "https://specs.livecontracts.io/v0.2.0/action/nop/schema.json#",
+            "title": "Step2",
+            "trigger_response": "ok",
+            "data": "second response",
+            "actors": ["organization", "user"],
+            "responses": {
+                "ok": {
+                    "update": [
+                        {
+                            "select": "bar",
+                            "patch": true
+                        }
+                    ]
+                },
+                "error": { }
+            }
+        },
+        "step3": {
+            "$schema": "https://specs.livecontracts.io/v0.2.0/action/schema.json#",
+            "title": "Step3",
+            "actor": "user",
+            "responses": {
+                "ok": {
+                    "update": [
+                        {
+                            "select": "bar",
+                            "patch": true,
+                            "projection": "{id: test}"
+                        }
+                    ]
+                },
+                "cancel": { }
+            }
+        }
+    },
+    "states": {
+        "initial": {
+            "action": "step1",
+            "transitions": [
+                {
+                    "action": "step1",
+                    "response": "ok",
+                    "transition": "second"
+                },
+                {
+                    "action": "step1",
+                    "response": "error",
+                    "transition": ":failed"
+                }
+            ]
+        },
+        "second": {
+            "action": "step2",
+            "transitions": [
+                {
+                    "action": "step2",
+                    "response": "ok",
+                    "transition": "third"
+                },
+                {
+                    "action": "step2",
+                    "response": "error",
+                    "transition": ":failed"
+                }
+            ]
+        },
+        "third": {
+            "action": "step3",
+            "transition": ":success"
+        }
+    },
+    "meta": { }
+}

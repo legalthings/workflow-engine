@@ -27,7 +27,7 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
     public function testInvoke()
     {
         $data = $this->getData();
-        $expected = $this->getExpectedScenario('basic-user-and-system');
+        $expected = $this->getExpectedScenario('basic-user-and-system.update-instructions');
         $scenario = $this->createMock(Scenario::class);
 
         $decorator = new PrettyScenarioDecorator();
@@ -53,7 +53,7 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
         $expected->states = (array)$expected->states;
 
         foreach ($expected->actions as $key => $action) {
-            $expected->actions[$key]->responses = (array)$action->responses;
+            $expected->actions[$key]->responses = $action->responses;
         }
 
         return $expected;
@@ -69,7 +69,7 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
         $scenario = (object)[
             'id' => '2557288f-108e-4398-8d2d-7914ffd93150',
             '$schema' => 'https://specs.livecontracts.io/v0.2.0/scenario/schema.json#',
-            'title' => 'Basic system and user',
+            'title' => 'Basic system and user with update instructions',
             'assets' => (object)[],
             'definitions' => (object)[],
             'allow_actions' => [],
@@ -115,9 +115,15 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
                 'label' => 'Launch step 1',
                 'actors' => ['organization'],
                 'url' => 'https://www.example.com',
-                'responses' => [
-                    'ok' => [ ],
-                    'error' => [ ]
+                'responses' => (object)[
+                    'ok' => (object)[
+                        'update' => [
+                            (object)['select' => 'foo'],
+                            (object)['select' => 'baz', 'patch' => true],
+                            (object)['select' => 'bar', 'patch' => false],
+                        ]
+                    ],
+                    'error' => (object)[]
                 ]
             ],
             'step2' => (object)[
@@ -129,9 +135,13 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
                 'trigger_response' => 'ok',
                 'data' => 'second response',
                 'actors' => ['organization', 'user'],
-                'responses' => [
-                    'ok' => [ ],
-                    'error' => [ ]
+                'responses' => (object)[
+                    'ok' => (object)[
+                        'update' => [
+                            (object)['select' => 'bar']
+                        ]
+                    ],
+                    'error' => (object)[]
                 ]
             ],
             'step3' => (object)[
@@ -141,9 +151,13 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
                 'description' => 'Step3',
                 'label' => 'Launch step 3',
                 'actors' => ['user'],
-                'responses' => [
-                    'ok' => [ ],
-                    'cancel' => [ ]
+                'responses' => (object)[
+                    'ok' => (object)[
+                        'update' => [
+                            (object)['select' => 'bar', 'projection' => '{id: test}', 'patch' => true],
+                        ]
+                    ],
+                    'cancel' => (object)[]
                 ]
             ]
         ];

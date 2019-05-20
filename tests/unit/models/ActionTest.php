@@ -363,7 +363,7 @@ class ActionTest extends \Codeception\Test\Unit
 
         $this->assertInstanceOf(Jasny\DB\EntitySet::class, $responses['ok']->update);
         $this->assertEquals($expectedUpdate1, $responses['ok']->update[0]->getValues());
-        $this->assertEquals($expectedUpdate2 + ['patch' => false], $responses['ok']->update[1]->getValues());
+        $this->assertEquals($expectedUpdate2 + ['patch' => true], $responses['ok']->update[1]->getValues());
 
         $this->assertEquals($responses['ok']->update, $responses['error']->update);        
     }

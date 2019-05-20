@@ -63,4 +63,34 @@ class UpdateInstructionTest extends \Codeception\Test\Unit
         $this->assertSame($instruction, $result);
         $this->assertEquals($expected, $result->data);
     }
+
+    /**
+     * Provide data for testing 'fromData' method
+     *
+     * @return array
+     */
+    public function fromDataProvider()
+    {
+        return [
+            ['foo'],
+            [['select' => 'foo']],
+            [(object)['select' => 'foo']],
+        ];
+    }
+
+    /**
+     * Test 'fromData' method
+     *
+     * @dataProvider fromDataProvider
+     */
+    public function testFromData($data)
+    {        
+        $result = UpdateInstruction::fromData($data);
+
+        $this->assertInstanceOf(UpdateInstruction::class, $result);
+        $this->assertSame('foo', $result->select);
+        $this->assertSame(true, $result->patch);
+        $this->assertSame(null, $result->data);
+        $this->assertSame(null, $result->projection);
+    }
 }

@@ -73,4 +73,19 @@ class UpdateInstruction extends BasicEntity implements Meta, Validation
         
         return $validation;
     }
+
+    /**
+     * Convert loaded values to an entity.
+     *
+     * @param array|stdClass|string $data
+     * @return static
+     */
+    public static function fromData($data)
+    {
+        if (is_string($data)) {
+            $data = ['select' => $data];
+        }
+
+        return parent::fromData($data);
+    }
 }

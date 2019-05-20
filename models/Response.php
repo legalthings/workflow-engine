@@ -74,6 +74,10 @@ class Response extends BasicEntity implements Meta
             $this->actor = (new Actor())->setValues(['key' => $this->actor]);
         }
 
+        if (!isset($this->key)) {
+            $this->key = 'ok';
+        }
+
         return parent::cast();
     }
 

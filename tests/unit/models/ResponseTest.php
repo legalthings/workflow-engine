@@ -19,35 +19,30 @@ class ResponseTest extends \Codeception\Test\Unit
     }
 
     /**
-     * Test `display` property default value   
+     * Test default values   
      */
-    public function testDisplayDefault()
+    public function testDefault()
     {
         $this->assertSame('always', $this->response->display);
+        $this->assertSame('ok', $this->response->key);
     }
 
     /**
-     * Test 'cast' method for 'action' property
+     * Test 'cast' method
      */
     public function testCastAction()
     {
         $this->response->action = 'foo';
+        $this->response->actor = 'bar';
+        $this->response->key = null;
+
         $this->response->cast();
 
         $this->assertInstanceOf(Action::class, $this->response->action);
-        $this->assertSame('foo', $this->response->action->key);
-    }
-
-    /**
-     * Test 'cast' method for 'actor' property
-     */
-    public function testCastActor()
-    {
-        $this->response->actor = 'foo';
-        $this->response->cast();
-
         $this->assertInstanceOf(Actor::class, $this->response->actor);
-        $this->assertSame('foo', $this->response->actor->key);
+        $this->assertSame('foo', $this->response->action->key);
+        $this->assertSame('bar', $this->response->actor->key);
+        $this->assertSame('ok', $this->response->key);
     }
 
     /**

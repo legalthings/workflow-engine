@@ -45,6 +45,48 @@ class IntroductionCest
     }
 
     /**
+     * @example { "scenario": "scenario-current-actor-v1.0.json" }
+     */
+    public function introductionUpdateCurrentActor(\FlowTester $I, \Codeception\Example $example)
+    {
+        $I->wantTo('run an introduction flow, updating current action actor');
+
+        $I->createProcessFrom($example['scenario']);
+
+        $I->comment('verify the process after initialization');
+        $I->seeCurrentStateIs('initial');
+        $I->seePreviousResponsesWere([]);
+        $I->seeDefaultActionIs('introduce');
+        $I->seeNextStatesAre(['wait_on_recipient', ':success']);
+
+        // Step
+        $I->amGoingTo("do the 'introduce' action, stepping to 'wait_on_recipient'");
+        $I->am('initiator');
+        $I->doAction('introduce', null, ['name' => 'Joe Smith', 'organization' => 'LTO Network']);
+
+        $I->comment('verify the process after stepping');
+        $I->seeCurrentStateIs('wait_on_recipient');
+        $I->seePreviousResponsesWere(['introduce.ok']);
+        $I->seePreviousResponseHas('data', ['name' => 'Joe Smith', 'organization' => 'LTO Network']);
+        $I->seeActorHas('initiator', 'name', 'Joe Smith');
+        $I->seeActorHas('initiator', 'organization', 'LTO Network');
+        $I->seeNextStatesAre([':success']);
+
+        // Step
+        $I->amGoingTo("do the 'introduce' action, stepping to ':success'");
+        $I->am('recipient');
+        $I->doAction('introduce', 'ok', ['name' => 'Jane Wong', 'organization' => 'Acme Inc']);
+
+        $I->comment('verify the process after stepping');
+        $I->seeCurrentStateIs(':success');
+        $I->seePreviousResponsesWere(['introduce.ok', 'introduce.ok']);
+        $I->seePreviousResponseHas('data', ['name' => 'Jane Wong', 'organization' => 'Acme Inc']);
+        $I->seeActorHas('recipient', 'name', 'Jane Wong');
+        $I->seeActorHas('recipient', 'organization', 'Acme Inc');
+        $I->seeNextStatesAre([]);
+    }
+
+    /**
      * @example { "scenario": "scenario-pretty-v1.0.json" }
      */
     public function introductionPretty(\FlowTester $I, \Codeception\Example $example)

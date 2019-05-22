@@ -1,0 +1,57 @@
+{
+    "actors": {
+        "initiator": {
+            "$schema": "http://json-schema.org/schema#",
+            "title": "Initiator",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "organization": {
+                    "type": "string"
+                },
+                "identity": {
+                    "type": "string",
+                    "default": "foo_id"
+                }
+            }
+        },
+        "recipient": {
+            "$schema": "http://json-schema.org/schema#",
+            "title": "Recipient",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "organization": {
+                    "type": "string"
+                },
+                "identity": {
+                    "type": "string",
+                    "default": "bar_id"
+                }
+            }
+        }
+    },
+    "actions": {
+        "introduce": {
+            "actors": [
+                "initiator",
+                "recipient"
+            ],
+            "update": "current.actor"
+        }
+    },
+    "states": {
+        "initial": {
+            "action": "introduce",
+            "transition": "wait_on_recipient"
+        },
+        "wait_on_recipient": {
+            "action": "introduce",
+            "transition": ":success"
+        }
+    }
+}

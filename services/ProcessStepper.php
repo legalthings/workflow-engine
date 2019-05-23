@@ -36,7 +36,10 @@ class ProcessStepper
     {
         $this->validate($process, $response)->mustSucceed();
 
-        $process->current->response = $this->expandResponse($process, $response);
+        $response = $this->expandResponse($process, $response);
+        $process->current->response = $response;
+        $process->current->actor = $response->actor;
+
         $this->processUpdater->update($process)->mustSucceed();
 
         $process->dispatch('step');

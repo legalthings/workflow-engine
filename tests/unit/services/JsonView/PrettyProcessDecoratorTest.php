@@ -193,6 +193,16 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
             'title' => 'Second state',
             'description' => 'Second state',
             'display' => 'always',
+            'actor' => (object)[
+                'key' => 'organization',
+                'title' => 'Organization',
+                'identity' => (object)[
+                    'id' => '6uk7288s-afe4-7398-8dbh-7914ffd930pl',
+                    'signkeys' => (object)[
+                        'default' => '57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn'
+                    ]
+                ]
+            ],
             'actions' => [
                 'step2' => (object)[
                     '$schema' => 'https://specs.livecontracts.io/v0.2.0/action/nop/schema.json#',

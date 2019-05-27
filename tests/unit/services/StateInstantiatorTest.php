@@ -39,11 +39,17 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
             'actors' => ['client'],
         ]);
 
+        $actor = new Actor();
+        $actor->key = 'foo';
+
         $scenario = new Scenario();
         $scenario->actions['fill-out-form'] = $action;
 
         $process = new Process();
         $process->scenario = $scenario;
+        $process->current = new CurrentState();
+        $process->current->response = new Response();
+        $process->current->response->actor = $actor;
 
         $state = State::fromData([
             'key' => 'client-form',
@@ -87,6 +93,8 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
         $this->assertEquals('2018-01-02T02:00:00+0000', $current->due_date->format(DATE_ISO8601));
 
         $this->assertAttributeEquals('always', 'display', $current);
+
+        $this->assertSame($actor, $current->actor);
     }
 
     /**

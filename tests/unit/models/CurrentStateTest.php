@@ -10,39 +10,17 @@ use Carbon\CarbonImmutable;
 class CurrentStateTest extends \Codeception\Test\Unit
 {
     /**
-     * Provide data for testing 'cast' method
-     *
-     * @return array
-     */
-    public function castProvider()
-    {
-        $update = [
-            ['select' => 'foo', 'patch' => true, 'data' => 'foo_data'],
-            ['select' => 'bar', 'data' => 'bar_data']
-        ];
-
-        $updateObj = $update;
-        $updateObj[0] = (object)$updateObj[0];
-        $updateObj[1] = (object)$updateObj[1];
-
-        return [
-            [$update],
-            [$updateObj],
-        ];
-    }
-
-    /**
      * Test 'cast' method
-     *
-     * @dataProvider castProvider
      */
-    public function testCast($update)
+    public function testCast()
     {
+        $date = new DateTime();
         $transition1 = $this->createMock(StateTransition::class);
         $transition2 = $this->createMock(StateTransition::class);
 
         $state = new CurrentState();
         $state->transitions = [$transition1, $transition2];
+        $state->due_date = $date;
 
         $state->cast();
 
@@ -54,6 +32,9 @@ class CurrentStateTest extends \Codeception\Test\Unit
         $this->assertCount(2, $transitions);        
         $this->assertSame($transition1, $transitions[0]);
         $this->assertSame($transition2, $transitions[1]);
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $state->due_date);
+        $this->assertSame($date->getTimestamp(), $state->due_date->getTimestamp());
     }
 
     /**

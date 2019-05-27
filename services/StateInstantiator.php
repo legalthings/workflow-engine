@@ -45,6 +45,10 @@ class StateInstantiator
 
             $actionDefinitions = $process->scenario->getActionsForState($definition);
             $currentState->actions = $this->instantiateActions($actionDefinitions, $process);
+
+            if (isset($process->current->response)) {
+                $currentState->actor = $process->current->response->actor;
+            }
         } catch (RuntimeException $e) {
             $msg = "Failed to instantiate state '%s' for process '%s': %s";
             $err = sprintf($msg, $definition->title ?: $definition->key, $process->id, $e->getMessage());

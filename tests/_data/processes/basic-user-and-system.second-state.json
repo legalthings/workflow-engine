@@ -49,6 +49,7 @@
     "current": {
         "key": "second",
         "action": "step2",
+        "actor": "organization",
         "transitions": [
             {
                 "action": "step2",

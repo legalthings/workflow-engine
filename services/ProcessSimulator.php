@@ -23,13 +23,19 @@ class ProcessSimulator
     protected $dataEnricher;
 
     /**
+     * @var ActionInstantiator
+     **/
+    protected $actionInstantiator;
+
+    /**
      * Class constructor.
      *
      * @param DataEnricher $dataEnricher
      */
-    public function __construct(DataEnricher $dataEnricher)
+    public function __construct(DataEnricher $dataEnricher, ActionInstantiator $actionInstantiator)
     {
         $this->dataEnricher = $dataEnricher;
+        $this->actionInstantiator = $actionInstantiator;
     }
 
     /**
@@ -93,10 +99,7 @@ class ProcessSimulator
                     return $scenario->getAction($actionKey);
                 })
                 ->find(function(Action $action) use ($process) {
-                    if ($action->condition instanceof DataInstruction) {
-                        $action = clone $action;
-                        $this->dataEnricher->applyTo($action, $process);
-                    }
+                    $this->actionInstantiator->applyActionCondition($action, $process);
 
                     return (bool)$action->condition;
                 });

@@ -3,6 +3,8 @@
 class IntroductionCest
 {
     /**
+     * Basic introduction flow
+     * 
      * @example { "scenario": "scenario-v1.0.json" }
      */
     public function introduction(\FlowTester $I, \Codeception\Example $example)
@@ -45,9 +47,11 @@ class IntroductionCest
     }
 
     /**
-     * @example { "scenario": "scenario-current-actor-v1.0.json" }
+     * Make sure actor can be updated using 'current.actor' reference
+     * 
+     * @example { "scenario": "scenario-current-actor-update-v1.0.json" }
      */
-    public function introductionUpdateCurrentActor(\FlowTester $I, \Codeception\Example $example)
+    public function introductionCurrentActorUpdate(\FlowTester $I, \Codeception\Example $example)
     {
         $I->wantTo('run an introduction flow, updating current action actor');
 
@@ -87,6 +91,52 @@ class IntroductionCest
     }
 
     /**
+     * Use action condition with reference to 'current.actor'
+     * 
+     * @example { "scenario": "scenario-current-actor-condition-v1.0.json" }
+     */
+    public function introductionCurrentActorCondition(\FlowTester $I, \Codeception\Example $example)
+    {
+        $I->wantTo('run an introduction flow');
+
+        $I->createProcessFrom($example['scenario']);
+
+        $I->comment('verify the process after initialization');
+        $I->seeCurrentStateIs('initial');
+        $I->seePreviousResponsesWere([]);
+        $I->seeDefaultActionIs('introduce');
+        $I->seeNextStatesAre(['wait_on_recipient', ':success']);
+
+        // Step
+        $I->amGoingTo("do the 'introduce' action, stepping to 'wait_on_recipient'");
+        $I->am('initiator');
+        $I->doAction('introduce', 'ok', ['name' => 'Joe Smith', 'organization' => 'LTO Network']);
+
+        $I->comment('verify the process after stepping');
+        $I->seeCurrentStateIs('wait_on_recipient');
+        $I->seePreviousResponsesWere(['introduce.ok']);
+        $I->seePreviousResponseHas('data', ['name' => 'Joe Smith', 'organization' => 'LTO Network']);
+        $I->seeActorHas('initiator', 'name', 'Joe Smith');
+        $I->seeActorHas('initiator', 'organization', 'LTO Network');
+        $I->seeNextStatesAre([':success']);
+
+        // Step
+        $I->amGoingTo("do the 'introduce' action, stepping to ':success'");
+        $I->am('recipient');
+        $I->doAction('introduce', 'ok', ['name' => 'Jane Wong', 'organization' => 'Acme Inc']);
+
+        $I->comment('verify the process after stepping');
+        $I->seeCurrentStateIs(':success');
+        $I->seePreviousResponsesWere(['introduce.ok', 'introduce.ok']);
+        $I->seePreviousResponseHas('data', ['name' => 'Jane Wong', 'organization' => 'Acme Inc']);
+        $I->seeActorHas('recipient', 'name', 'Jane Wong');
+        $I->seeActorHas('recipient', 'organization', 'Acme Inc');
+        $I->seeNextStatesAre([]);
+    }
+
+    /**
+     * Use prettyfied format of update command for action
+     * 
      * @example { "scenario": "scenario-pretty-v1.0.json" }
      */
     public function introductionPretty(\FlowTester $I, \Codeception\Example $example)

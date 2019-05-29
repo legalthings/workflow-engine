@@ -15,6 +15,11 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
     protected $enricher;
 
     /**
+     * @var ActionInstantiator
+     **/
+    protected $actionInstantiator;
+
+    /**
      * @var StateInstantiator
      */
     protected $stateInstantiator;
@@ -24,7 +29,8 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
         CarbonImmutable::setTestNow(CarbonImmutable::create(2018, 1, 1, 0, 0, 0, 'UTC'));
 
         $this->enricher = $this->createMock(DataEnricher::class);
-        $this->stateInstantiator = new StateInstantiator($this->enricher);
+        $this->actionInstantiator = $this->createMock(ActionInstantiator::class);
+        $this->stateInstantiator = new StateInstantiator($this->enricher, $this->actionInstantiator);
     }
 
     public function _after()
@@ -68,11 +74,15 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
             'display' => 'always',
         ]);
 
-        $this->enricher->expects($this->exactly(2))->method('applyTo')
-            ->withConsecutive(
-                [$state, $this->identicalTo($process)],
-                [$action, $this->identicalTo($process)]
-            );
+        $this->actionInstantiator->expects($this->once())->method('instantiate')
+            ->will($this->returnCallback(function(AssocEntitySet $actionDefinitions, Process $process) use ($action) {
+                $this->assertCount(1, $actionDefinitions);
+                $this->assertSame($action, $actionDefinitions['fill-out-form']);
+
+                $actionClone = clone $action;
+
+                return new AssocEntitySet([$actionClone]);
+            }));
 
         $current = $this->stateInstantiator->instantiate($state, $process);
 
@@ -146,11 +156,9 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
         $process = $this->createProcess();
         $scenario = $process->scenario;
 
-        $this->enricher->expects($this->exactly(2))->method('applyTo')
-            ->withConsecutive(
-                [$scenario->actions['foo'], $this->identicalTo($process)],
-                [$scenario->actions['bar'], $this->identicalTo($process)]
-            );
+        $this->actionInstantiator->expects($this->once())->method('instantiate')
+            ->with($scenario->actions, $this->identicalTo($process))
+            ->willReturn($scenario->actions);
 
         $this->stateInstantiator->recalcActions($process);
     }

@@ -101,7 +101,9 @@ class ProcessSimulatorTest extends \Codeception\Test\Unit
         $dataEnricher->expects($this->exactly(2))->method('applyTo')
             ->with($this->isInstanceOf(NextState::class), $this->isInstanceOf(Process::class));
 
-        $simulator = new ProcessSimulator($dataEnricher);
+        $actionInstantiator = $this->createMock(ActionInstantiator::class);
+
+        $simulator = new ProcessSimulator($dataEnricher, $actionInstantiator);
 
         $next = $simulator->getNextStates($process);
         $this->assertInstanceOf(EntitySet::class, $next);
@@ -141,7 +143,9 @@ class ProcessSimulatorTest extends \Codeception\Test\Unit
         $dataEnricher->expects($this->exactly(count($expected)))->method('applyTo')
             ->with($this->isInstanceOf(NextState::class), $this->isInstanceOf(Process::class));
 
-        $simulator = new ProcessSimulator($dataEnricher);
+        $actionInstantiator = $this->createMock(ActionInstantiator::class);
+
+        $simulator = new ProcessSimulator($dataEnricher, $actionInstantiator);
 
         $next = $simulator->getNextStates($process);
 
@@ -179,7 +183,9 @@ class ProcessSimulatorTest extends \Codeception\Test\Unit
                 return $subject;
             });
 
-        $simulator = new ProcessSimulator($dataEnricher);
+        $actionInstantiator = $this->createMock(ActionInstantiator::class);
+
+        $simulator = new ProcessSimulator($dataEnricher, $actionInstantiator);
 
         $next = $simulator->getNextStates($process);
 
@@ -206,7 +212,9 @@ class ProcessSimulatorTest extends \Codeception\Test\Unit
         $process->scenario->actions['alt']->condition = DataInstruction::fromData(['<eval>' => $condition]);
 
         $dataEnricher = $this->createMock(DataEnricher::class);
-        $dataEnricher->expects($this->any())->method('applyTo')
+
+        $actionInstantiator = $this->createMock(ActionInstantiator::class);
+        $actionInstantiator->expects($this->any())->method('applyActionCondition')
             ->willReturnCallback(function($subject) {
                 if ($subject instanceof Action && $subject->condition instanceof DataInstruction) {
                     $subject->condition = ($subject->condition->getValues() === ['<eval>' => 'true']);
@@ -215,7 +223,7 @@ class ProcessSimulatorTest extends \Codeception\Test\Unit
                 return $subject;
             });
 
-        $simulator = new ProcessSimulator($dataEnricher);
+        $simulator = new ProcessSimulator($dataEnricher, $actionInstantiator);
 
         $next = $simulator->getNextStates($process);
 
@@ -235,38 +243,13 @@ class ProcessSimulatorTest extends \Codeception\Test\Unit
         $dataEnricher->expects($this->any())->method('applyTo')
             ->with($this->isInstanceOf(NextState::class), $this->isInstanceOf(Process::class));
 
-        $simulator = new ProcessSimulator($dataEnricher);
+        $actionInstantiator = $this->createMock(ActionInstantiator::class);
+
+        $simulator = new ProcessSimulator($dataEnricher, $actionInstantiator);
 
         $next = $simulator->getNextStates($process);
 
         $this->assertEquals(['alt_step', 'basic_step', 'alt_step', ':loop'], $next->key);
-    }
-
-    public function testActionRuntimeException()
-    {
-        $process = $this->createProcess();
-
-        // Emulate an invalid data instruction
-        $process->scenario->actions['second']->condition = DataInstruction::fromData(['<eval>' => '99x']);
-
-        $dataEnricher = $this->createMock(DataEnricher::class);
-        $dataEnricher->expects($this->any())->method('applyTo')
-            ->willReturnCallback(function($subject) {
-                if ($subject instanceof Action && $subject->condition instanceof DataInstruction) {
-                    throw new RuntimeException("Invalid data instruction");
-                }
-
-                return $subject;
-            });
-
-        $simulator = new ProcessSimulator($dataEnricher);
-
-        $next = @$simulator->getNextStates($process);
-
-        $this->assertLastError(E_USER_WARNING, "Error while getting default action for state " .
-            "'basic_step' in process: '00000000-0000-0000-0000-000000000000': Invalid data instruction");
-
-        $this->assertEquals(['basic_step'], $next->key);
     }
 
     public function testTransitionRuntimeException()
@@ -287,7 +270,9 @@ class ProcessSimulatorTest extends \Codeception\Test\Unit
                 return $subject;
             });
 
-        $simulator = new ProcessSimulator($dataEnricher);
+        $actionInstantiator = $this->createMock(ActionInstantiator::class);
+
+        $simulator = new ProcessSimulator($dataEnricher, $actionInstantiator);
 
         $next = @$simulator->getNextStates($process);
 
@@ -314,7 +299,9 @@ class ProcessSimulatorTest extends \Codeception\Test\Unit
                 return $subject;
             });
 
-        $simulator = new ProcessSimulator($dataEnricher);
+        $actionInstantiator = $this->createMock(ActionInstantiator::class);
+
+        $simulator = new ProcessSimulator($dataEnricher, $actionInstantiator);
 
         $next = @$simulator->getNextStates($process);
 

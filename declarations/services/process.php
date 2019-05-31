@@ -31,4 +31,7 @@ return [
     StateInstantiator::class => static function(AutowireContainerInterface $container) {
         return $container->autowire(StateInstantiator::class);
     },
+    ActionInstantiator::class => static function(AutowireContainerInterface $container) {
+        return $container->autowire(ActionInstantiator::class);
+    },
 ];

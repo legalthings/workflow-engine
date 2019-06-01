@@ -1,0 +1,42 @@
+{
+    "$schema": "https://specs.livecontracts.io/v0.2.0/scenario/schema.json#",
+    "title": "Introduction with transition condition",
+    "actors": {
+        "initiator": {
+            "$schema": "http://json-schema.org/schema#",
+            "title": "Initiator",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "organization": {
+                    "type": "string"
+                },
+                "identity": {
+                    "type": "string",
+                    "default": "foo_id"
+                }
+            }
+        }
+    },
+    "actions": {
+        "introduce": {
+            "actors": [
+                "initiator"
+            ],
+            "update": "actors.initiator"
+        }
+    },
+    "states": {
+        "initial": {
+            "action": "introduce",
+            "transitions": [
+                {
+                    "transition": ":success",
+                    "condition": "!eval actors.initiator.name != null"
+                }
+            ]
+        }
+    }
+}

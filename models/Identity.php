@@ -69,7 +69,7 @@ class Identity extends MongoDocument implements Identifiable
         return
             ($identity->id !== null || $identity->signkeys !== []) && // Match at least one of these
             ($identity->id === null || $identity->id === $this->id) &&
-            ($identity->signkeys === [] || array_contains($this->signkeys, $identity->signkeys, true));
+            ($identity->signkeys === [] || array_contains((array)$this->signkeys, $identity->signkeys, true));
     }
 
     /**

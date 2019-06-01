@@ -66,6 +66,12 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
     public $default_response = 'ok';
 
     /**
+     * Determine / force the response.
+     * @var string|DataInstruction|null
+     */
+    public $determine_response;
+
+    /**
      * Cast entity properties.
      *
      * @return $this

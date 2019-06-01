@@ -124,6 +124,8 @@ class ProcessController extends BaseController
         // Stepper does validation (in context of the current state of the process).
         $this->stepper->step($process, $response);
 
+        $this->eventChainRepository->persistAll();
+
         $this->output($process);
     }
 
@@ -137,7 +139,11 @@ class ProcessController extends BaseController
         $process = $this->getProcessFromInput($id);        
         $this->authzForAccount($process);
 
-        $this->eventChainRepository->fetch($process->chain);
+        $input = $this->getInput();
+
+        if (isset($input['chain'])) {
+            $this->eventChainRepository->register($input['chain']);
+        }
 
         $actor = $this->getActorForAccount($process);
         $response = $this->triggerManager->invoke($process, null, $actor);

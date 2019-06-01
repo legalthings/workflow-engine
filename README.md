@@ -60,7 +60,7 @@ $I->expectHttpRequest(function (Request $request) use ($I) {
 To serve the project on localhost run
 
 ```
-php -S localhost:4001 -t www
+php -S localhost:4001 app.php
 ```
 
 _Note, it's preferable to work TDD and use tests when developing. This means you would hardly ever need to run this

@@ -1,9 +1,13 @@
 <?php declare(strict_types=1);
 
 use LegalThings\DataEnricher;
+use DataEnricher\ResourceId;
 
 return [
     DataEnricher::class => static function() {
-        return new DataEnricher();
+        $dataEnricher = new DataEnricher();
+        $dataEnricher->processors[] = new ResourceId('<id>');
+
+        return $dataEnricher;
     },
 ];

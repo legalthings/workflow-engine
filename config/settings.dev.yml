@@ -3,12 +3,12 @@ digest: optional
 noauth: true
 
 triggers:
-  nop:
-    schema: https://specs.livecontracts.io/v0.2.0/action/nop/schema.json#
-  http:
-    schema: https://specs.livecontracts.io/v0.2.0/action/http/schema.json#
-  event:
-    schema: https://specs.livecontracts.io/v0.2.0/action/event/schema.json#
+  - schema: https://specs.livecontracts.io/v0.2.0/action/nop/schema.json#
+    type: nop
+  - schema: https://specs.livecontracts.io/v0.2.0/action/http/schema.json#
+    type: http
+  - schema: https://specs.livecontracts.io/v0.2.0/action/event/schema.json#
+    type: event
 
 lto:
   account:

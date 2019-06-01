@@ -9,9 +9,12 @@ return [
         $identityGateway = $container->get(IdentityGateway::class);
         $expandIdentities = new ExpandIdentities($identityGateway);
 
+        $hookManager = $container->get(HookManager::class);
+
         return (new EventDispatcher)
             ->on('fetch', $expandIdentities)
-            ->on('instantiate', $expandIdentities);
+            ->on('instantiate', $expandIdentities)
+            ->on('update', $hookManager);
     },
     ProcessGateway::class => static function(AutowireContainerInterface $container) {
         return $container->autowire(ProcessGateway::class);

@@ -19,13 +19,13 @@ class EventChainRepository
     /**
      * @var EventChain[]
      */
-    protected $chains;
+    protected $chains = [];
 
     /**
      * Latest persisted hashes per chain.
      * @var array<string,string>
      */
-    protected $latestHashes;
+    protected $latestHashes = [];
 
     /**
      * @var callable
@@ -174,7 +174,7 @@ class EventChainRepository
             return;
         }
 
-        $this->client->request('POST', 'queue', ['json' => $partialChain]);
+        $this->client->request('POST', '/event-chains', ['json' => $partialChain]);
     }
 
     /**
@@ -192,7 +192,7 @@ class EventChainRepository
                 return $chain->events !== [];
             })
             ->map(function(EventChain $chain) {
-                return $this->client->requestAsync('POST', 'queue', ['json' => $chain]);
+                return $this->client->requestAsync('POST', '/event-chains', ['json' => $chain]);
             })
             ->toArray();
 

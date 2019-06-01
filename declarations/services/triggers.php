@@ -10,14 +10,30 @@ return [
         $configuration = (array)$container->get('config.triggers');
 
         return Pipeline::with($configuration)
-            ->map(static function($settings, $key) use ($container) {
+            ->map(static function($settings) use ($container) {
                 return (object)[
                     'schema' => $settings->schema ?? null,
-                    'trigger' => $container->get(($settings->type ?? $key) . '_trigger')
+                    'trigger' => $container->get($settings->type . '_trigger')
                         ->withConfig($settings, $container),
                 ];
             })
             ->reduce(static function(TriggerManager $manager, stdClass $entry): TriggerManager {
+                return $manager->with($entry->schema, $entry->trigger);
+            }, $manager);
+    },
+    HookManager::class => static function(AutowireContainerInterface $container) {
+        $manager = $container->autowire(HookManager::class);
+        $configuration = (array)$container->get('config.hooks');
+
+        return Pipeline::with($configuration)
+            ->map(static function($settings) use ($container) {
+                return (object)[
+                    'schema' => $settings->schema ?? null,
+                    'trigger' => $container->get($settings->type . '_trigger')
+                        ->withConfig($settings, $container),
+                ];
+            })
+            ->reduce(static function(HookManager $manager, stdClass $entry): HookManager {
                 return $manager->with($entry->schema, $entry->trigger);
             }, $manager);
     },

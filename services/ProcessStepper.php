@@ -55,7 +55,6 @@ class ProcessStepper
     protected function validate(Process $process, Response $response): ValidationResult
     {
         $actionKey = i\type_check($response->action ?? null, Action::class)->key;
-        $responseKey = $response->key;
 
         if (!isset($process->scenario->actions[$actionKey])) {
             return ValidationResult::error("Unknown action '%s'", $actionKey);
@@ -83,6 +82,8 @@ class ProcessStepper
             );
         }
 
+        $responseKey = $currentAction->determine_response ?? $response->key;
+
         if (!$currentAction->isValidResponse($responseKey)) {
             return ValidationResult::error("Invalid response '%s' for action '%s'", $responseKey, $actionKey);
         }
@@ -98,12 +99,15 @@ class ProcessStepper
     protected function expandResponse(Process $process, Response $input): Response
     {
         $currentAction = $process->current->actions[$input->action->key];
-        $availableResponse = $currentAction->getResponse($input->key);
+        $responseKey = $currentAction->determine_response ?? $input->key;
+
+        $availableResponse = $currentAction->getResponse($responseKey);
 
         $response = clone $input;
         $response->setValues($availableResponse->getValues());
 
         $response->action = clone $currentAction;
+        $response->key = $responseKey;
         $response->action->responses = null;
         $response->action->actors = null;
 

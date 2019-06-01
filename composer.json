@@ -5,7 +5,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/jmespath-extended/jmespath.php.git"
+            "url": "https://github.com/l33tpath/l33tpath.php.git"
         }
     ],
     "require": {

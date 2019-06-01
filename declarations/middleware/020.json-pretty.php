@@ -4,7 +4,7 @@ use Jasny\RouterInterface;
 use Psr\Container\ContainerInterface;
 
 return [
-    PrettyJsonMiddleware::class => static function(RouterInterface $router, ContainerInterface $container) {
+    static function(RouterInterface $router, ContainerInterface $container) {
         return new PrettyJsonMiddleware();
     },
 ];

@@ -42,9 +42,15 @@ class ProcessController extends BaseController
     protected $account;
 
     /**
+     * Account that signed the request.
+     * @var \LTO\EventChain|null
+     */
+    protected $chain;
+
+    /**
      * @var EventChainRepository
      **/
-    protected $eventChainRepository;
+    protected $chainRepository;
 
     /**
      * Class constructor for DI.
@@ -56,7 +62,7 @@ class ProcessController extends BaseController
         ProcessStepper $stepper,
         TriggerManager $triggerManager,
         JsonView $jsonView,
-        EventChainRepository $eventChainRepository
+        EventChainRepository $chainRepository
     ) {
         $this->processes = $processes;
         $this->scenarios = $scenarios;
@@ -64,7 +70,7 @@ class ProcessController extends BaseController
         $this->stepper = $stepper;
         $this->triggerManager = $triggerManager;
         $this->jsonView = $jsonView;
-        $this->eventChainRepository = $eventChainRepository;
+        $this->chainRepository = $chainRepository;
     }
 
     /**
@@ -77,6 +83,8 @@ class ProcessController extends BaseController
         if ($this->account === null) {
             throw new AuthException('Request not signed', 401);
         }
+
+        $this->chain = $this->request->getAttribute('event-chain');
     }
 
     /**
@@ -124,9 +132,7 @@ class ProcessController extends BaseController
         // Stepper does validation (in context of the current state of the process).
         $this->stepper->step($process, $response);
 
-        $this->eventChainRepository->persistAll();
-
-        $this->output($process);
+        $this->persistNewEvents();
     }
 
     /**
@@ -136,23 +142,47 @@ class ProcessController extends BaseController
      */
     public function invokeAction(string $id): void
     {
+        if ($this->chain === null) {
+            $this->badRequest('No X-Event-Chain header');
+            return;
+        }
+
         $process = $this->getProcessFromInput($id);        
         $this->authzForAccount($process);
-
-        $input = $this->getInput();
-
-        if (isset($input['chain'])) {
-            $this->eventChainRepository->register($input['chain']);
-        }
 
         $actor = $this->getActorForAccount($process);
         $response = $this->triggerManager->invoke($process, null, $actor);
 
-        if (!isset($response)) {
-            $this->noContent();
+        if ($response !== null) {
+            $this->chainRepository->addResponse($this->chain->id, $response);
+        }
+
+        $this->persistNewEvents();
+    }
+
+    /**
+     * Persist new events.
+     * Output the events if the repository isn't able to persist them.
+     *
+     * @throws RuntimeException if event chain uri is not configured and changes are made for other chains.
+     */
+    protected function persistNewEvents(): void
+    {
+        $newEvents = $this->chain !== null && !$this->chainRepository->canPersist()
+            ? $this->chainRepository->getPartial($this->chain->id)
+            : null;
+
+        if ($newEvents !== null) {
+            $this->chainRepository->register($newEvents); // mark as persisted
+        }
+
+        // Also persist new events of other chains
+        $this->chainRepository->persistAll();
+
+        if ($newEvents !== null) {
+            $this->output($newEvents, 'json');
         } else {
-            $partial = $this->eventChainRepository->addResponse($process->chain, $response);
-            $this->output($partial, 'json');            
+            $this->noContent();
         }
     }
 

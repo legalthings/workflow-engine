@@ -4,38 +4,32 @@ use Improved\IteratorPipeline\Pipeline;
 use Psr\Container\ContainerInterface;
 use Jasny\Container\AutowireContainerInterface;
 
+$configuredManager = static function($manager, $configuration, $container) {
+    return Pipeline::with($configuration)
+        ->map(static function($settings) use ($container) {
+            return (object)[
+                'schema' => $settings->schema ?? null,
+                'trigger' => $container->get($settings->type . '_trigger')
+                    ->withConfig($settings, $container),
+            ];
+        })
+        ->reduce(static function($manager, stdClass $entry) {
+            return $manager->with($entry->schema, $entry->trigger);
+        }, $manager);
+};
+
 return [
-    TriggerManager::class => static function(AutowireContainerInterface $container) {
+    TriggerManager::class => static function(AutowireContainerInterface $container) use ($configuredManager) {
         $manager = $container->autowire(TriggerManager::class);
-        $configuration = (array)$container->get('config.triggers');
+        $configuration = $container->get('config.triggers');
 
-        return Pipeline::with($configuration)
-            ->map(static function($settings) use ($container) {
-                return (object)[
-                    'schema' => $settings->schema ?? null,
-                    'trigger' => $container->get($settings->type . '_trigger')
-                        ->withConfig($settings, $container),
-                ];
-            })
-            ->reduce(static function(TriggerManager $manager, stdClass $entry): TriggerManager {
-                return $manager->with($entry->schema, $entry->trigger);
-            }, $manager);
+        return $configuredManager($manager, $configuration, $container);
     },
-    HookManager::class => static function(AutowireContainerInterface $container) {
+    HookManager::class => static function(AutowireContainerInterface $container) use ($configuredManager) {
         $manager = $container->autowire(HookManager::class);
-        $configuration = (array)$container->get('config.hooks');
+        $configuration = $container->get('config.hooks');
 
-        return Pipeline::with($configuration)
-            ->map(static function($settings) use ($container) {
-                return (object)[
-                    'schema' => $settings->schema ?? null,
-                    'trigger' => $container->get($settings->type . '_trigger')
-                        ->withConfig($settings, $container),
-                ];
-            })
-            ->reduce(static function(HookManager $manager, stdClass $entry): HookManager {
-                return $manager->with($entry->schema, $entry->trigger);
-            }, $manager);
+        return $configuredManager($manager, $configuration, $container);
     },
 
     'nop_trigger' => static function(AutowireContainerInterface $container) {

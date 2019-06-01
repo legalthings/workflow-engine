@@ -16,6 +16,10 @@ return [
             return new HttpClient($newOptions + $client->getConfig());
         };
 
+        if (!$container->has('config.event_chain.url') || $container->get('config.event_chain.url') === null) {
+            return null;
+        }
+
         $options = [
             'base_uri' => $container->get('config.event_chain.url'),
             'signature_key_id' => $container->get(Account::class)->getPublicSignKey(),

@@ -20,6 +20,3 @@ lto:
       secretkey: BnjFJJarge15FiqcxrB7Mzt68nseBXXR4LQ54qFBsWHG
       publickey: BVv1ZuE3gKFa6krwWJQwEmrLYUESuUabNCXgYTmCoBt6
   network: T
-
-event_chain:
-  url: http://localhost:4002/

@@ -4,7 +4,6 @@ use Improved\IteratorPipeline\Pipeline;
 use GuzzleHttp\ClientInterface as HttpClient;
 use GuzzleHttp\Promise;
 use LTO\EventChain;
-use LTO\Event;
 
 /**
  * Service to register, load and persist event chains.
@@ -14,7 +13,7 @@ class EventChainRepository
     /**
      * @var HttpClient
      */
-    protected $client;
+    protected $http;
 
     /**
      * @var EventChain[]
@@ -34,18 +33,20 @@ class EventChainRepository
 
     /**
      * Account to sign new events (our account).
-     * @var LTO\Account
+     * @var LTO\Account|null
      */
     protected $account;
 
     /**
      * Class constructor.
      *
-     * @param HttpClient $client
+     * @param callable        $createEvent
+     * @param LTO\Account     $account
+     * @param HttpClient|null $http
      */
-    public function __construct(callable $createEvent, LTO\Account $account, HttpClient $client)
+    public function __construct(callable $createEvent, LTO\Account $account, ?HttpClient $http)
     {
-        $this->client = $client;
+        $this->http = $http;
         $this->createEvent = $createEvent;
         $this->account = $account;
     }
@@ -66,9 +67,8 @@ class EventChainRepository
      *
      * @param string $id
      * @param Response $response 
-     * @return LTO\EventChain
      */
-    public function addResponse(string $id, Response $response)
+    public function addResponse(string $id, Response $response): void
     {
         $chain = $this->get($id);        
 
@@ -76,8 +76,6 @@ class EventChainRepository
         $chain->add($event);
 
         $this->update($chain);
-
-        return $chain;
     }
 
     /**
@@ -93,6 +91,23 @@ class EventChainRepository
     }
 
     /**
+     * Get partial chain with only new events
+     *
+     * @param string $id
+     * @return EventChain|null
+     */
+    public function getPartial(string $id): ?EventChain
+    {
+        if (!isset($this->chains[$id])) {
+            return null;
+        }
+
+        $partial = $this->chains[$id]->getPartialAfter($this->latestHashes[$id]);
+
+        return $partial->events !== [] ? $partial : null;
+    }
+
+    /**
      * Fetch an event chain and register it.
      *
      * @param string $id
@@ -101,7 +116,11 @@ class EventChainRepository
      */
     public function fetch(string $id): EventChain
     {
-        $response = $this->client->request('GET', 'event-chains/' . $id);
+        if ($this->http === null) {
+            throw new RuntimeException("Unable to fetch chain '$id': Event chain endpoint not configured'");
+        }
+
+        $response = $this->http->request('GET', 'event-chains/' . $id);
         $data = $this->unserializeEventChainJson((string)$response->getBody());
 
         $chain = new EventChain($data->id, $data->latest_hash);
@@ -157,6 +176,16 @@ class EventChainRepository
     }
 
     /**
+     * Check if the repository is able to persist changes made to
+     *
+     * @return bool
+     */
+    public function canPersist(): bool
+    {
+        return $this->http !== null;
+    }
+
+    /**
      * Persist new events added to an event chain.
      *
      * @param string $id
@@ -174,7 +203,11 @@ class EventChainRepository
             return;
         }
 
-        $this->client->request('POST', '/event-chains', ['json' => $partialChain]);
+        if ($this->http === null) {
+            throw new RuntimeException("Unable to persist chain '$id': Event chain endpoint not configured'");
+        }
+
+        $this->http->request('POST', '/event-chains', ['json' => $partialChain]);
     }
 
     /**
@@ -184,17 +217,28 @@ class EventChainRepository
      */
     public function persistAll(): void
     {
-        $promises = Pipeline::with($this->chains)
+        $modifiedChains = Pipeline::with($this->chains)
             ->map(function(EventChain $chain) {
                 return $chain->getPartialAfter($this->latestHashes[$chain->id]);
             })
             ->filter(static function(EventChain $chain) {
                 return $chain->events !== [];
             })
-            ->map(function(EventChain $chain) {
-                return $this->client->requestAsync('POST', '/event-chains', ['json' => $chain]);
-            })
             ->toArray();
+
+        if ($modifiedChains === []) {
+            return;
+        }
+
+        if ($this->client === null) {
+            throw new RuntimeException("Unable to persist chains: Event chain endpoint not configured'");
+        }
+
+        $promises = [];
+
+        foreach ($modifiedChains as $chain) {
+            $promises[] = $this->http->requestAsync('POST', '/event-chains', ['json' => $chain]);
+        }
 
         Promise\unwrap($promises);
     }

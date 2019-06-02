@@ -101,7 +101,7 @@ class ProcessController extends BaseController
 
         $this->processes->save($process);
 
-        $this->output($process);
+        $this->created('/processes/' . $process->id);
     }
 
     /**
@@ -132,7 +132,7 @@ class ProcessController extends BaseController
         // Stepper does validation (in context of the current state of the process).
         $this->stepper->step($process, $response);
 
-        $this->persistNewEvents();
+        $this->persistNewEvents($process->chain);
     }
 
     /**
@@ -142,34 +142,30 @@ class ProcessController extends BaseController
      */
     public function invokeAction(string $id): void
     {
-        if ($this->chain === null) {
-            $this->badRequest('No X-Event-Chain header');
-            return;
-        }
-
-        $process = $this->getProcessFromInput($id);        
+        $process = $this->getProcessFromInput($id);
         $this->authzForAccount($process);
 
         $actor = $this->getActorForAccount($process);
         $response = $this->triggerManager->invoke($process, null, $actor);
 
         if ($response !== null) {
-            $this->chainRepository->addResponse($this->chain->id, $response);
+            $this->chainRepository->addResponse($process->chain, $response);
         }
 
-        $this->persistNewEvents();
+        $this->persistNewEvents($process->chain);
     }
 
     /**
      * Persist new events.
      * Output the events if the repository isn't able to persist them.
      *
+     * @param string|null $chainId
      * @throws RuntimeException if event chain uri is not configured and changes are made for other chains.
      */
-    protected function persistNewEvents(): void
+    protected function persistNewEvents(?string $chainId = null): void
     {
-        $newEvents = $this->chain !== null && !$this->chainRepository->canPersist()
-            ? $this->chainRepository->getPartial($this->chain->id)
+        $newEvents = $chainId !== null && !$this->chainRepository->canPersist()
+            ? $this->chainRepository->getPartial($chainId)
             : null;
 
         if ($newEvents !== null) {

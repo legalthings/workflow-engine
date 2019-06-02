@@ -14,20 +14,17 @@ use LTO\EventChain;
 return [
     static function(RouterInterface $router, ContainerInterface $container) {
         return function(Request $request, Response $response, callable $next) use ($container): Response {
-            if (!$request->hasHeader('X-Event-Chain') || !$container->has(EventChainRepository::class)) {
-                return $next($request, $response);
+            if ($request->hasHeader('X-Event-Chain') && $container->has(EventChainRepository::class)) {
+                /** @var EventChainRepository $repository */
+                $repository = $container->get(EventChainRepository::class);
+
+                [$id, $latestHash] = explode(':', $request->getHeaderLine('X-Event-Chain'), 2);
+                $eventChain = new EventChain($id, $latestHash);
+
+                $repository->register($eventChain);
             }
 
-            /** @var EventChainRepository $repository */
-            $repository = $container->get(EventChainRepository::class);
-
-            [$id, $latestHash] = explode(':', $request->getHeaderLine('X-Event-Chain'), 2);
-            $eventChain = new EventChain($id, $latestHash);
-
-            $repository->register($eventChain);
-            $nextRequest = $request->withAttribute('event-chain', $eventChain);
-
-            return $next($nextRequest, $response);
+            return $next($request, $response);
         };
     },
 ];

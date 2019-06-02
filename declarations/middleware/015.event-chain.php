@@ -18,10 +18,12 @@ return [
                 /** @var EventChainRepository $repository */
                 $repository = $container->get(EventChainRepository::class);
 
-                [$id, $latestHash] = explode(':', $request->getHeaderLine('X-Event-Chain'), 2);
-                $eventChain = new EventChain($id, $latestHash);
+                foreach ($request->getHeader('X-Event-Chain') as $header) {
+                    [$id, $latestHash] = explode(':', $header, 2);
+                    $eventChain = new EventChain($id, $latestHash);
 
-                $repository->register($eventChain);
+                    $repository->register($eventChain);
+                }
             }
 
             return $next($request, $response);

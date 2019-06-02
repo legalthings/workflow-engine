@@ -22,13 +22,12 @@ class HookManager
     {
         $clone = clone $this;
 
-        $clone->handlers[] = function (Process $process, $payload) use ($trigger, $schema) {
+        $clone->handlers[] = function (Process $process, Action $payload) use ($trigger, $schema) {
             if ($schema !== null && $payload->schema !== $schema) {
                 return $payload; // Not handled by this handler
             }
 
             $action = clone $payload;
-
             $trigger($process, $action);
         };
 

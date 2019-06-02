@@ -24,7 +24,7 @@ return [
 
         return array_reduce($sources, static function(array $middleware, string $source) {
             $declaration = include $source;
-            return $middleware + $declaration;
+            return array_merge($middleware, $declaration);
         }, []);
     },
     'router.runner' => static function(ContainerInterface $container) {

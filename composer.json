@@ -40,7 +40,7 @@
         "guzzlehttp/guzzle": "^6.3",
         "legalthings/data-enricher": "^0.8.1",
         "legalthings/base58-compat": "^0.1.0",
-        "improved/improved": "~1.0",
+        "improved/improved": "~0.1.0",
         "respect/validation": "^1.0",
         "mtdowling/jmespath.php": "dev-master#a132511a1e05539af8f755ae110d2924d245bf40 as 2.4.0",
         "mustache/mustache": "^2.10",

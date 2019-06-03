@@ -157,19 +157,17 @@ class ProcessController extends BaseController
 
     /**
      * Persist new events.
-     * Output the events if the repository isn't able to persist them.
+     * Output the events for the current chain.
      *
      * @param string|null $chainId
      * @throws RuntimeException if event chain uri is not configured and changes are made for other chains.
      */
     protected function persistNewEvents(?string $chainId = null): void
     {
-        $newEvents = $chainId !== null && !$this->chainRepository->canPersist()
-            ? $this->chainRepository->getPartial($chainId)
-            : null;
+        $newEvents = $chainId !== null ? $this->chainRepository->getPartial($chainId) : null;
 
         if ($newEvents !== null) {
-            $this->chainRepository->register($newEvents); // mark as persisted
+            $this->chainRepository->register($newEvents); // mark current chain as persisted
         }
 
         // Also persist new events of other chains

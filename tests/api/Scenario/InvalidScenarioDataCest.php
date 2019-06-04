@@ -65,19 +65,8 @@ class InvalidScenarioDataCest
             [
                 'field' => 'id', 
                 'value' => '2557288f-108e-4398-8d2d-7914ffd93150', // id of existing scenario
-                'code' => 200
+                'code' => 204
             ]
-            // [
-            //     'field' => 'actors', 
-            //     'value' => [
-            //         'foo_actor' => [
-            //             'title' => 'Foo actor',
-            //             'identity' => 'non-exist-identity-id'
-            //         ]
-            //     ], 
-            //     'message' => ['Expected array,instance of stdClass,instance of Actor or instance of JsonSchema, string(3) "foo" given'],
-            //     'code' => 400
-            // ],
         ];
     }
 
@@ -109,6 +98,8 @@ class InvalidScenarioDataCest
             $I->seeResponseContainsJson($message);
         } elseif (isset($message)) {
             $I->seeResponseEquals($message);
+        } elseif ($code === 204) {
+            $I->seeResponseEquals('');
         } else {
             $I->seeResponseContainsJson(['title' => 'Basic system and user']);
         }

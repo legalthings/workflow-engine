@@ -230,7 +230,7 @@ class EventChainRepository
             return;
         }
 
-        if ($this->client === null) {
+        if ($this->http === null) {
             throw new RuntimeException("Unable to persist chains: Event chain endpoint not configured'");
         }
 

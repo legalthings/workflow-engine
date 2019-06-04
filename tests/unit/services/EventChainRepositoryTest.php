@@ -279,7 +279,7 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
         $request = $history[0]['request'];
 
         $this->assertEquals('POST', $request->getMethod());
-        $this->assertEquals('queue', (string)$request->getUri());
+        $this->assertEquals('/event-chains', (string)$request->getUri());
         $this->assertEquals('application/json', $request->getHeaderLine('Content-Type'));
 
         $this->assertEquals($data, json_decode((string)$request->getBody(), true));
@@ -351,7 +351,7 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
         /** @var HttpRequest $request */
         foreach ($history as $i => ['request' => $request]) {
             $this->assertEquals('POST', $request->getMethod());
-            $this->assertEquals('queue', (string)$request->getUri());
+            $this->assertEquals('/event-chains', (string)$request->getUri());
             $this->assertEquals('application/json', $request->getHeaderLine('Content-Type'));
 
             $expected = [
@@ -410,8 +410,6 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
         $chain->expects($this->once())->method('add')->with($this->identicalTo($signedEvent));
         $repository->expects($this->once())->method('update')->with($this->identicalTo($chain));
 
-        $result = $repository->addResponse($chainId, $response);
-
-        $this->assertSame($chain, $result);
+        $repository->addResponse($chainId, $response);
     }
 }

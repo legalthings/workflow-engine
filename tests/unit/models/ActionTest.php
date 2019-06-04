@@ -343,7 +343,8 @@ class ActionTest extends \Codeception\Test\Unit
         $simpleExpected = array_merge($simpleExpected, [
             'schema' => 'https://specs.livecontracts.io/v0.2.0/action/schema.json#',
             'condition' => true,
-            'default_response' => 'ok'
+            'default_response' => 'ok',
+            'determine_response' => null
         ]);
 
         $responses = $values['responses'];

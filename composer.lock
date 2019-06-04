@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cc0c7b5f9c752228cbc8de38cdf16975",
+    "content-hash": "1d7388aa22a8de5c4496748248a1b585",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -1237,7 +1237,7 @@
         },
         {
             "name": "improved/function",
-            "version": "v1.0.1",
+            "version": "v0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/improved-php-library/function.git",
@@ -1285,22 +1285,22 @@
         },
         {
             "name": "improved/improved",
-            "version": "v1.0.1",
+            "version": "v0.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/improved-php-library/improved.git",
-                "reference": "f52d2e31d90327c2c94b1096a03bc567d119cf39"
+                "reference": "a814ee32848ff94d28dbf79f35e5c113d627aedf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/improved-php-library/improved/zipball/f52d2e31d90327c2c94b1096a03bc567d119cf39",
-                "reference": "f52d2e31d90327c2c94b1096a03bc567d119cf39",
+                "url": "https://api.github.com/repos/improved-php-library/improved/zipball/a814ee32848ff94d28dbf79f35e5c113d627aedf",
+                "reference": "a814ee32848ff94d28dbf79f35e5c113d627aedf",
                 "shasum": ""
             },
             "require": {
-                "improved/function": "~1.0",
-                "improved/iterable": "~1.0",
-                "improved/type": "~1.0",
+                "improved/function": "~0.1.0",
+                "improved/iterable": "~0.1.0",
+                "improved/type": "~0.1.0",
                 "php": ">=7.2.0"
             },
             "type": "metapackage",
@@ -1316,24 +1316,24 @@
                 }
             ],
             "description": "Improved PHP library",
-            "time": "2019-02-20T19:52:01+00:00"
+            "time": "2019-06-03T17:01:40+00:00"
         },
         {
             "name": "improved/iterable",
-            "version": "v1.0.2",
+            "version": "v0.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/improved-php-library/iterable.git",
-                "reference": "f3fc78201b36a56895054cb8fe28b404a31aa7a9"
+                "reference": "6673f1b4b88628794183556e51ee62203ecf2eeb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/improved-php-library/iterable/zipball/f3fc78201b36a56895054cb8fe28b404a31aa7a9",
-                "reference": "f3fc78201b36a56895054cb8fe28b404a31aa7a9",
+                "url": "https://api.github.com/repos/improved-php-library/iterable/zipball/6673f1b4b88628794183556e51ee62203ecf2eeb",
+                "reference": "6673f1b4b88628794183556e51ee62203ecf2eeb",
                 "shasum": ""
             },
             "require": {
-                "improved/type": "~1.0",
+                "improved/type": "~0.1.0",
                 "php": ">=7.2.0"
             },
             "provide": {
@@ -1351,9 +1351,11 @@
                 },
                 "files": [
                     "src/functions-const.php",
+                    "src/functions/iterable_after.php",
                     "src/functions/iterable_apply.php",
                     "src/functions/iterable_average.php",
-                    "src/functions/iterable_chunk.php",
+                    "src/functions/iterable_after.php",
+                    "src/functions/iterable_before.php",
                     "src/functions/iterable_cleanup.php",
                     "src/functions/iterable_column.php",
                     "src/functions/iterable_concat.php",
@@ -1407,11 +1409,11 @@
                 }
             ],
             "description": "Functions to interact with arrays, iterators and other traversable objects",
-            "time": "2019-02-20T21:39:36+00:00"
+            "time": "2019-06-03T17:24:29+00:00"
         },
         {
             "name": "improved/type",
-            "version": "v1.0.1",
+            "version": "v0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/improved-php-library/type.git",
@@ -1961,21 +1963,21 @@
         },
         {
             "name": "jasny/event-dispatcher",
-            "version": "v0.1.2",
+            "version": "v0.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jasny/event-dispatcher.git",
-                "reference": "4515185448108171a467f32599143fabdb6de38a"
+                "reference": "cf5eb03646a988e3190b66ee83052cfb94a3625b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jasny/event-dispatcher/zipball/4515185448108171a467f32599143fabdb6de38a",
-                "reference": "4515185448108171a467f32599143fabdb6de38a",
+                "url": "https://api.github.com/repos/jasny/event-dispatcher/zipball/cf5eb03646a988e3190b66ee83052cfb94a3625b",
+                "reference": "cf5eb03646a988e3190b66ee83052cfb94a3625b",
                 "shasum": ""
             },
             "require": {
-                "improved/function": "~1.0",
-                "improved/iterable": "~1.0",
+                "improved/function": "~0.1.0",
+                "improved/iterable": "~0.1.0",
                 "php": "^7.2.0"
             },
             "require-dev": {
@@ -1998,24 +2000,24 @@
                     "homepage": "http://www.jasny.net"
                 }
             ],
-            "time": "2019-05-11T21:55:02+00:00"
+            "time": "2019-06-03T21:05:04+00:00"
         },
         {
             "name": "jasny/http-digest",
-            "version": "v1.2.0",
+            "version": "v1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jasny/http-digest.git",
-                "reference": "22311599552dd373a3753df1769e9d49925bafdd"
+                "reference": "429e0cbfdf3b2f8faf29ae5f350c4517a498d3ff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jasny/http-digest/zipball/22311599552dd373a3753df1769e9d49925bafdd",
-                "reference": "22311599552dd373a3753df1769e9d49925bafdd",
+                "url": "https://api.github.com/repos/jasny/http-digest/zipball/429e0cbfdf3b2f8faf29ae5f350c4517a498d3ff",
+                "reference": "429e0cbfdf3b2f8faf29ae5f350c4517a498d3ff",
                 "shasum": ""
             },
             "require": {
-                "improved/improved": "^1.0",
+                "improved/improved": "^0.1.0",
                 "php": ">=7.2.0",
                 "psr/http-factory": "^1.0",
                 "psr/http-message": "^1.0",
@@ -2045,7 +2047,7 @@
                     "homepage": "http://www.jasny.net"
                 }
             ],
-            "time": "2019-03-17T02:50:30+00:00"
+            "time": "2019-06-03T17:31:58+00:00"
         },
         {
             "name": "jasny/http-message",
@@ -2100,20 +2102,20 @@
         },
         {
             "name": "jasny/http-signature",
-            "version": "v1.1.2",
+            "version": "v1.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jasny/http-signature.git",
-                "reference": "b5ee6193006e7cb07419996aa4b1dc41e21b8411"
+                "reference": "6e175dbffbefdca6945cf426b27a3894f904a388"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jasny/http-signature/zipball/b5ee6193006e7cb07419996aa4b1dc41e21b8411",
-                "reference": "b5ee6193006e7cb07419996aa4b1dc41e21b8411",
+                "url": "https://api.github.com/repos/jasny/http-signature/zipball/6e175dbffbefdca6945cf426b27a3894f904a388",
+                "reference": "6e175dbffbefdca6945cf426b27a3894f904a388",
                 "shasum": ""
             },
             "require": {
-                "improved/improved": "^1.0",
+                "improved/improved": "^0.1.0",
                 "nesbot/carbon": "^2.12",
                 "php": ">=7.2.0",
                 "psr/http-factory": "^1.0",
@@ -2145,7 +2147,7 @@
                 }
             ],
             "description": "Implementation of the IETF HTTP Signatures draft RFC",
-            "time": "2019-03-14T05:12:19+00:00"
+            "time": "2019-06-03T17:32:58+00:00"
         },
         {
             "name": "jasny/immutable",
@@ -2544,16 +2546,16 @@
         },
         {
             "name": "lto/api",
-            "version": "v0.2.6",
+            "version": "v0.2.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/legalthings/lto-api.php.git",
-                "reference": "48d0b52004437f6f0bfa4b131b2bf99ae6d6994b"
+                "reference": "4ef5c5f7063580dab35a0227aa2c4b1d61dd8236"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/legalthings/lto-api.php/zipball/48d0b52004437f6f0bfa4b131b2bf99ae6d6994b",
-                "reference": "48d0b52004437f6f0bfa4b131b2bf99ae6d6994b",
+                "url": "https://api.github.com/repos/legalthings/lto-api.php/zipball/4ef5c5f7063580dab35a0227aa2c4b1d61dd8236",
+                "reference": "4ef5c5f7063580dab35a0227aa2c4b1d61dd8236",
                 "shasum": ""
             },
             "require": {
@@ -2600,7 +2602,7 @@
                 }
             ],
             "description": "LTO Network client",
-            "time": "2019-03-15T05:25:54+00:00"
+            "time": "2019-06-01T04:55:17+00:00"
         },
         {
             "name": "mongodb/mongodb",
@@ -2850,16 +2852,16 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "2.18.0",
+            "version": "2.19.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "8322b7bd1805be31867c13bf3cdaab948a0dd406"
+                "reference": "c3545b39197d314205226ac3c33cb4db99aa54ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/8322b7bd1805be31867c13bf3cdaab948a0dd406",
-                "reference": "8322b7bd1805be31867c13bf3cdaab948a0dd406",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/c3545b39197d314205226ac3c33cb4db99aa54ab",
+                "reference": "c3545b39197d314205226ac3c33cb4db99aa54ab",
                 "shasum": ""
             },
             "require": {
@@ -2906,7 +2908,7 @@
                 "datetime",
                 "time"
             ],
-            "time": "2019-05-16T18:44:35+00:00"
+            "time": "2019-05-30T10:15:05+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -7571,7 +7573,8 @@
         "ext-filter": "*",
         "ext-pcre": "*",
         "ext-session": "*",
-        "ext-spl": "*"
+        "ext-spl": "*",
+        "ext-yaml": "*"
     },
     "platform-dev": []
 }

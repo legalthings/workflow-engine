@@ -17,13 +17,19 @@ class StateInstantiator
     protected $dataEnricher;
 
     /**
+     * @var ActionInstantiator
+     **/
+    protected $actionInstantiator;
+
+    /**
      * Class constructor.
      *
      * @param DataEnricher  $dataEnricher
      */
-    public function __construct(DataEnricher $dataEnricher)
+    public function __construct(DataEnricher $dataEnricher, ActionInstantiator $actionInstantiator)
     {
         $this->dataEnricher = $dataEnricher;
+        $this->actionInstantiator = $actionInstantiator;
     }
 
     /**
@@ -44,7 +50,7 @@ class StateInstantiator
             $currentState->due_date = $this->calcDueDate($state);
 
             $actionDefinitions = $process->scenario->getActionsForState($definition);
-            $currentState->actions = $this->instantiateActions($actionDefinitions, $process);
+            $currentState->actions = $this->actionInstantiator->instantiate($actionDefinitions, $process);
 
             if (isset($process->current->response)) {
                 $currentState->actor = $process->current->response->actor;
@@ -65,8 +71,8 @@ class StateInstantiator
      */
     public function recalcActions(Process $process): void
     {
-        $actionDefinitions = $process->scenario->getActionsForState($process->current->key);
-        $process->current->actions = $this->instantiateActions($actionDefinitions, $process);
+        $actionDefinitions = $process->scenario->getActionsForState($process->current->key);        
+        $process->current->actions = $this->actionInstantiator->instantiate($actionDefinitions, $process);
     }
 
     /**
@@ -87,27 +93,6 @@ class StateInstantiator
 
             $process->current->transitions[] = $transition;
         }
-    }
-
-    /**
-     * Instantiate actions from the scenario.
-     *
-     * @param iterable<Action> $actionDefinitions
-     * @param Process          $process
-     * @return AssocEntitySet&iterable<Action>
-     */
-    protected function instantiateActions(iterable $actionDefinition, Process $process): AssocEntitySet
-    {
-        $actions = AssocEntitySet::forClass(Action::class);
-
-        foreach ($actionDefinition as $key => $definition) {
-            $action = clone $definition;
-            $this->dataEnricher->applyTo($action, $process);
-
-            $actions[$key] = $action;
-        }
-
-        return $actions;
     }
 
     /**

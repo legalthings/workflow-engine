@@ -17,9 +17,8 @@ $response = [
 $I->haveHttpHeader('Content-Type', 'application/json');
 $I->sendPOST('/processes/-/response', $response);
 
-$I->seeResponseIsJson();
-$I->seeResponseCodeIs(200);
-$I->seeResponseIsProcess('basic-user-and-system', 'second-state');
+$I->seeResponseEquals('');
+$I->seeResponseCodeIs(204);
 
 $I->expectTo('see correctly persisted process');
 

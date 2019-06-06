@@ -13,6 +13,13 @@ $I->sendPOST('/processes', [
     ],
 ]);
 
+$I->seeResponseEquals('');
+$I->seeResponseCodeIs(201);
+$I->seeHttpHeader('Location', '/processes/823d1e54-9009-4745-8901-dd62ec46eaf2');
+
+$I->expectTo('see that process was persisted');
+
+$I->sendGET('/processes/823d1e54-9009-4745-8901-dd62ec46eaf2');
 $I->seeResponseIsJson();
 $I->seeResponseCodeIs(200);
 

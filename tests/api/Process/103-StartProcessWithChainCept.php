@@ -1,7 +1,7 @@
 <?php
 
 $I = new ApiTester($scenario);
-$I->wantTo('start a process, passing scenario id');
+$I->wantTo('start a process, passing scenario id and chain id');
 
 $I->signRequestAs('organization', 'POST', '/processes');
 
@@ -18,6 +18,13 @@ $I->sendPOST('/processes', [
     ],
 ]);
 
+$I->seeResponseEquals('');
+$I->seeResponseCodeIs(201);
+$I->seeHttpHeader('Location', '/processes/2z4AmxL122aaTLyVy6rhEfXHGJMGuUnViUhw3D7XC4VcycnkEwkHXXdxg73vLb');
+
+$I->expectTo('see that process was persisted');
+
+$I->sendGET('/processes/2z4AmxL122aaTLyVy6rhEfXHGJMGuUnViUhw3D7XC4VcycnkEwkHXXdxg73vLb');
 $I->seeResponseIsJson();
 $I->seeResponseCodeIs(200);
 

@@ -99,7 +99,7 @@ class ProcessSimulator
                     return $scenario->getAction($actionKey);
                 })
                 ->find(function(Action $action) use ($process) {
-                    $resolvedAction = $this->actionInstantiator->applyActionCondition($action, $process);
+                    $resolvedAction = $this->actionInstantiator->enrichAction($action, $process);
 
                     return (bool)$resolvedAction->condition;
                 });

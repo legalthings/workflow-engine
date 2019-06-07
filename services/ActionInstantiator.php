@@ -29,7 +29,7 @@ class ActionInstantiator
         $actions = AssocEntitySet::forClass(Action::class);        
 
         foreach ($actionDefinitions as $definition) {            
-            $action = $this->applyActionCondition($definition, $process);            
+            $action = $this->enrichAction($definition, $process);            
 
             if ((bool)$action->condition) {
                 $actions[$action->key] = $action;
@@ -40,33 +40,33 @@ class ActionInstantiator
     }
 
     /**
-     * Apply action condition
+     * Apply data enricher to action
      *
      * @param Action $action
      * @param Process $process
      * @return Action           Action, processed with data enricher   
      */
-    public function applyActionCondition(Action $definition, Process $process): Action
+    public function enrichAction(Action $definition, Process $process): Action
     {
         $action = clone $definition;
 
-        $instruction = (string)$action->condition;
-        $hasCurrentActor = strpos($instruction, 'current.actor') !== false;
+        $condition = (string)$action->condition;
+        $hasCurrentActor = strpos($condition, 'current.actor') !== false;
         
         $hasCurrentActor ?
-            $this->applyCurrentActorCondition($action, $process) :
+            $this->enrichWithCurrentActor($action, $process) :
             $this->dataEnricher->applyTo($action, $process);
 
         return $action;
     }
 
     /**
-     * Apply action condition, if it holds reference to current actor
+     * Apply data enricher, if condition holds reference to current actor
      *
      * @param Action $action
      * @param Process $process
      */
-    protected function applyCurrentActorCondition(Action $action, Process $process)
+    protected function enrichWithCurrentActor(Action $action, Process $process)
     {
         $process = clone $process;
         if (!isset($process->current)) {
@@ -81,7 +81,7 @@ class ActionInstantiator
 
             $this->dataEnricher->applyTo($action, $process);
 
-            if (is_bool($action->condition) && !$action->condition) {
+            if (!(bool)$action->condition) {
                 unset($action->actors[$idx]);
             }
 

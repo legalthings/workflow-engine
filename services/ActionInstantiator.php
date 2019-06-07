@@ -29,10 +29,9 @@ class ActionInstantiator
         $actions = AssocEntitySet::forClass(Action::class);        
 
         foreach ($actionDefinitions as $definition) {            
-            $action = clone $definition;
-            $this->applyActionCondition($action, $process);            
+            $action = $this->applyActionCondition($definition, $process);            
 
-            if (count($action->actors) > 0) {
+            if ((bool)$action->condition) {
                 $actions[$action->key] = $action;
             }
         }
@@ -45,12 +44,11 @@ class ActionInstantiator
      *
      * @param Action $action
      * @param Process $process
+     * @return Action           Action, processed with data enricher   
      */
-    public function applyActionCondition(Action $action, Process $process)
+    public function applyActionCondition(Action $definition, Process $process): Action
     {
-        if (!$action->condition instanceof DataInstruction) {
-            return;
-        }
+        $action = clone $definition;
 
         $instruction = (string)$action->condition;
         $hasCurrentActor = strpos($instruction, 'current.actor') !== false;
@@ -58,6 +56,8 @@ class ActionInstantiator
         $hasCurrentActor ?
             $this->applyCurrentActorCondition($action, $process) :
             $this->dataEnricher->applyTo($action, $process);
+
+        return $action;
     }
 
     /**
@@ -73,6 +73,8 @@ class ActionInstantiator
             $process->current = new CurrentState();
         }
 
+        $condition = $action->condition;
+
         foreach ($action->actors as $idx => $actorKey) {
             $actor = $process->getActor($actorKey);
             $process->current->actor = $actor;
@@ -82,6 +84,11 @@ class ActionInstantiator
             if (is_bool($action->condition) && !$action->condition) {
                 unset($action->actors[$idx]);
             }
+
+            // restore condition expression to calculate it again for next actor
+            $action->condition = $condition;
         }
+
+        $action->condition = count($action->actors) > 0;
     }
 }

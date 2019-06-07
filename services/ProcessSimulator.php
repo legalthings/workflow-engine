@@ -99,9 +99,9 @@ class ProcessSimulator
                     return $scenario->getAction($actionKey);
                 })
                 ->find(function(Action $action) use ($process) {
-                    $this->actionInstantiator->applyActionCondition($action, $process);
+                    $resolvedAction = $this->actionInstantiator->applyActionCondition($action, $process);
 
-                    return (bool)$action->condition;
+                    return (bool)$resolvedAction->condition;
                 });
         } catch (RuntimeException $exception) {
             $msg = "Error while getting default action for state '%s' in process: '%s': %s";

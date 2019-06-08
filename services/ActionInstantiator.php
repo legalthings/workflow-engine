@@ -68,10 +68,9 @@ class ActionInstantiator
      */
     protected function enrichWithCurrentActor(Action $action, Process $process)
     {
+        // Prevent changing process
         $process = clone $process;
-        if (!isset($process->current)) {
-            $process->current = new CurrentState();
-        }
+        $process->current = isset($process->current) ? clone $process->current : new CurrentState();
 
         $condition = $action->condition;
 

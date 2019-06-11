@@ -214,7 +214,7 @@ class ProcessSimulatorTest extends \Codeception\Test\Unit
         $dataEnricher = $this->createMock(DataEnricher::class);
 
         $actionInstantiator = $this->createMock(ActionInstantiator::class);
-        $actionInstantiator->expects($this->any())->method('applyActionCondition')
+        $actionInstantiator->expects($this->any())->method('enrichAction')
             ->willReturnCallback(function($subject) {
                 if ($subject instanceof Action && $subject->condition instanceof DataInstruction) {
                     $subject->condition = ($subject->condition->getValues() === ['<eval>' => 'true']);
@@ -240,10 +240,13 @@ class ProcessSimulatorTest extends \Codeception\Test\Unit
         $process->scenario->actions['alt']->default_response = 'retry';
 
         $dataEnricher = $this->createMock(DataEnricher::class);
-        $dataEnricher->expects($this->any())->method('applyTo')
-            ->with($this->isInstanceOf(NextState::class), $this->isInstanceOf(Process::class));
 
         $actionInstantiator = $this->createMock(ActionInstantiator::class);
+        $actionInstantiator->expects($this->any())->method('enrichAction')
+            ->with($this->isInstanceOf(Action::class), $this->isInstanceOf(Process::class))
+            ->will($this->returnCallback(function($action) {
+                return $action;
+            }));
 
         $simulator = new ProcessSimulator($dataEnricher, $actionInstantiator);
 

@@ -29,10 +29,9 @@ class ActionInstantiator
         $actions = AssocEntitySet::forClass(Action::class);        
 
         foreach ($actionDefinitions as $definition) {            
-            $action = clone $definition;
-            $this->applyActionCondition($action, $process);            
+            $action = $this->enrichAction($definition, $process);            
 
-            if (count($action->actors) > 0) {
+            if ((bool)$action->condition) {
                 $actions[$action->key] = $action;
             }
         }
@@ -41,37 +40,39 @@ class ActionInstantiator
     }
 
     /**
-     * Apply action condition
+     * Apply data enricher to action
      *
      * @param Action $action
      * @param Process $process
+     * @return Action           Action, processed with data enricher   
      */
-    public function applyActionCondition(Action $action, Process $process)
+    public function enrichAction(Action $definition, Process $process): Action
     {
-        if (!$action->condition instanceof DataInstruction) {
-            return;
-        }
+        $action = clone $definition;
 
-        $instruction = (string)$action->condition;
-        $hasCurrentActor = strpos($instruction, 'current.actor') !== false;
+        $condition = (string)$action->condition;
+        $hasCurrentActor = strpos($condition, 'current.actor') !== false;
         
         $hasCurrentActor ?
-            $this->applyCurrentActorCondition($action, $process) :
+            $this->enrichWithCurrentActor($action, $process) :
             $this->dataEnricher->applyTo($action, $process);
+
+        return $action;
     }
 
     /**
-     * Apply action condition, if it holds reference to current actor
+     * Apply data enricher, if condition holds reference to current actor
      *
      * @param Action $action
      * @param Process $process
      */
-    protected function applyCurrentActorCondition(Action $action, Process $process)
+    protected function enrichWithCurrentActor(Action $action, Process $process)
     {
+        // Prevent changing process
         $process = clone $process;
-        if (!isset($process->current)) {
-            $process->current = new CurrentState();
-        }
+        $process->current = isset($process->current) ? clone $process->current : new CurrentState();
+
+        $condition = $action->condition;
 
         foreach ($action->actors as $idx => $actorKey) {
             $actor = $process->getActor($actorKey);
@@ -79,9 +80,14 @@ class ActionInstantiator
 
             $this->dataEnricher->applyTo($action, $process);
 
-            if (is_bool($action->condition) && !$action->condition) {
+            if (!(bool)$action->condition) {
                 unset($action->actors[$idx]);
             }
+
+            // restore condition expression to calculate it again for next actor
+            $action->condition = $condition;
         }
+
+        $action->condition = count($action->actors) > 0;
     }
 }

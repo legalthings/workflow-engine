@@ -129,6 +129,10 @@ class ProcessUpdater
         }
 
         $this->patcher->set($process, $update->select, $data, $update->patch);
+
+        // Todo; only cast what has been updated instead of everything
+        $this->castAll($process->assets, $process->scenario->assets);
+        $this->castAll($process->actors, $process->scenario->actors);
     }
 
     /**
@@ -160,5 +164,18 @@ class ProcessUpdater
         $process->current->key = $scenarioState->key;
 
         $process->current = $this->stateInstantiator->instantiate($scenarioState, $process);
+    }
+
+    /**
+     * Cast all entities
+     *
+     * @param iterable     $entities
+     * @param JsonSchema[] $schemas
+     */
+    protected function castAll(iterable $entities, $schemas): void
+    {
+        foreach ($entities as $key => $entity) {
+            $schemas[$key]->typeCast($entity);
+        }
     }
 }

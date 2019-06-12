@@ -7,6 +7,7 @@ use LTO\Account;
 
 /**
  * Handle a response and step through a process.
+ * @immutable
  */
 class ProcessStepper
 {
@@ -16,13 +17,20 @@ class ProcessStepper
     protected $processUpdater;
 
     /**
+     * @var ActionInstantiator
+     */
+    protected $actionInstantiator;
+
+    /**
      * ProcessStepper constructor.
      *
-     * @param ProcessUpdater $processUpdater
+     * @param ProcessUpdater     $processUpdater
+     * @param ActionInstantiator $actionInstantiator
      */
-    public function __construct(ProcessUpdater $processUpdater)
+    public function __construct(ProcessUpdater $processUpdater, ActionInstantiator $actionInstantiator)
     {
         $this->processUpdater = $processUpdater;
+        $this->actionInstantiator = $actionInstantiator;
     }
 
     /**
@@ -36,12 +44,9 @@ class ProcessStepper
     {
         $this->validate($process, $response)->mustSucceed();
 
-        $response = $this->expandResponse($process, $response);
-        $process->current->response = $response;
-        $process->current->actor = $response->actor;
+        $this->enrichCurrentResponse($process, $response);
 
         $this->processUpdater->update($process)->mustSucceed();
-
         $process->dispatch('step');
     }
 
@@ -92,13 +97,17 @@ class ProcessStepper
     }
 
     /**
+     * Enrich the current response of the process.
+     *
      * @param Process  $process
      * @param Response $response
-     * @return Response
      */
-    protected function expandResponse(Process $process, Response $input): Response
+    protected function enrichCurrentResponse(Process $process, Response $input): void
     {
-        $currentAction = $process->current->actions[$input->action->key];
+        $process->current->response = $input;
+
+        $actionDefinition = $process->scenario->actions[$input->action->key];
+        $currentAction = $this->actionInstantiator->enrichAction($actionDefinition, $process);
         $responseKey = $currentAction->determine_response ?? $input->key;
 
         $availableResponse = $currentAction->getResponse($responseKey);
@@ -106,13 +115,14 @@ class ProcessStepper
         $response = clone $input;
         $response->setValues($availableResponse->getValues());
 
-        $response->action = clone $currentAction;
+        $response->action = $currentAction;
         $response->key = $responseKey;
         $response->action->responses = null;
         $response->action->actors = null;
 
         $response->actor = $process->getActorForAction($currentAction->key, $response->actor);
 
-        return $response;
+        $process->current->actor = $response->actor;
+        $process->current->response = $response;
     }
 }

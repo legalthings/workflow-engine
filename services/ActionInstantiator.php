@@ -44,7 +44,7 @@ class ActionInstantiator
      *
      * @param Action $action
      * @param Process $process
-     * @return Action           Action, processed with data enricher   
+     * @return Action
      */
     public function enrichAction(Action $definition, Process $process): Action
     {

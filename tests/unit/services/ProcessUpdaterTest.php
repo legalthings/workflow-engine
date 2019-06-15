@@ -94,6 +94,31 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         $process->actors['manager'] = new Actor();
         $process->actors['client'] = new Actor();
 
+        $actorSchema1 = new JsonSchema([
+            'type' => 'object',
+            'properties' => [
+                'key' => [
+                    'type' => 'string',
+                    'default' => 'manager'
+                ]
+            ]
+        ]);
+
+        $actorSchema2 = new JsonSchema([
+            'type' => 'object',
+            'properties' => [
+                'key' => [
+                    'type' => 'string',
+                    'default' => 'client'
+                ]
+            ]
+        ]);
+
+        $process->scenario->actors = new AssocEntitySet([
+            'manager' => $actorSchema1, 
+            'client' => $actorSchema2
+        ]);
+
         $process->current = new CurrentState();
         $process->current->key = 'initial';
         $process->current->actions['first'] = clone $process->scenario->actions['first'];
@@ -303,7 +328,6 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         $this->assertEquals('alt.ok', $process->previous[2]->getRef());
         $this->assertEquals($response, $process->previous[3]);
     }
-
 
     public function testUpdateWithUpdateInstructions()
     {

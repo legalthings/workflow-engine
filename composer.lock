@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1d7388aa22a8de5c4496748248a1b585",
+    "content-hash": "ca023d18bcea9e77f72a726f6a3f1439",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -2754,13 +2754,13 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/l33tpath/l33tpath.php.git",
-                "reference": "a132511a1e05539af8f755ae110d2924d245bf40"
+                "url": "https://github.com/legalthings/jmespath.php.git",
+                "reference": "818a8b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/l33tpath/l33tpath.php/zipball/a132511a1e05539af8f755ae110d2924d245bf40",
-                "reference": "a132511a1e05539af8f755ae110d2924d245bf40",
+                "url": "https://api.github.com/repos/legalthings/jmespath.php/zipball/818a8b7",
+                "reference": "818a8b7",
                 "shasum": ""
             },
             "require": {
@@ -2804,7 +2804,7 @@
             "support": {
                 "source": "https://github.com/legalthings/jmespath.php/tree/master"
             },
-            "time": "2019-01-30T09:40:43+00:00"
+            "time": "2019-06-17T23:20:42+00:00"
         },
         {
             "name": "mustache/mustache",

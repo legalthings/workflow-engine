@@ -14,8 +14,13 @@
                     "type": "string"
                 },
                 "identity": {
-                    "type": "string",
-                    "default": "foo_id"
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "default": "foo_id"
+                        }
+                    }
                 }
             }
         }
@@ -34,7 +39,9 @@
             "transitions": [
                 {
                     "transition": ":success",
-                    "condition": "!eval actors.initiator.name != null"
+                    "condition": {
+                        "<eval>": "actors.initiator.name != null"
+                    }
                 }
             ]
         }

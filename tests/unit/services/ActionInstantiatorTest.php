@@ -34,11 +34,11 @@ class ActionInstantiatorTest extends \Codeception\Test\Unit
         $definitions = [
             $this->getAction('pass1', true),
             $this->getAction('not_pass1', false),
-            $this->getAction('not_pass2', '!eval current.actor.name != null'),
-            $this->getAction('pass2', '!eval actors.user != null'),
-            $this->getAction('not_pass3', '!eval actors.non_exist != null'),
-            $this->getAction('pass3', '!eval current.actor.key != null'),
-            $this->getAction('pass4', '!eval current.actor.key == \'user\''),
+            $this->getAction('not_pass2', ['<eval>' => 'current.actor.name != null']),
+            $this->getAction('pass2', ['<eval>' => 'actors.user != null']),
+            $this->getAction('not_pass3', ['<eval>' => 'actors.non_exist != null']),
+            $this->getAction('pass3', ['<eval>' => 'current.actor.key != null']),
+            $this->getAction('pass4', ['<eval>' => 'current.actor.key == \'user\'']),
         ];
 
         $actions = [];
@@ -87,11 +87,11 @@ class ActionInstantiatorTest extends \Codeception\Test\Unit
         return [
             [$this->getAction('pass1', true), true, 2],
             [$this->getAction('not_pass1', false), false, 2],
-            [$this->getAction('not_pass2', '!eval current.actor.name != null'), false, 0],
-            [$this->getAction('pass2', '!eval actors.user != null'), true, 2],
-            [$this->getAction('not_pass3', '!eval actors.non_exist != null'), false, 2],
-            [$this->getAction('pass3', '!eval current.actor.key != null'), true, 2],
-            [$this->getAction('pass4', '!eval current.actor.key == \'user\''), true, 1]
+            [$this->getAction('not_pass2', ['<eval>' => 'current.actor.name != null']), false, 0],
+            [$this->getAction('pass2', ['<eval>' => 'actors.user != null']), true, 2],
+            [$this->getAction('not_pass3', ['<eval>' => 'actors.non_exist != null']), false, 2],
+            [$this->getAction('pass3', ['<eval>' => 'current.actor.key != null']), true, 2],
+            [$this->getAction('pass4', ['<eval>' => 'current.actor.key == \'user\'']), true, 1]
         ];
     }
 

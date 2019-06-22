@@ -50,8 +50,9 @@ class ActionInstantiator
     {
         $action = clone $definition;
 
-        $condition = (string)$action->condition;
-        $hasCurrentActor = strpos($condition, 'current.actor') !== false;
+        $condition = $action->condition;
+        $hasCurrentActor = $condition instanceof DataInstruction &&
+            strpos($condition->getInstruction(), 'current.actor') !== false;
         
         $hasCurrentActor ?
             $this->enrichWithCurrentActor($action, $process) :

@@ -1,58 +1,20 @@
-<?php
+<?php declare(strict_types=1);
 
+use Improved as i;
 use function Jasny\object_get_properties;
 
 /**
- * Flatten an array, concatenating the keys
- * 
- * @param string $glue
- * @param array  $array
+ * Get names of properties that an object has, but aren't defined by the class.
+ *
+ * @param object $object
+ * @return array
  */
-function flatten($array)
+function get_dynamic_properties($object): array
 {
-    foreach ($array as $key => &$value) {
-        if (!is_associative_array($value)) {
-            continue;
-        }
+    $allProps = get_object_vars($object);
+    $classProps = get_class_vars(get_class($object));
 
-        unset($array[$key]);
-        $value = flatten($value);
-
-        foreach ($value as $subkey => $subvalue) {
-            $array["$key.$subkey"] = $subvalue;
-        }
-    }
-    
-    return $array;
-}
-
-/**
- * Check if values from the first array/object are matches in the seccond
- * 
- * @param mixed $first
- * @param mixed $second
- * @return boolean
- */
-function compare_assoc($first, $second)
-{
-    if ((!is_array($first) && !is_object($first)) || (!is_array($second) && !is_object($second))) {
-        return $first == $second;
-    }
-    
-    foreach ($first as $key => $value) {
-        if (!isset($value)) {
-            continue;
-        }
-        
-        if (
-            !array_key_exists($key, $second) ||
-            !compare_assoc($value, is_object($second) ? $second->$key : $second[$key])
-        ) {
-            return false;
-        }
-    }
-    
-    return true;
+    return array_values(array_diff(array_keys($allProps), array_keys($classProps)));
 }
 
 /**
@@ -63,7 +25,7 @@ function compare_assoc($first, $second)
  * @param string $to
  * @return array
  */
-function array_rename_key(array $array, string $from, string $to)
+function array_rename_key(array $array, string $from, string $to): array
 {
     if (array_key_exists($from, $array)) {
         $array[$to] = $array[$from];
@@ -79,7 +41,7 @@ function array_rename_key(array $array, string $from, string $to)
  * @param object $object
  * @param string $from
  * @param string $to
- * @return array
+ * @return object
  */
 function object_rename_key($object, string $from, string $to)
 {
@@ -117,30 +79,27 @@ function object_copy_properties($from, $to)
 }
 
 /**
- * Get parameters names of given method
- * @param  string $class
- * @param  string $method
- * @return array
- */
-function get_method_args_names(string $class, string $method)
-{
-    $reflection = new ReflectionMethod($class, $method);
-    $params = $reflection->getParameters();
-
-    return array_map(function($item) {
-        return $item->getName();
-    }, $params);
-}
-
-/**
  * Keep only specified properties in stdClass object
  * @param  stdClass $object
  * @param  array    $with
  * @return stdClass
  */
-function std_object_only_with(stdClass $object, array $with)
+function std_object_only_with(stdClass $object, array $with): stdClass
 {
     $object = array_only((array)$object, $with);
 
     return (object)$object;
+}
+
+/**
+ * Check if link to schema specification is valid
+ * @param  string  $link
+ * @param  string  $type
+ * @return boolean
+ */
+function is_schema_link_valid(string $link, string $type): bool
+{
+    $pattern = '|https://specs\.livecontracts\.io/v\d+\.\d+\.\d+/' . preg_quote($type) . '/schema\.json#|';
+
+    return (bool)preg_match($pattern, $link);
 }

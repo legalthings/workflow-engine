@@ -19,13 +19,24 @@ class IdentityController extends BaseController
     }
 
     /**
-     * Add an identity
+     * Add or update identity
      */
-    public function addAction(): void
+    public function putAction(): void
     {
-        $identity = $this->identities->create()->setValues($this->getInput());
-        $identity->validate()->mustSucceed();
+        $data = $this->getInput();
+        $identity = $this->identities->create()->setValues($data);
 
+        try {
+            $existing = $this->identities->fetch($data['id']);       
+        } catch (EntityNotFoundException $e) {
+            $existing = null;
+        };
+
+        if (isset($existing)) {
+            $identity = $existing->setValues($identity->getValues());
+        }
+
+        $identity->validate()->mustSucceed();
         $this->identities->save($identity);
 
         $this->output($identity);
@@ -39,23 +50,6 @@ class IdentityController extends BaseController
     public function getAction(string $id): void
     {
         $identity = $this->identities->fetch($id);
-
-        $this->output($identity);
-    }
-
-    /**
-     * Update identity.
-     *
-     * @param string $id  Identity id
-     */
-    public function updateAction(string $id): void
-    {
-        $identity = $this->identities->fetch($id);
-
-        $identity->setValues($this->getInput());
-        $identity->validate()->mustSucceed();
-
-        $this->identities->save($identity);
 
         $this->output($identity);
     }

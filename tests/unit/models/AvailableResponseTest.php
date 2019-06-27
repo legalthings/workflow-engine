@@ -16,8 +16,9 @@ class AvailableResponseTest extends \Codeception\Test\Unit
     public function castMultiProvider()
     {
         $update = [
-            ['select' => 'foo', 'patch' => true, 'data' => 'foo_data'],
-            ['select' => 'bar', 'data' => 'bar_data']
+            ['select' => 'foo', 'patch' => false, 'data' => 'foo_data'],
+            ['select' => 'bar', 'data' => 'bar_data'],
+            'zoo'
         ];
 
         $updateObj = $update;
@@ -47,15 +48,19 @@ class AvailableResponseTest extends \Codeception\Test\Unit
         $this->assertInstanceOf(EntitySet::class, $update);
         $this->assertAttributeEquals(UpdateInstruction::class, 'entityClass', $update);
 
-        $this->assertCount(2, $update);
+        $this->assertCount(3, $update);
         
         $this->assertSame('foo', $update[0]->select);
-        $this->assertSame(true, $update[0]->patch);
+        $this->assertSame(false, $update[0]->patch);
         $this->assertSame('foo_data', $update[0]->data);
 
         $this->assertSame('bar', $update[1]->select);
-        $this->assertSame(false, $update[1]->patch);
+        $this->assertSame(true, $update[1]->patch);
         $this->assertSame('bar_data', $update[1]->data);
+
+        $this->assertSame('zoo', $update[2]->select);
+        $this->assertSame(true, $update[2]->patch);
+        $this->assertSame(null, $update[2]->data);
     }
 
     /**
@@ -95,6 +100,57 @@ class AvailableResponseTest extends \Codeception\Test\Unit
         $this->assertSame('foo', $update[0]->select);
         $this->assertSame(true, $update[0]->patch);
         $this->assertSame('foo_data', $update[0]->data);
+    }
+
+    /**
+     * Test 'cast' method in case of multi pretty input
+     */
+    public function testCastMultiPretty()
+    {
+        $response = new AvailableResponse();
+
+        $response->update = ['foo', 'bar'];
+        $response->cast();
+
+        $update = $response->update;
+
+        $this->assertInstanceOf(EntitySet::class, $update);
+        $this->assertAttributeEquals(UpdateInstruction::class, 'entityClass', $update);
+
+        $this->assertCount(2, $update);
+        
+        $this->assertSame('foo', $update[0]->select);
+        $this->assertSame(true, $update[0]->patch);
+        $this->assertSame(null, $update[0]->data);
+        $this->assertSame(null, $update[0]->projection);
+
+        $this->assertSame('bar', $update[1]->select);
+        $this->assertSame(true, $update[1]->patch);
+        $this->assertSame(null, $update[1]->data);
+        $this->assertSame(null, $update[1]->projection);
+    }
+
+    /**
+     * Test 'cast' method in case of single pretty input
+     */
+    public function testCastSinglePretty()
+    {
+        $response = new AvailableResponse();
+
+        $response->update = 'foo';
+        $response->cast();
+
+        $update = $response->update;
+
+        $this->assertInstanceOf(EntitySet::class, $update);
+        $this->assertAttributeEquals(UpdateInstruction::class, 'entityClass', $update);
+
+        $this->assertCount(1, $update);
+        
+        $this->assertSame('foo', $update[0]->select);
+        $this->assertSame(true, $update[0]->patch);
+        $this->assertSame(null, $update[0]->data);
+        $this->assertSame(null, $update[0]->projection);
     }
 
     /**

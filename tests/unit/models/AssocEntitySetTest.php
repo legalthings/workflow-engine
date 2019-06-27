@@ -193,6 +193,21 @@ class AssocEntitySetTest extends \Codeception\Test\Unit
     }
 
     /**
+     * Test 'jsonSerialize' method
+     */
+    public function testJsonSerialize()
+    {
+        $set = new AssocEntitySet();
+        $this->setPrivateProperty($set, 'entities', ['foo', 'bar']);
+
+        $result = $set->jsonSerialize();
+
+        $expected = (object)['foo', 'bar'];
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
      * Get class for custom entity
      *
      * @return string

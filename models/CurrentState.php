@@ -59,6 +59,11 @@ class CurrentState extends State
      */
     public $response;
 
+    /**
+     * Actor who performed current action
+     * @var Actor
+     */
+    public $actor;
 
     /**
      * Cast properties
@@ -67,15 +72,9 @@ class CurrentState extends State
      */
     public function cast()
     {
-        if ($this->transitions !== null && !$this->transitions instanceof EntitySet) {
-            // Should not really contain duplicates, but entity is not identifiable.
-            $this->transitions = EntitySet::forClass(
-                StateTransition::class,
-                $this->transitions,
-                0,
-                EntitySet::ALLOW_DUPLICATES
-            );
-        }
+        if ($this->due_date instanceof DateTime) {
+            $this->due_date = DateTimeImmutable::createFromMutable($this->due_date);
+        }        
 
         return parent::cast();
     }

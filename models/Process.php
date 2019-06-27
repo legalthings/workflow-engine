@@ -1,5 +1,6 @@
 <?php declare(strict_types=1);
 
+use Improved as i;
 use Improved\IteratorPipeline\Pipeline;
 use Jasny\DB\EntitySet;
 use Jasny\ValidationResult;
@@ -127,7 +128,6 @@ class Process extends MongoDocument
         return $this->dispatcher->trigger($event, $this, $payload);
     }
 
-
     /**
      * Cast properties
      *
@@ -158,6 +158,57 @@ class Process extends MongoDocument
         return $this;
     }
 
+    /**
+     * Set the values of process
+     *
+     * @param array|\stdClass $values
+     * @return self
+     */
+    public function setValues($values)
+    {
+        if (!$this->actors instanceof AssocEntitySet) {
+            return parent::setValues($values);
+        }
+
+        $values = arrayify($values);
+
+        $actorsValues = null;
+        if (isset($values['actors']) && is_array($values['actors'])) {
+            $actorsValues = $values['actors'] ?? [];
+            unset($values['actors']);
+        }
+
+        parent::setValues($values);
+
+        if (isset($actorsValues)) {
+            $this->updateActors($actorsValues);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Update current process actors
+     *
+     * @param array $actorsValues
+     */
+    protected function updateActors(array $actorsValues): void
+    {
+        Pipeline::with($actorsValues)
+            ->mapKeys(static function($vals, $key) {
+                return $vals['key'] ?? $key;
+            })
+            ->filter(function ($_, $key) {
+                return isset($this->actors[$key]);
+            })
+            ->map(static function($vals) {
+                return is_string($vals) ? ['identity' => $vals] : (array)$vals;
+            })
+            ->apply(function(array $vals, $key) {
+                $this->actors[$key]->setValues($vals);
+            })
+            ->walk();
+    }
 
     /**
      * Find any actors that matches the given one.
@@ -187,15 +238,27 @@ class Process extends MongoDocument
     }
 
     /**
+     * Check if the process has any actor with an identity.
+     *
+     * @return bool
+     */
+    public function hasKnownActors(): bool
+    {
+        return i\iterable_has_any($this->actors, static function(Actor $actor) {
+            return $actor->identity !== null;
+        });
+    }
+
+    /**
      * Get the specific actor or an actor that matches the condition.
      *
      * @param string|Actor $match  Actor or actor key.
      * @return Actor
-     * @throws OutOfBoundsException
+     * @throws RangeException
      */
     public function getActor($match): Actor
     {
-        return $this->getMatchingActors($match, true)->first();
+        return $this->getMatchingActors($match)->first(true);
     }
 
     /**
@@ -240,7 +303,7 @@ class Process extends MongoDocument
     public function getAvailableAction(string $actionKey): Action
     {
         if (!isset($this->current->actions[$actionKey])) {
-            $msg = "Action '%s' is not available in state '%s' for process '%s";
+            $msg = "Action '%s' is not available in state '%s' for process '%s'";
             throw new OutOfBoundsException(sprintf($msg, $actionKey, $this->current->key, $this->id));
         }
 
@@ -267,6 +330,11 @@ class Process extends MongoDocument
     public function validate(): ValidationResult
     {
         $validation = parent::validate();
+
+        if (!$this->hasKnownActors()) {
+            $validation->addError('no known actors');
+        }
+
         $validation = $this->dispatcher->trigger('validate', $this, $validation);
 
         return $validation;
@@ -280,13 +348,11 @@ class Process extends MongoDocument
      */
     public function getPreviousResponse(): ?Response
     {
-        $length = count($this->previous);
+        $count = count($this->previous);
         
-        if (!$length) {
-            return null;
-        }
-        
-        return $this->previous[$length - 1];
+        return $count > 0 ? 
+            $this->previous[$count - 1] :
+            null;
     }
 
     /**
@@ -297,5 +363,18 @@ class Process extends MongoDocument
     public static function getFinishedStates()
     {
         return [':success', ':failed', ':cancelled'];
+    }
+    
+    /**
+     * Prepare json serialization
+     *
+     * @return stdClass
+     */
+    public function jsonSerialize(): stdClass
+    {
+        $object = parent::jsonSerialize();
+        $object = object_rename_key($object, 'schema', '$schema');
+
+        return $object;
     }
 }

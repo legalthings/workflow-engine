@@ -1,4 +1,14 @@
 debug: true
+digest: optional
+noauth: true
+
+triggers:
+  - schema: https://specs.livecontracts.io/v0.2.0/action/nop/schema.json#
+    type: nop
+  - schema: https://specs.livecontracts.io/v0.2.0/action/http/schema.json#
+    type: http
+  - schema: https://specs.livecontracts.io/v0.2.0/action/event/schema.json#
+    type: event
 
 lto:
   account:

@@ -27,11 +27,13 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
     public function testInvoke()
     {
         $data = $this->getData();
-        $expected = $this->getExpectedProcess('basic-user-and-system_second-state');
+        $expected = $this->getExpectedProcess('basic-user-and-system.second-state');
         $process = $this->createMock(Process::class);
 
         $decorator = new PrettyProcessDecorator();
         $result = $decorator($process, $data);
+
+        $expected->id = $data->id;
 
         $this->assertEquals($expected, $result);
     }
@@ -42,13 +44,50 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
     public function testInvokeCurrentSingleTransition()
     {
         $data = $this->getData();
-        $expected = $this->getExpectedProcess('basic-user-and-system_second-state');
+        $expected = $this->getExpectedProcess('basic-user-and-system.second-state');
         $process = $this->createMock(Process::class);
 
         unset($data->current->transitions[1]);
 
+        $expected->id = $data->id;
         $expected->current->transition = $expected->current->transitions[0];
         unset($expected->current->transitions);
+
+        $decorator = new PrettyProcessDecorator();
+        $result = $decorator($process, $data);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Provide data for testing '__invoke' method, when current state is one of implicit states
+     *
+     * @return array
+     */
+    public function invokeCurrentImplicitStateProvider()
+    {
+        return [
+            [':success'],
+            [':failed'],
+            [':cancelled']
+        ];
+    }
+
+    /**
+     * Test '__invoke' method, when current state is one of implicit states
+     *
+     * @dataProvider invokeCurrentImplicitStateProvider
+     */
+    public function testInvokeCurrentImplicitState($key)
+    {
+        $data = $this->getData();
+        $expected = $this->getExpectedProcess('basic-user-and-system.second-state');
+        $process = $this->createMock(Process::class);
+
+        $data->current->key = $key;
+
+        $expected->id = $data->id;
+        $expected->current = (object)['key' => $key];
 
         $decorator = new PrettyProcessDecorator();
         $result = $decorator($process, $data);
@@ -81,8 +120,8 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
         $process = (object)[
             'id' => '4527288f-108e-fk69-8d2d-7914ffd93894',
             'scenario' => (object)['id' => '2557288f-108e-4398-8d2d-7914ffd93150'],
-            'schema' => 'https://specs.livecontracts.io/v1.0.0/process/schema.json#',
-            'title' => 'Basic system and user process',
+            'schema' => 'https://specs.livecontracts.io/v0.2.0/process/schema.json#',
+            'title' => 'Basic system and user',
             'assets' => (object)[],
             'definitions' => (object)[],
             'meta' => (object)[]
@@ -90,27 +129,36 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
 
         $process->actors = [
             'user' => (object)[
-                '$schema' => 'https://specs.livecontracts.io/v1.0.0/asset/actor.json#',
+                '$schema' => 'https://specs.livecontracts.io/v0.2.0/asset/actor.json#',
                 'key' => 'user',
-                'title' => 'User'
+                'title' => 'User',
+                'identity' => (object)[
+                    'id' => 'e2d54eef-3748-4ceb-b723-23ff44a2512b',
+                    'signkeys' => (object)[
+                        'default' => 'AZeQurvj5mFHkPihiFa83nS2Fzxv3M75N7o9m5KQHUmo',
+                        'system' => 'C47Qse1VRCGnn978WB1kqvkcsd1oG8p9SfJXUbwVZ9vV'
+                    ]
+                ]
             ],
-            'system' => (object)[
-                '$schema' => 'https://specs.livecontracts.io/v1.0.0/asset/actor.json#',
-                'key' => 'system',
-                'title' => 'System',
-                'signkeys' => [
-                    '57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn'
-                ],
-                'identity' => '6uk7288s-afe4-7398-8dbh-7914ffd930pl'
+            'organization' => (object)[
+                '$schema' => 'https://specs.livecontracts.io/v0.2.0/asset/actor.json#',
+                'key' => 'organization',
+                'title' => 'Organization',
+                'identity' => (object)[
+                    'id' => '6uk7288s-afe4-7398-8dbh-7914ffd930pl',
+                    'signkeys' => (object)[
+                        'default' => '57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn'
+                    ]
+                ]
             ]
         ];
 
         $process->previous = [
             (object)[
-                '$schema' => 'https://specs.livecontracts.io/v1.0.0/response/schema.json#',
+                '$schema' => 'https://specs.livecontracts.io/v0.2.0/response/schema.json#',
                 'title' => null,
                 'action' => (object)[
-                    '$schema' => 'https://specs.livecontracts.io/v1.0.0/action/http/schema.json#',
+                    '$schema' => 'https://specs.livecontracts.io/v0.2.0/action/http/schema.json#',
                     'key' => 'step1',
                     'title' => 'Step1',
                     'description' => 'Step1',
@@ -128,8 +176,14 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
                     'foo' => 'bar'
                 ],
                 'actor' => (object)[
-                    'key' => 'system',
-                    'title' => 'System',
+                    'key' => 'organization',
+                    'title' => 'Organization',
+                    'identity' => (object)[
+                        'id' => '6uk7288s-afe4-7398-8dbh-7914ffd930pl',
+                        'signkeys' => (object)[
+                            'default' => '57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn'
+                        ]
+                    ]
                 ]
             ]
         ];
@@ -139,9 +193,19 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
             'title' => 'Second state',
             'description' => 'Second state',
             'display' => 'always',
+            'actor' => (object)[
+                'key' => 'organization',
+                'title' => 'Organization',
+                'identity' => (object)[
+                    'id' => '6uk7288s-afe4-7398-8dbh-7914ffd930pl',
+                    'signkeys' => (object)[
+                        'default' => '57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn'
+                    ]
+                ]
+            ],
             'actions' => [
                 'step2' => (object)[
-                    '$schema' => 'https://specs.livecontracts.io/v1.0.0/action/nop/schema.json#',
+                    '$schema' => 'https://specs.livecontracts.io/v0.2.0/action/nop/schema.json#',
                     'key' => 'step2',
                     'title' => 'Step2',
                     'description' => 'Step2',

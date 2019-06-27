@@ -31,7 +31,7 @@ class ProcessStepperTest extends \Codeception\Test\Unit
         $scenario = new Scenario();
         $scenario->title = 'Do the test';
 
-        $scenario->states[':initial'] = State::fromData([
+        $scenario->states['initial'] = State::fromData([
             'title' => 'Initial state',
             'actions' => ['first'],
             'transitions' => [
@@ -106,7 +106,7 @@ class ProcessStepperTest extends \Codeception\Test\Unit
         $process->actors['manager'] = Actor::fromData(['title' => 'Manager']);
 
         $process->current = new CurrentState();
-        $process->current->key = ':initial';
+        $process->current->key = 'initial';
 
         $process->current->actions['first'] = clone $process->scenario->actions['first'];
 
@@ -146,7 +146,7 @@ class ProcessStepperTest extends \Codeception\Test\Unit
         return [
             ['non_existent', 'ok', 'client', ["Unknown action 'non_existent'"]],
             ['first', 'ok', 'robot', ["Unknown actor 'robot'"]],
-            ['alt', 'ok', 'client', ["Action 'alt' isn't allowed in state ':initial'"]],
+            ['alt', 'ok', 'client', ["Action 'alt' isn't allowed in state 'initial'"]],
             ['first', 'yo', 'client', ["Invalid response 'yo' for action 'first'"]],
             ['first', 'ok', 'manager', ["Manager isn't allowed to perform action 'first'"]],
             ['first', 'yo', 'manager', ["Manager isn't allowed to perform action 'first'"]],

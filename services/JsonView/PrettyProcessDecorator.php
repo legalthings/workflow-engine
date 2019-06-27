@@ -42,7 +42,7 @@ class PrettyProcessDecorator
         }
 
         if (isset($data->current)) {
-            $data->current = $this->decorateState($data->current);   
+            $data->current = $this->decorateCurrentState($data->current);   
         }
 
         $this->removeEmptyProperties($data, ['chain', 'assets', 'definitions', 'next']);
@@ -76,7 +76,6 @@ class PrettyProcessDecorator
 
         return $identity;
     }
-
 
     /**
      * Decorate response data
@@ -120,13 +119,13 @@ class PrettyProcessDecorator
      * @param stdClass $state
      * @return stdClass
      */
-    protected function decorateState(stdClass $state): stdClass
+    protected function decorateCurrentState(stdClass $state): stdClass
     {
         if (in_array($state->key, [':success', ':failed', ':cancelled'])) {
             return (object)['key' => $state->key];
         }
 
-        $state = std_object_only_with($state, ['key', 'display', 'transitions', 'actions']);
+        $state = std_object_only_with($state, ['key', 'display', 'transitions', 'actions', 'actor']);
 
         if (isset($state->display) && $state->display === 'always') {
             unset($state->display);
@@ -148,6 +147,12 @@ class PrettyProcessDecorator
         if (count((array)$state->transitions) === 1) {
             $state->transition = reset($state->transitions);
             unset($state->transitions);
+        }
+
+        if (isset($state->actor)) {
+            $state->actor = $state->actor->key;
+        } else {
+            unset($state->actor);
         }
 
         return $state;
@@ -173,7 +178,7 @@ class PrettyProcessDecorator
     protected function removeEmptyProperties(stdClass $data, array $properties): void
     {
         foreach ($properties as $prop) {
-            $value = $data->$prop;
+            $value = $data->$prop ?? null;
 
             if ($value === null || $value === [] || ($value instanceof stdClass &&  $value == (object)[])) {
                 unset($data->$prop);

@@ -15,6 +15,11 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
     protected $enricher;
 
     /**
+     * @var ActionInstantiator
+     **/
+    protected $actionInstantiator;
+
+    /**
      * @var StateInstantiator
      */
     protected $stateInstantiator;
@@ -24,7 +29,8 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
         CarbonImmutable::setTestNow(CarbonImmutable::create(2018, 1, 1, 0, 0, 0, 'UTC'));
 
         $this->enricher = $this->createMock(DataEnricher::class);
-        $this->stateInstantiator = new StateInstantiator($this->enricher);
+        $this->actionInstantiator = $this->createMock(ActionInstantiator::class);
+        $this->stateInstantiator = new StateInstantiator($this->enricher, $this->actionInstantiator);
     }
 
     public function _after()
@@ -39,11 +45,17 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
             'actors' => ['client'],
         ]);
 
+        $actor = new Actor();
+        $actor->key = 'foo';
+
         $scenario = new Scenario();
         $scenario->actions['fill-out-form'] = $action;
 
         $process = new Process();
         $process->scenario = $scenario;
+        $process->current = new CurrentState();
+        $process->current->response = new Response();
+        $process->current->response->actor = $actor;
 
         $state = State::fromData([
             'key' => 'client-form',
@@ -62,11 +74,15 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
             'display' => 'always',
         ]);
 
-        $this->enricher->expects($this->exactly(2))->method('applyTo')
-            ->withConsecutive(
-                [$state, $this->identicalTo($process)],
-                [$action, $this->identicalTo($process)]
-            );
+        $this->actionInstantiator->expects($this->once())->method('instantiate')
+            ->will($this->returnCallback(function(AssocEntitySet $actionDefinitions, Process $process) use ($action) {
+                $this->assertCount(1, $actionDefinitions);
+                $this->assertSame($action, $actionDefinitions['fill-out-form']);
+
+                $actionClone = clone $action;
+
+                return new AssocEntitySet([$actionClone]);
+            }));
 
         $current = $this->stateInstantiator->instantiate($state, $process);
 
@@ -87,11 +103,13 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
         $this->assertEquals('2018-01-02T02:00:00+0000', $current->due_date->format(DATE_ISO8601));
 
         $this->assertAttributeEquals('always', 'display', $current);
+
+        $this->assertSame($actor, $current->actor);
     }
 
     /**
      * @expectedException RuntimeException
-     * @expectedExceptionMessage Failed to instantiate state ':initial' for process '00000000-0000-0000-0000-000000000000': some error
+     * @expectedExceptionMessage Failed to instantiate state 'initial' for process '00000000-0000-0000-0000-000000000000': some error
      */
     public function testInstantiateException()
     {
@@ -99,7 +117,7 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
         $process->id = '00000000-0000-0000-0000-000000000000';
 
         $state = new State();
-        $state->key = ':initial';
+        $state->key = 'initial';
 
         $this->enricher->expects($this->once())->method('applyTo')
             ->with($state, $this->identicalTo($process))
@@ -113,16 +131,16 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
     {
         $scenario = new Scenario();
 
-        $scenario->states[':initial'] = new State();
-        $scenario->states[':initial']->actions = ['foo', 'bar'];
-        $scenario->states[':initial']->transitions[0] = StateTransition::fromData(['transition' => ':success']);
-        $scenario->states[':initial']->transitions[1] = StateTransition::fromData(['transition' => ':failed']);
+        $scenario->states['initial'] = new State();
+        $scenario->states['initial']->actions = ['foo', 'bar'];
+        $scenario->states['initial']->transitions[0] = StateTransition::fromData(['transition' => ':success']);
+        $scenario->states['initial']->transitions[1] = StateTransition::fromData(['transition' => ':failed']);
 
         $scenario->actions['foo'] = Action::fromData(['title' => 'Foo']);
         $scenario->actions['bar'] = Action::fromData(['title' => 'Bar']);
 
         $current = new CurrentState();
-        $current->key = ':initial';
+        $current->key = 'initial';
         $current->actions['foo'] = new Action();
         $current->actions['bar'] = new Action();
 
@@ -138,11 +156,9 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
         $process = $this->createProcess();
         $scenario = $process->scenario;
 
-        $this->enricher->expects($this->exactly(2))->method('applyTo')
-            ->withConsecutive(
-                [$scenario->actions['foo'], $this->identicalTo($process)],
-                [$scenario->actions['bar'], $this->identicalTo($process)]
-            );
+        $this->actionInstantiator->expects($this->once())->method('instantiate')
+            ->with($scenario->actions, $this->identicalTo($process))
+            ->willReturn($scenario->actions);
 
         $this->stateInstantiator->recalcActions($process);
     }
@@ -154,8 +170,8 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
 
         $this->enricher->expects($this->exactly(2))->method('applyTo')
             ->withConsecutive(
-                [$scenario->states[':initial']->transitions[0], $this->identicalTo($process)],
-                [$scenario->states[':initial']->transitions[1], $this->identicalTo($process)]
+                [$scenario->states['initial']->transitions[0], $this->identicalTo($process)],
+                [$scenario->states['initial']->transitions[1], $this->identicalTo($process)]
             );
 
         $this->stateInstantiator->recalcTransitions($process);

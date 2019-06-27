@@ -7,6 +7,7 @@ use Jasny\EventDispatcher\EventDispatcher;
 /**
  * Update a process that has a response for the current state.
  * Apply update instructions, determine the transaction and instantiate the new current state.
+ * @immutable
  */
 class ProcessUpdater
 {
@@ -128,6 +129,10 @@ class ProcessUpdater
         }
 
         $this->patcher->set($process, $update->select, $data, $update->patch);
+
+        // Todo; only cast what has been updated instead of everything
+        $this->castAll($process->assets, $process->scenario->assets);
+        $this->castAll($process->actors, $process->scenario->actors);
     }
 
     /**
@@ -153,6 +158,24 @@ class ProcessUpdater
         }
 
         $scenarioState = $scenario->getState($transition->transition);
+
+        // Temporary current state during instantiating the current state.
+        $process->current = new CurrentState();
+        $process->current->key = $scenarioState->key;
+
         $process->current = $this->stateInstantiator->instantiate($scenarioState, $process);
+    }
+
+    /**
+     * Cast all entities
+     *
+     * @param iterable     $entities
+     * @param JsonSchema[] $schemas
+     */
+    protected function castAll(iterable $entities, $schemas): void
+    {
+        foreach ($entities as $key => $entity) {
+            $schemas[$key]->typeCast($entity);
+        }
     }
 }

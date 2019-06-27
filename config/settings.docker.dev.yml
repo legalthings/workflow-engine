@@ -1,0 +1,7 @@
+db:
+  default:
+    client: mongodb://mongo:27017
+    database: lto_workflow
+
+services:
+  event_chain: null

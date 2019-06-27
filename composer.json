@@ -1,11 +1,11 @@
 {
-    "name": "legalthings/workflow-engine",
-    "description": "Workflow Engine",
-    "license": "MIT",
+    "name": "lto/workflow-engine",
+    "description": "LTO Network - Workflow Engine",
+    "license": "GPL-3.0-or-later",
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/jmespath-extended/jmespath.php.git"
+            "url": "https://github.com/legalthings/jmespath.php.git"
         }
     ],
     "require": {
@@ -21,6 +21,7 @@
         "ext-pcre": "*",
         "ext-session": "*",
         "ext-spl": "*",
+        "ext-yaml": "*",
         "jasny/application-env": "^1.0",
         "jasny/autowire": "^1.1",
         "jasny/controller": "^1.2",
@@ -39,9 +40,9 @@
         "guzzlehttp/guzzle": "^6.3",
         "legalthings/data-enricher": "^0.8.1",
         "legalthings/base58-compat": "^0.1.0",
-        "improved/improved": "~1.0",
+        "improved/improved": "~0.1.0",
         "respect/validation": "^1.0",
-        "mtdowling/jmespath.php": "dev-master#a132511a1e05539af8f755ae110d2924d245bf40 as 2.4.0",
+        "mtdowling/jmespath.php": "dev-master#818a8b7 as 2.4.0",
         "mustache/mustache": "^2.10",
         "desarrolla2/cache": "^3.0",
         "jasny/event-dispatcher": "^0.1.1",
@@ -51,7 +52,8 @@
         "jasny/http-digest": "^1.1",
         "lto/api": "^0.2.1",
         "ramsey/uuid": "^3.8",
-        "jasny/immutable": "^1.0"
+        "jasny/immutable": "^1.0",
+        "jasny/dummy-middleware": "^1.1"
     },
     "require-dev" : {
         "jasny/php-code-quality" : "^2.0.0",

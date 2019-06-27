@@ -254,7 +254,7 @@ class DataPatcherTest extends \Codeception\Test\Unit
                     'I' => 'uno',
                 ],
             ],
-            'current' => ['key' => ':initial'],
+            'current' => ['key' => 'initial'],
         ]);
     }
 
@@ -309,7 +309,7 @@ class DataPatcherTest extends \Codeception\Test\Unit
         $this->patcher->set($process, 'assets.data', $value);
 
         $expected = [
-            'schema' => 'https://specs.livecontracts.io/v1.0.0/asset/schema.json#',
+            'schema' => 'https://specs.livecontracts.io/v0.2.0/asset/schema.json#',
             'key' => 'data',
             'I' => 'one',
             'II' => 'two',
@@ -356,7 +356,7 @@ class DataPatcherTest extends \Codeception\Test\Unit
             '{current: current.key, manager: actors.manager.name, content: assets.document.content}'
         );
 
-        $this->assertEquals(['current' => ':initial', 'manager' => 'Jane Black', 'content' => 'Foo bar'], $result);
+        $this->assertEquals(['current' => 'initial', 'manager' => 'Jane Black', 'content' => 'Foo bar'], $result);
     }
 
     /**

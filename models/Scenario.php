@@ -5,6 +5,7 @@ use Improved\IteratorPipeline\Pipeline;
 use Jasny\DB\Entity\Dynamic;
 use Jasny\EventDispatcher\EventDispatcher;
 use Jasny\ValidationResult;
+use Jasny\ValidationException;
 
 /**
  * A scenario is the blueprint of a process.
@@ -217,8 +218,8 @@ class Scenario extends MongoDocument implements Dynamic
 
         $actions = Pipeline::with(array_merge($state->actions, $this->allow_actions))
             ->unique()
-            ->map(function($key) {
-                return $this->actions[$key] ?? null;
+            ->map(function($name) {
+                return $this->actions[$name] ?? null;
             })
             ->cleanup();
 
@@ -234,13 +235,18 @@ class Scenario extends MongoDocument implements Dynamic
     {
         $validation = new ValidationResult();
 
+        $isSchemaValid = is_schema_link_valid($this->schema, 'scenario');
+        if (!$isSchemaValid) {
+            $validation->addError("schema property value is not valid");
+        }
+
         $actionPrefix = $validation->translate("action '%s'");
         foreach ($this->actions as $key => $action) {
             $validation->add($action->validate(), sprintf($actionPrefix, $key) . ':');
         }
         
-        if (!isset($this->states[':initial'])) {
-            $validation->addError("scenario must have an ':initial' state");
+        if (!isset($this->states['initial'])) {
+            $validation->addError("scenario must have an 'initial' state");
         }
         
         $statePrefix = $validation->translate("state '%s'");
@@ -298,7 +304,7 @@ class Scenario extends MongoDocument implements Dynamic
         // Remove implicit states
         $object->states = (object)Pipeline::with((array)$object->states->jsonSerialize())
             ->filter(function(stdClass $state, string $key) {
-                return !str_starts_with($key, ':') || $key === ':initial';
+                return !str_starts_with($key, ':');
             })
             ->toArray();
 

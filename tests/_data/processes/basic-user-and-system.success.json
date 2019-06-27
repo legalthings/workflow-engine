@@ -2,6 +2,7 @@
     "$schema": "https://specs.livecontracts.io/v0.2.0/process/schema.json#",
     "title": "Basic system and user",
     "scenario": "2557288f-108e-4398-8d2d-7914ffd93150",
+    "chain": "2c83KDmRCJwaKWky1jmtTRYmsgXAhmuDC8P12KpqqbrQKkY6UMECmKeZE5m8Rx",
     "actors": {
         "user": {
             "$schema": "https://specs.livecontracts.io/v0.2.0/asset/actor.json#",
@@ -18,9 +19,9 @@
             "$schema": "https://specs.livecontracts.io/v0.2.0/asset/actor.json#",
             "title": "Organization",
             "identity": {
-                "id": "6uk7288s-afe4-7398-8dbh-7914ffd930pl",
+                "id": "e8a1479e-d40f-4b54-a31d-15f39bdb00f5",
                 "signkeys": {
-                    "default": "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn"
+                    "system": "3UDCFY6MojrPKaayHgAEqrnp99JhviSAiraJX8J1fJ9E"
                 }
             }
         }

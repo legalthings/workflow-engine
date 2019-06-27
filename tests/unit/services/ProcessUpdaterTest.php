@@ -14,7 +14,7 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         $scenario = new Scenario();
         $scenario->title = 'Do the test';
 
-        $scenario->states[':initial'] = State::fromData([
+        $scenario->states['initial'] = State::fromData([
             'title' => 'Initial',
             'actions' => ['first'],
             'transitions' => [
@@ -95,7 +95,7 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         $process->actors['client'] = new Actor();
 
         $process->current = new CurrentState();
-        $process->current->key = ':initial';
+        $process->current->key = 'initial';
         $process->current->actions['first'] = clone $process->scenario->actions['first'];
         $process->current->transitions[] = StateTransition::fromData(['transition' => 'basic_step']);
 
@@ -319,7 +319,7 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
                 UpdateInstruction::fromData([
                     'select' => 'actors.manager.name',
                     'projection' => 'name',
-                    'patch' => true,
+                    'patch' => false,
                 ]),
                 UpdateInstruction::fromData([
                     'select' => 'actors.client.name',
@@ -345,13 +345,13 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         $patcher->expects($this->exactly(2))->method('project')
             ->withConsecutive(
                 [['name' => 'Jane', 'age' => 42], 'name'],
-                [['first_name' => 'John'], 'first_name']
+                [(object)['first_name' => 'John'], 'first_name']
             )
             ->willReturnOnConsecutiveCalls('Jane', 'John');
         $patcher->expects($this->exactly(3))->method('set')
             ->withConsecutive(
-                [$this->identicalTo($process), 'assets.data', ['name' => 'Jane', 'age' => 42], false],
-                [$this->identicalTo($process), 'actors.manager.name', 'Jane', true],
+                [$this->identicalTo($process), 'assets.data', ['name' => 'Jane', 'age' => 42], true],
+                [$this->identicalTo($process), 'actors.manager.name', 'Jane', false],
                 [$this->identicalTo($process), 'actors.client.name', 'John', true]
             )
             ->willReturnOnConsecutiveCalls(
@@ -402,14 +402,14 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
 
         $this->assertEquals(ValidationResult::error('some error'), $validation);
         $this->assertNotSame($basicStepState, $process->current);
-        $this->assertEquals(':initial', $process->current->key);
+        $this->assertEquals('initial', $process->current->key);
 
         return $process;
     }
 
     /**
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Can't update process '00000000-0000-0000-0000-000000000000' in state ':initial' without a response
+     * @expectedExceptionMessage Can't update process '00000000-0000-0000-0000-000000000000' in state 'initial' without a response
      */
     public function testUpdateNoResponse()
     {

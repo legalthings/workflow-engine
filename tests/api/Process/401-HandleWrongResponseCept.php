@@ -3,7 +3,7 @@
 $I = new ApiTester($scenario);
 $I->wantTo('see the error, when trying to perform wrong action');
 
-$I->am('organization');
+$I->signRequestAs('organization', 'POST', '/responses');
 
 $response = [
     '$schema' => 'https://specs.livecontracts.io/v1.0.0/response/schema.json#',
@@ -19,4 +19,4 @@ $I->sendPOST('/responses', $response);
 $I->seeResponseIsJson();
 $I->seeResponseCodeIs(400);
 
-$I->seeResponseContainsJson(["Action 'step2' isn't allowed in state ':initial'"]);
+$I->seeResponseContainsJson(["Action 'step2' isn't allowed in state 'initial'"]);

@@ -23,17 +23,23 @@ class ProcessSimulator
     protected $dataEnricher;
 
     /**
+     * @var ActionInstantiator
+     **/
+    protected $actionInstantiator;
+
+    /**
      * Class constructor.
      *
      * @param DataEnricher $dataEnricher
      */
-    public function __construct(DataEnricher $dataEnricher)
+    public function __construct(DataEnricher $dataEnricher, ActionInstantiator $actionInstantiator)
     {
         $this->dataEnricher = $dataEnricher;
+        $this->actionInstantiator = $actionInstantiator;
     }
 
     /**
-     * Walk over the process to get the next states.
+     * Walk over the process to get the next default states chain
      *
      * @param Process $process
      * @return EntitySet&iterable<NextState>
@@ -93,12 +99,9 @@ class ProcessSimulator
                     return $scenario->getAction($actionKey);
                 })
                 ->find(function(Action $action) use ($process) {
-                    if ($action->condition instanceof DataInstruction) {
-                        $action = clone $action;
-                        $this->dataEnricher->applyTo($action, $process);
-                    }
+                    $resolvedAction = $this->actionInstantiator->enrichAction($action, $process);
 
-                    return (bool)$action->condition;
+                    return (bool)$resolvedAction->condition;
                 });
         } catch (RuntimeException $exception) {
             $msg = "Error while getting default action for state '%s' in process: '%s': %s";

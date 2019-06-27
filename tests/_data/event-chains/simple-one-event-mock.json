@@ -1,0 +1,19 @@
+{
+    "id": "2c83KDmRCJwaKWky1jmtTRYmsgXAhmuDC8P12KpqqbrQKkY6UMECmKeZE5m8Rx",
+    "events": [
+        {
+            "origin": "localhost",
+            "body": "BFragPoLCHrFeo7BPi",
+            "timestamp": 1555188124,
+            "previous": "AiGgCfjJk3UA5a1nF1wWAEmXbBDgh6nB6vxqxWB8ZDKY",
+            "signkey": "FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y",
+            "signature": "2iKUv3EV32KNcKEikYtxKa5HhMQcnZF8k31RsPiwX4pKXyyxtKWSP1HbCDvhrnbERrViEaCJKyLYjcwSGdjfEMTp",
+            "hash": "HuT1ts2iRt9tPUmbQDLJDjgYWaeHBR1B14TePYtwqSS5",
+            "receipt": null,
+            "original": null
+        }
+    ],
+    "identities": [],
+    "resources": [],
+    "latest_hash": "HuT1ts2iRt9tPUmbQDLJDjgYWaeHBR1B14TePYtwqSS5"
+}

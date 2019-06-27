@@ -13,7 +13,6 @@ class StateTransition extends BasicEntity implements Dynamic, Meta, Validation
     use DeepClone;
     use Meta\Implementation;
 
-
     /**
      * Action reference
      * @var string
@@ -38,7 +37,6 @@ class StateTransition extends BasicEntity implements Dynamic, Meta, Validation
      */
     public $transition;
 
-
     /**
      * Validate the state transition.
      *
@@ -47,13 +45,5 @@ class StateTransition extends BasicEntity implements Dynamic, Meta, Validation
     public function validate(): ValidationResult
     {
         return ValidationResult::success();
-    }
-
-    /**
-     * Class constructor
-     */
-    public function __construct()
-    {
-        $this->cast();
     }
 }

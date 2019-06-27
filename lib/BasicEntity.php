@@ -19,6 +19,8 @@ class BasicEntity extends stdClass implements Entity, Meta
 
     /**
      * Class constructor
+     *
+     * @codeCoverageIgnore
      */
     public function __construct()
     {
@@ -48,7 +50,7 @@ class BasicEntity extends stdClass implements Entity, Meta
      */
     public function set($key, $value = null)
     {
-        $values = func_get_args() === 1 ? $key : [$key => $value];
+        $values = count(func_get_args()) === 1 ? $key : [$key => $value];
 
         return $this->setValues($values);
     }

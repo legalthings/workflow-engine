@@ -7,13 +7,15 @@ use Jasny\DB\Entity\Meta;
  */
 class Response extends BasicEntity implements Meta
 {
+    public const BASE_SCHEMA = 'https://specs.livecontracts.io/v0.2.0/response/schema.json#';
+
     use DeepClone;
     use Meta\Implementation;
 
     /**
      * @var string
      */
-    public $schema = 'https://specs.livecontracts.io/v0.2.0/response/schema.json#';
+    public $schema = self::BASE_SCHEMA;
 
     /**
      * The title that will be displayed in the process if the action is performed.
@@ -72,6 +74,10 @@ class Response extends BasicEntity implements Meta
 
         if (is_string($this->actor)) {
             $this->actor = (new Actor())->setValues(['key' => $this->actor]);
+        }
+
+        if (!isset($this->key)) {
+            $this->key = 'ok';
         }
 
         return parent::cast();

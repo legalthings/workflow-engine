@@ -1,15 +1,14 @@
 locale: en_US
-translate: true
+debug: false
+digest: required
 noauth: false
 
-triggers:
-  nop:
-    schema: https://specs.livecontracts.io/v1.0.0/action/nop/schema.json#
+triggers: []
+hooks: []
 
 db:
   default:
-    client: mongodb://localhost:27017
+    client: !env MONGO_DB mongodb://localhost:27017
     database: lto_workflow
 
-environment_variables:
-  WORKFLOW_NO_AUTH: noauth
+event_chain: null

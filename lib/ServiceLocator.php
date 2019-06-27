@@ -5,6 +5,7 @@ use Psr\Container\ContainerInterface;
 /**
  * Trait to use App class as service locator.
  * @deprecated
+ * @codeCoverageIgnore
  *
  * Don't use any of these methods. This is for BC and old services that are not yet rewritten to DI.
  */

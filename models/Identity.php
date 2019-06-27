@@ -45,9 +45,8 @@ class Identity extends MongoDocument implements Identifiable
         return 'id';
     }
 
-
     /**
-     * Describe the actor based on the known properties.
+     * Describe the identity based on the known properties.
      *
      * @return string
      */
@@ -60,7 +59,7 @@ class Identity extends MongoDocument implements Identifiable
     }
 
     /**
-     * See if the specified identity matches this actor.
+     * See if the specified identity matches this identity.
      *
      * @param Identity $identity  Only some properties need to be set.
      * @return bool
@@ -70,7 +69,7 @@ class Identity extends MongoDocument implements Identifiable
         return
             ($identity->id !== null || $identity->signkeys !== []) && // Match at least one of these
             ($identity->id === null || $identity->id === $this->id) &&
-            ($identity->signkeys === [] || array_contains($this->signkeys, $identity->signkeys, true));
+            ($identity->signkeys === [] || array_contains((array)$this->signkeys, $identity->signkeys, true));
     }
 
     /**
@@ -81,7 +80,7 @@ class Identity extends MongoDocument implements Identifiable
     public static function fromAccount(Account $account): Identity
     {
         $identity = new Identity();
-        $identity->signkeys[] = $account->getPublicSignKey();
+        $identity->signkeys['system'] = $account->getPublicSignKey();
 
         return $identity;
     }

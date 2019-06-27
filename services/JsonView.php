@@ -82,7 +82,7 @@ class JsonView
      * @param Response $response
      * @param mixed    $data
      */
-    public function output(Response $response, $data): void
+    public function output(Response $response, $data): Response
     {
         $serialized = $this->serialize($data);
 
@@ -99,6 +99,8 @@ class JsonView
         }
 
         $response->getBody()->write($json);
+
+        return $response;
     }
 
     /**

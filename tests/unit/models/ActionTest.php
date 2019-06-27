@@ -36,11 +36,25 @@ class ActionTest extends \Codeception\Test\Unit
     public function testCast()
     {
         $this->action->actors = 'foo';
+        $this->action->bar = [
+            'alpha' => 'value1',
+            'beta' => [
+                'teta' => 'valu2'
+            ]
+        ];
+
+        $expectedBar = (object)[
+            'alpha' => 'value1',
+            'beta' => (object)[
+                'teta' => 'valu2'
+            ]
+        ];
 
         $result = $this->action->cast();
 
         $this->assertSame($this->action, $result);
         $this->assertEquals(['foo'], $result->actors);
+        $this->assertEquals($expectedBar, $result->bar);
 
         $result2 = $result->cast();
         $this->assertEquals(['foo'], $result2->actors);
@@ -327,9 +341,10 @@ class ActionTest extends \Codeception\Test\Unit
         $simpleValues = array_without($values, ['responses']);
         $simpleExpected = array_without($data, ['responses', 'display', 'update']);
         $simpleExpected = array_merge($simpleExpected, [
-            'schema' => 'https://specs.livecontracts.io/v1.0.0/action/schema.json#',
+            'schema' => 'https://specs.livecontracts.io/v0.2.0/action/schema.json#',
             'condition' => true,
-            'default_response' => 'ok'
+            'default_response' => 'ok',
+            'determine_response' => null
         ]);
 
         $responses = $values['responses'];
@@ -342,9 +357,14 @@ class ActionTest extends \Codeception\Test\Unit
         $this->assertSame('ok', $responses['ok']->key);
         $this->assertSame('error', $responses['error']->key);
 
+        $expectedUpdate1 = $data['update'][0];
+        $expectedUpdate2 = $data['update'][1];
+        $expectedUpdate1['data'] = (object)$expectedUpdate1['data'];
+        $expectedUpdate2['data'] = (object)$expectedUpdate2['data'];
+
         $this->assertInstanceOf(Jasny\DB\EntitySet::class, $responses['ok']->update);
-        $this->assertEquals($data['update'][0], $responses['ok']->update[0]->getValues());
-        $this->assertEquals($data['update'][1] + ['patch' => false], $responses['ok']->update[1]->getValues());
+        $this->assertEquals($expectedUpdate1, $responses['ok']->update[0]->getValues());
+        $this->assertEquals($expectedUpdate2 + ['patch' => true], $responses['ok']->update[1]->getValues());
 
         $this->assertEquals($responses['ok']->update, $responses['error']->update);        
     }

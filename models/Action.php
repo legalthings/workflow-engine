@@ -57,7 +57,7 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
      * Available responses on the action.
      * @var AvailableResponse[]|AssocEntitySet
      */
-    public $responses;
+    public $responses = ['ok' => []];
 
     /**
      * Default response used for golden flow
@@ -66,17 +66,10 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
     public $default_response = 'ok';
 
     /**
-     * Action constructor.
+     * Determine / force the response.
+     * @var string|DataInstruction|null
      */
-    public function __construct()
-    {
-        parent::__construct();
-
-        if (!isset($this->responses)) {
-            $this->responses = AssocEntitySet::forClass(AvailableResponse::class);
-            $this->responses['ok'] = new AvailableResponse();
-        }
-    }
+    public $determine_response;
 
     /**
      * Cast entity properties.
@@ -87,6 +80,12 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
     {
         if (is_string($this->actors)) {
             $this->actors = [$this->actors];
+        }
+
+        foreach (get_dynamic_properties($this) as $prop) {
+            if (is_associative_array($this->$prop)) {
+                $this->$prop = objectify($this->$prop);
+            }
         }
 
         return parent::cast();
@@ -195,7 +194,12 @@ class Action extends BasicEntity implements Meta, Validation, Dynamic
         $responseValues = array_only($values, ['display', 'update']);
         $values = array_without($values, ['display', 'update']);
 
-        if ($responseValues !== [] && isset($values['responses'])) {
+        if (!isset($values['responses'])) {
+            $values['responses'] = [];
+            $values['responses']['ok'] = [];
+        }
+
+        if ($responseValues !== []) {
             foreach ($values['responses'] as &$response) {
                 $response += $responseValues;
             }

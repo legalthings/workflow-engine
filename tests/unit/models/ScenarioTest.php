@@ -2,12 +2,28 @@
 
 use Jasny\ValidationResult;
 use Jasny\EventDispatcher\EventDispatcher;
+use Jasny\DB\EntitySet;
 
 /**
  * @covers Scenario
  */
 class ScenarioTest extends \Codeception\Test\Unit
 {
+    use Jasny\TestHelper;
+
+    /**
+     * @var Scenario
+     **/
+    protected $scenario;
+
+    /**
+     * Execute actions before each test case
+     */
+    public function _before()
+    {
+        $this->scenario = new Scenario();
+    }
+
     public function testConstruction()
     {
         $scenario = new Scenario();
@@ -37,10 +53,10 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $scenario = new Scenario();
 
-        $manager = new JsonSchema(['$ref' => 'https://specs.livecontracts.io/v0.1.0/actor/schema.json#']);
+        $manager = new JsonSchema(['$ref' => 'https://specs.livecontracts.io/v0.2.0/actor/schema.json#']);
         $scenario->actors['manager'] = $manager;
 
-        $worker = new JsonSchema(['$ref' => 'https://specs.livecontracts.io/v0.1.0/actor/schema.json#']);
+        $worker = new JsonSchema(['$ref' => 'https://specs.livecontracts.io/v0.2.0/actor/schema.json#']);
         $scenario->actors['worker'] = $worker;
 
         $this->assertSame($manager, $scenario->getActor('manager'));
@@ -55,7 +71,7 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $scenario = new Scenario();
 
-        $manager = new JsonSchema(['$ref' => 'https://specs.livecontracts.io/v0.1.0/actor/schema.json#']);
+        $manager = new JsonSchema(['$ref' => 'https://specs.livecontracts.io/v0.2.0/actor/schema.json#']);
         $scenario->actors['manager'] = $manager;
 
         $scenario->getActor('walker');
@@ -91,7 +107,7 @@ class ScenarioTest extends \Codeception\Test\Unit
         $scenario = new Scenario();
 
         $initial = new State();
-        $scenario->states[':initial'] = $initial;
+        $scenario->states['initial'] = $initial;
 
         $foo = new State();
         $scenario->states['foo'] = $foo;
@@ -99,7 +115,7 @@ class ScenarioTest extends \Codeception\Test\Unit
         $bar = new State();
         $scenario->states['bar'] = $bar;
 
-        $this->assertSame($initial, $scenario->getState(':initial'));
+        $this->assertSame($initial, $scenario->getState('initial'));
         $this->assertSame($foo, $scenario->getState('foo'));
         $this->assertSame($bar, $scenario->getState('bar'));
     }
@@ -277,10 +293,10 @@ class ScenarioTest extends \Codeception\Test\Unit
         $this->assertAttributeInstanceOf(AssocEntitySet::class, 'states', $scenario);
         $this->assertEquals(State::class, $scenario->states->getEntityClass());
 
-        $this->assertArrayHasKey(':initial', $scenario->states->getArrayCopy());
-        $this->assertInstanceOf(State::class, $scenario->states[':initial']);
-        $this->assertAttributeEquals('First', 'title', $scenario->states[':initial']);
-        $this->assertAttributeEquals(['foo'], 'actions', $scenario->states[':initial']);
+        $this->assertArrayHasKey('initial', $scenario->states->getArrayCopy());
+        $this->assertInstanceOf(State::class, $scenario->states['initial']);
+        $this->assertAttributeEquals('First', 'title', $scenario->states['initial']);
+        $this->assertAttributeEquals(['foo'], 'actions', $scenario->states['initial']);
     }
 
     protected function assertScenarioActors(Scenario $scenario)
@@ -347,7 +363,7 @@ class ScenarioTest extends \Codeception\Test\Unit
             ],
             'allow_actions' => ['bar'],
             'states' => [
-                ':initial' => [
+                'initial' => [
                     'title' => 'First',
                     'actions' => ['foo'],
                     'transitions' => [
@@ -410,7 +426,7 @@ class ScenarioTest extends \Codeception\Test\Unit
             'allow_actions' => ['bar'],
             'states' => [
                 [
-                    'key' => ':initial',
+                    'key' => 'initial',
                     'title' => 'First',
                     'action' => 'foo',
                     'transitions' => [
@@ -475,6 +491,8 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $scenario = new Scenario();
 
+        $scenario->schema = 'bar';
+
         $scenario->actions['foo'] = $this->createMock(Action::class);
         $scenario->actions['foo']
             ->expects($this->once())
@@ -491,7 +509,8 @@ class ScenarioTest extends \Codeception\Test\Unit
         $errors = $validation->getErrors();
 
         $expected = [
-            "scenario must have an ':initial' state",
+            "schema property value is not valid",
+            "scenario must have an 'initial' state",
             "action 'foo': 'ok' response is required",
             "state 'one': state is invalid",
         ];
@@ -550,7 +569,7 @@ class ScenarioTest extends \Codeception\Test\Unit
                     'display' => 'always',
                 ],
                 [
-                    'key' => ':initial',
+                    'key' => 'initial',
                     'title' => 'First',
                     'actions' => ['foo'],
                     'transitions' => [
@@ -618,8 +637,8 @@ class ScenarioTest extends \Codeception\Test\Unit
         $scenario->actions['bar']->expects($this->atLeastOnce())->method('toData')
             ->willReturn(['title' => "Bar", 'responses' => [['key' => 'ok', 'transition' => ':success']]]);
 
-        $scenario->states[':initial'] = $this->createMock(State::class);
-        $scenario->states[':initial']->expects($this->atLeastOnce())->method('toData')
+        $scenario->states['initial'] = $this->createMock(State::class);
+        $scenario->states['initial']->expects($this->atLeastOnce())->method('toData')
             ->willReturn([
                 'title' => "First",
                 'actions' => ['foo'],
@@ -688,8 +707,8 @@ class ScenarioTest extends \Codeception\Test\Unit
         $scenario->actors['manager']->expects($this->once())->method('jsonSerialize')
             ->willReturn(['title' => "Operational manager"]);
 
-        $scenario->states[':initial'] = $this->createMock(State::class);
-        $scenario->states[':initial']->expects($this->once())->method('jsonSerialize')
+        $scenario->states['initial'] = $this->createMock(State::class);
+        $scenario->states['initial']->expects($this->once())->method('jsonSerialize')
             ->willReturn([
                 'title' => "First",
                 'actions' => ['foo'],
@@ -724,7 +743,7 @@ class ScenarioTest extends \Codeception\Test\Unit
                 ]
             ],
             'states' => [
-                ':initial' => [
+                'initial' => [
                     'title' => 'First',
                     'actions' => ['foo'],
                     'instructions' => [],
@@ -760,10 +779,8 @@ class ScenarioTest extends \Codeception\Test\Unit
 
     public function testJsonSerializeBlank()
     {
-        $scenario = new Scenario();
-
         $expected = [
-            '$schema' => 'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#',
+            '$schema' => 'https://specs.livecontracts.io/v0.2.0/scenario/schema.json#',
             'id' => null,
             'title' => null,
             'description' => null,
@@ -776,7 +793,152 @@ class ScenarioTest extends \Codeception\Test\Unit
             'meta' => [],
         ];
 
-        $serialized = json_encode($scenario);
+        $serialized = json_encode($this->scenario);
         $this->assertEquals($expected, json_decode($serialized, true));
+    }
+
+    /**
+     * Test 'dispatch' method
+     */
+    public function testDispatch()
+    {
+        $event = 'foo';
+        $payload = ['foo' => 'bar'];
+        $expected = 'baz';
+
+        $dispatcher = $this->createMock(EventDispatcher::class);
+        $dispatcher->expects($this->once())->method('trigger')->with(
+            $event,
+            $this->identicalTo($this->scenario),
+            $payload
+        )->willReturn($expected);
+
+        $this->setPrivateProperty($this->scenario, 'dispatcher', $dispatcher);
+        $result = $this->scenario->dispatch($event, $payload);
+
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Provide data for testing 'getActionsForState' method, using state key
+     *
+     * @return array
+     */
+    public function getActionsForStateByKeyProvider()
+    {
+        $actions = [
+            'step1' => $this->createMock(Action::class),
+            'step2' => $this->createMock(Action::class),
+            'step3' => $this->createMock(Action::class),
+            'step4' => $this->createMock(Action::class)
+        ];
+
+        $actions['step1']->key = 'step1';
+        $actions['step2']->key = 'step2';
+        $actions['step3']->key = 'step3';
+        $actions['step4']->key = 'step4';
+
+        return [
+            [
+                $actions, 
+                [], 
+                ['step1', 'step4', 'step5'], 
+                [
+                    'step1' => $actions['step1'],
+                    'step4' => $actions['step4']
+                ]
+            ],
+            [
+                $actions, 
+                ['step1', 'step4', 'step5'], 
+                [], 
+                [
+                    'step1' => $actions['step1'],
+                    'step4' => $actions['step4']
+                ]
+            ],
+            [
+                $actions, 
+                ['step1', 'step4', 'step5'], 
+                ['step1', 'step2', 'step4'], 
+                [
+                    'step1' => $actions['step1'],
+                    'step2' => $actions['step2'],
+                    'step4' => $actions['step4']
+                ]
+            ],
+            [
+                $actions, 
+                ['step5'], 
+                [], 
+                []
+            ],
+            [
+                $actions, 
+                [], 
+                [], 
+                []
+            ],
+            [
+                [], 
+                ['step1'], 
+                ['step1'], 
+                []
+            ],
+        ];
+    }
+
+    /**
+     * Test 'getActionsForState' method, using state key
+     *
+     * @dataProvider getActionsForStateByKeyProvider
+     */
+    public function testGetActionsForStateByKey($actions, $stateActions, $allowActions, $expected)
+    {
+        $this->scenario->actions = $actions;
+        $this->scenario->allow_actions = $allowActions;
+        $this->scenario->states = [
+            'foo' => $this->createMock(State::class),
+            'bar' => $this->createMock(State::class)
+        ];
+
+        $this->scenario->states['bar']->actions = $stateActions;
+
+        $result = $this->scenario->getActionsForState('bar');
+        $asArray = $result->getArrayCopy();
+
+        $this->assertInstanceOf(EntitySet::class, $result);
+        $this->assertEquals($expected, $asArray);
+    }
+
+    /**
+     * Test 'getActionsForState' method, using state object
+     *
+     * @dataProvider getActionsForStateByKeyProvider
+     */
+    public function testGetActionsForStateByValue($actions, $stateActions, $allowActions, $expected)
+    {
+        $this->scenario->actions = $actions;
+        $this->scenario->allow_actions = $allowActions;
+
+        $state = $this->createMock(State::class);
+        $state->actions = $stateActions;
+
+        $result = $this->scenario->getActionsForState($state);
+        $asArray = $result->getArrayCopy();
+
+        $this->assertInstanceOf(EntitySet::class, $result);
+        $this->assertEquals($expected, $asArray);
+    }
+
+    /**
+     * Test 'getActionsForState' method, if state is not found
+     *
+     * @expectedException OutOfBoundsException
+     * @expectedExceptionMessage Scenario doesn't have a 'foo' state
+     */
+    public function testGetActionsForStateNotFound()
+    {
+        $this->scenario->getActionsForState('foo');
     }
 }

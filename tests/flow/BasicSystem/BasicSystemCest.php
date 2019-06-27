@@ -15,7 +15,7 @@ class BasicSystemCest
         $I->createProcessFrom($example['scenario']);
 
         $I->comment('verify the process after initialization');
-        $I->seeCurrentStateIs(':initial');
+        $I->seeCurrentStateIs('initial');
         $I->seePreviousResponsesWere([]);
         $I->seeDefaultActionIs('step1');
         $I->seeNextStatesAre(['step2', ':success']);
@@ -51,7 +51,7 @@ class BasicSystemCest
         $I->createProcessFrom($example['scenario']);
 
         $I->comment('verify the process after initialization');
-        $I->seeCurrentStateIs(':initial');
+        $I->seeCurrentStateIs('initial');
         $I->seePreviousResponsesWere([]);
         $I->seeDefaultActionIs('step1');
         $I->seeNextStatesAre(['step2', ':success']);

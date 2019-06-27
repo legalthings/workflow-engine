@@ -24,7 +24,7 @@ class UpdateInstruction extends BasicEntity implements Meta, Validation
      * Whether patch or replace existing objects or array.
      * @var boolean
      */
-    public $patch = false;
+    public $patch = true;
     
     /**
      * Use explicit data instead of response data
@@ -41,15 +41,18 @@ class UpdateInstruction extends BasicEntity implements Meta, Validation
      */
     public $projection;
     
-    
     /**
-     * Class constructor
+     * @inheritDoc
      */
-    public function __construct()
+    public function cast()
     {
-        $this->cast();
+        if (is_associative_array($this->data)) {
+            $this->data = objectify($this->data);
+        }
+
+        return parent::cast();
     }
-    
+
     /**
      * Validate the update instruction
      * 
@@ -69,5 +72,20 @@ class UpdateInstruction extends BasicEntity implements Meta, Validation
         }
         
         return $validation;
+    }
+
+    /**
+     * Convert loaded values to an entity.
+     *
+     * @param array|stdClass|string $data
+     * @return static
+     */
+    public static function fromData($data)
+    {
+        if (is_string($data)) {
+            $data = ['select' => $data];
+        }
+
+        return parent::fromData($data);
     }
 }

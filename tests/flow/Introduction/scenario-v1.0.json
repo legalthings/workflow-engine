@@ -1,0 +1,64 @@
+{
+    "$schema": "https://specs.livecontracts.io/v0.2.0/scenario/schema.json#",
+    "title": "A proper introduction",
+    "actors": {
+        "initiator": {
+            "$schema": "http://json-schema.org/schema#",
+            "title": "Initiator",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "organization": {
+                    "type": "string"
+                },
+                "identity": {
+                    "type": "string",
+                    "default": "foo_id"
+                }
+            }
+        },
+        "recipient": {
+            "$schema": "http://json-schema.org/schema#",
+            "title": "Recipient",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "organization": {
+                    "type": "string"
+                },
+                "identity": {
+                    "type": "string",
+                    "default": "bar_id"
+                }
+            }
+        }
+    },
+    "actions": {
+        "introduce_initiator": {
+            "actor": "initiator",
+            "update": {
+                "select": "actors.initiator"
+            }
+        },
+        "introduce_recipient": {
+            "actor": "recipient",
+            "update": {
+                "select": "actors.recipient"
+            }
+        }
+    },
+    "states": {
+        "initial": {
+            "action": "introduce_initiator",
+            "transition": "wait_on_recipient"
+        },
+        "wait_on_recipient": {
+            "action": "introduce_recipient",
+            "transition": ":success"
+        }
+    }
+}

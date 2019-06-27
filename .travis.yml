@@ -1,0 +1,34 @@
+language: php
+php:
+  - 7.2
+
+dist: xenial
+addons:
+  apt:
+    sources:
+    - sourceline: ppa:ondrej/php
+    packages:
+    - libsodium-dev
+
+services: mongodb
+
+# Add your branch here to have it tested
+branches:
+  only:
+  - master
+  - /^v\d+\.\d+\.\d+$/
+
+before_install:
+- pecl install --soft libsodium
+- echo "extension = mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+
+install:
+- composer install
+- wget https://scrutinizer-ci.com/ocular.phar -O "$HOME/ocular.phar"
+
+before_script:
+- php bin/codecept build
+
+script:
+- php bin/codecept run --coverage --coverage-xml
+

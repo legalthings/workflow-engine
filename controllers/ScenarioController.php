@@ -16,9 +16,10 @@ class ScenarioController extends BaseController
     /**
      * @param ScenarioGateway $scenarios
      */
-    public function __construct(ScenarioGateway $scenarios)
+    public function __construct(ScenarioGateway $scenarios, JsonView $jsonView)
     {
         $this->scenarios = $scenarios;
+        $this->jsonView = $jsonView;
     }
 
     /**
@@ -29,8 +30,12 @@ class ScenarioController extends BaseController
         $scenario = $this->scenarios->create()->setValues($this->getInput());
         $scenario->validate()->mustSucceed();
 
-        $this->scenarios->save($scenario);
+        $exists = isset($scenario->id) && $this->scenarios->exists($scenario->id);
+        if ($exists) {
+            return $this->noContent();
+        }
 
+        $this->scenarios->save($scenario);
         $this->output($scenario);
     }
 

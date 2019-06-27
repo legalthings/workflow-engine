@@ -1,0 +1,133 @@
+{
+    "$schema": "https://specs.livecontracts.io/v0.2.0/scenario/schema.json#",
+    "title": "A handshake",
+    "actors": {
+        "initiator": {
+            "title": "Initiator",
+            "properties": {
+                "identity": {
+                    "type": "string",
+                    "default": "foo_id"
+                }
+            }
+        },
+        "recipient": {
+            "title": "Recipient",
+            "properties": {
+                "identity": {
+                    "type": "string",
+                    "default": "bar_id"
+                }
+            }
+        }
+    },
+    "actions": {
+        "greet": {
+            "actor": "initiator",
+            "title": "Greet the person you're meeting",
+            "responses": {
+                "ok": {
+                    "title": "Hi, how are you?"
+                }
+            }
+        },
+        "reply": {
+            "actor": "recipient",
+            "title": "Respond to the greeting",
+            "responses": {
+                "ok": {
+                    "title": "Fine. How about you?"
+                },
+                "not_good": {
+                    "title": "Not so good."
+                }
+            }
+        },
+        "ignore": {
+            "actor": "recipient",
+            "title": "Ignore the greeting"
+        },
+        "sympathize": {
+            "actor": "initiator",
+            "title": "Ask further",
+            "responses": {
+                "ok": {
+                    "title": "Sorry to hear that. Please tell me more."
+                }
+            }
+        },
+        "elaborate": {
+            "actor": "recipient",
+            "title": "Tell what's the matter."
+        },
+        "complete": {
+            "actor": "initiator",
+            "title": "End the conversation"
+        }
+    },
+    "states": {
+        "initial": {
+            "action": "greet",
+            "transition": "wait_on_recipient"
+        },
+        "wait_on_recipient": {
+            "title": "Waiting on the recipient to respond.",
+            "instructions": {
+                "recipient": "Respond or, if you're feeling rude, ignore it."
+            },
+            "actions": [
+                "reply",
+                "ignore"
+            ],
+            "transitions": [
+                {
+                    "action": "reply",
+                    "response": "ok",
+                    "transition": "wait_on_initiator"
+                },
+                {
+                    "action": "reply",
+                    "response": "not_good",
+                    "transition": "expect_sympathy"
+                },
+                {
+                    "action": "ignore",
+                    "transition": ":cancelled"
+                }
+            ]
+        },
+        "expect_sympathy": {
+            "title": "Waiting on the initiator to respond.",
+            "instructions": {
+                "initiator": "Ask further or end the conversation politely."
+            },
+            "actions": [
+                "sympathize",
+                "complete"
+            ],
+            "transitions": [
+                {
+                    "action": "sympathize",
+                    "transition": "recipient_can_elaborate"
+                },
+                {
+                    "action": "complete",
+                    "transition": ":success"
+                }
+            ]
+        },
+        "recipient_can_elaborate": {
+            "title": "Waiting on the recipient to elaborate.",
+            "instructions": {
+                "recipient": "Please explain why it's not going well."
+            },
+            "action": "elaborate",
+            "transition": "expect_sympathy"
+        },
+        "wait_on_initiator": {
+            "title": "Waiting on the initiator to respond.",
+            "action": "complete",
+            "transition": ":success"
+        }
+    }
+}

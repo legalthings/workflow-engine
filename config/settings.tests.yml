@@ -1,11 +1,12 @@
-debug: true
-display_errors: true
+digest: optional
 
 triggers:
-  nop:
-    schema: https://specs.livecontracts.io/v1.0.0/action/nop/schema.json#
-  http:
-    schema: https://specs.livecontracts.io/v1.0.0/action/http/schema.json#
+  - schema: https://specs.livecontracts.io/v0.2.0/action/nop/schema.json#
+    type: nop
+  - schema: https://specs.livecontracts.io/v0.2.0/action/http/schema.json#
+    type: http
+  - schema: https://specs.livecontracts.io/v0.2.0/action/event/schema.json#
+    type: event
 
 db:
   default:
@@ -21,3 +22,6 @@ lto:
       secretkey: 3R2rpsEQqifWTt1BdLTbQv5vzXPQ91onH8Z3sVnkfPu7
       publickey: EGG47VCK3ZnJYZAZpwG7u3SbDkC7QgDfLDrpGTdydURd
   network: T
+
+event_chain:
+  url: http://foo-event-chain-service/

@@ -9,12 +9,33 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use LTO\Event;
 use LTO\EventChain;
+use LTO\Account;
 
 /**
  * @covers \EventChainRepository
  */
 class EventChainRepositoryTest extends \Codeception\Test\Unit
 {
+    use Jasny\TestHelper;
+
+    /**
+     * @var callable
+     **/
+    protected $createEvent;
+
+    /**
+     * @var LTO\Account
+     **/
+    protected $account;
+
+    /**
+     * Perform some actions before each test
+     */
+    public function _before()
+    {
+        $this->createEvent = function() {};
+        $this->account = $this->createMock(Account::class);
+    }
     /**
      * Create a Guzzle mock handler
      *
@@ -69,7 +90,7 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
 
         $chain = $this->createEventChainMock();
 
-        $repository = new EventChainRepository($client);
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
         $repository->register($chain);
 
         $result = $repository->get($chain->id);
@@ -102,7 +123,7 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
             new HttpResponse(200, ['Content-Type' => 'application/json'], json_encode($chainResponseBody))
         ], $history);
 
-        $repository = new EventChainRepository($client);
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
 
         $chain = $repository->$method('JEKNVnkbo3jqSHT8tfiAKK4tQTFK7jbx8t18wEEnygya');
 
@@ -119,12 +140,68 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
         $this->assertEquals('event-chains/JEKNVnkbo3jqSHT8tfiAKK4tQTFK7jbx8t18wEEnygya', (string)$request->getUri());
     }
 
+    /**
+     * Test 'fetch' method, if json decode error happened
+     *
+     * @expectedException UnexpectedValueException
+     * @expectedExceptionMessage Received invalid JSON from event chain service. Control character error, possibly incorrectly encoded
+     */
+    public function testFetchJsonError()
+    {
+        $client = $this->createGuzzleMock([
+            new HttpResponse(200, ['Content-Type' => 'application/json'], '{"id": "JEKNVnkbo3jqSHT8tfiAKK4tQTFK7')
+        ], $history);
+
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
+        $repository->fetch('JEKNVnkbo3jqSHT8tfiAKK4tQTFK7jbx8t18wEEnygya');
+    }
+
+    /**
+     * Test 'fetch' method, if json returned does not contain chain id
+     *
+     * @expectedException UnexpectedValueException
+     * @expectedExceptionMessage 'id' property is missing
+     */
+    public function testFetchNoId()
+    {
+        $chainResponseBody = [
+            'latest_hash' => 'J26EAStUDXdRUMhm1UcYXUKtJWTkcZsFpxHRzhkStzbS'
+        ];
+
+        $client = $this->createGuzzleMock([
+            new HttpResponse(200, ['Content-Type' => 'application/json'], json_encode($chainResponseBody))
+        ], $history);
+
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
+        $repository->fetch('JEKNVnkbo3jqSHT8tfiAKK4tQTFK7jbx8t18wEEnygya');
+    }
+
+    /**
+     * Test 'fetch' method, if json returned does not contain chain id
+     *
+     * @expectedException UnexpectedValueException
+     * @expectedExceptionMessage 'latest_hash' property is missing
+     */
+    public function testFetchNoLatestHash()
+    {
+        $chainResponseBody = [
+            'id' => 'JEKNVnkbo3jqSHT8tfiAKK4tQTFK7jbx8t18wEEnygya'
+        ];
+
+        $client = $this->createGuzzleMock([
+            new HttpResponse(200, ['Content-Type' => 'application/json'], json_encode($chainResponseBody))
+        ], $history);
+
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
+        $repository->fetch('JEKNVnkbo3jqSHT8tfiAKK4tQTFK7jbx8t18wEEnygya');
+    }
+
     public function testUpdateAndGet()
     {
         $client = $this->createMock(HttpClient::class);
         $client->expects($this->never())->method($this->anything());
 
-        $repository = new EventChainRepository($client);
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
 
         $chain = $this->createEventChainMock(2);
         $repository->register($chain);
@@ -141,13 +218,30 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
         $this->assertNotSame($result, $newChain);
     }
 
+    /**
+     * Test 'update' method, if chain is not registered
+     *
+     * @expectedException BadMethodCallException
+     * @expectedExceptionMessageRegExp /Chain '[0-9a-zA-Z]+' is not registered with the repository/
+     */
+    public function testUpdateNotRegistered()
+    {
+        $client = $this->createMock(HttpClient::class);
+        $client->expects($this->never())->method($this->anything());
+
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
+
+        $chain = $this->createEventChainMock(2);
+        $repository->update($chain);        
+    }
+
     public function testPersist()
     {
         $client = $this->createGuzzleMock([
             new HttpResponse(201)
         ], $history);
 
-        $repository = new EventChainRepository($client);
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
 
         $chain = $this->createEventChainMock(2);
         $repository->register($chain);
@@ -185,7 +279,7 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
         $request = $history[0]['request'];
 
         $this->assertEquals('POST', $request->getMethod());
-        $this->assertEquals('queue', (string)$request->getUri());
+        $this->assertEquals('/event-chains', (string)$request->getUri());
         $this->assertEquals('application/json', $request->getHeaderLine('Content-Type'));
 
         $this->assertEquals($data, json_decode((string)$request->getBody(), true));
@@ -196,7 +290,7 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
         $client = $this->createMock(HttpClient::class);
         $client->expects($this->never())->method($this->anything());
 
-        $repository = new EventChainRepository($client);
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
 
         $partialChain = $this->createEventChainMock(2);
         $partialChain->events = [];
@@ -219,7 +313,7 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
             new HttpResponse(201),
         ], $history);
 
-        $repository = new EventChainRepository($client);
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
 
         $chains = [];
 
@@ -257,7 +351,7 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
         /** @var HttpRequest $request */
         foreach ($history as $i => ['request' => $request]) {
             $this->assertEquals('POST', $request->getMethod());
-            $this->assertEquals('queue', (string)$request->getUri());
+            $this->assertEquals('/event-chains', (string)$request->getUri());
             $this->assertEquals('application/json', $request->getHeaderLine('Content-Type'));
 
             $expected = [
@@ -269,5 +363,53 @@ class EventChainRepositoryTest extends \Codeception\Test\Unit
             ];
             $this->assertEquals($expected, json_decode((string)$request->getBody(), true));
         }
+    }
+
+    /**
+     * Test 'persist' method, if chain is not registered
+     *
+     * @expectedException BadMethodCallException
+     * @expectedExceptionMessageRegExp /Chain '[0-9a-zA-Z]+' is not registered with the repository/
+     */
+    public function testPersistNotRegistered()
+    {
+        $client = $this->createMock(HttpClient::class);
+        $client->expects($this->never())->method($this->anything());
+
+        $repository = new EventChainRepository($this->createEvent, $this->account, $client);
+
+        $chain = $this->createEventChainMock(2);
+        $repository->persist($chain->id);        
+    }
+
+    /**
+     * Test 'addResponse' method
+     */
+    public function testAddResponse()
+    {
+        $latestHash = 'bar';
+        $chainId = 'foo';
+        $chain = $this->createMock(EventChain::class);
+        $account = $this->createMock(Account::class);
+        $response = $this->createMock(Response::class);
+
+        $event = $this->createMock(Event::class);
+        $signedEvent = $this->createMock(Event::class);
+        $createEvent = $this->createCallbackMock($this->once(), [
+            $this->identicalTo($response),
+            $latestHash
+        ], $event);
+        $event->expects($this->once())->method('signWith')->with($this->identicalTo($account))->willReturn($signedEvent);
+
+        $repository = $this->createPartialMock(EventChainRepository::class, ['get', 'update']);
+        $this->setPrivateProperty($repository, 'createEvent', $createEvent);
+        $this->setPrivateProperty($repository, 'account', $account);
+
+        $repository->expects($this->once())->method('get')->with($chainId)->willReturn($chain);
+        $chain->expects($this->once())->method('getLatestHash')->willReturn($latestHash);
+        $chain->expects($this->once())->method('add')->with($this->identicalTo($signedEvent));
+        $repository->expects($this->once())->method('update')->with($this->identicalTo($chain));
+
+        $repository->addResponse($chainId, $response);
     }
 }

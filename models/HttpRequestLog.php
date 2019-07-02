@@ -1,7 +1,8 @@
 <?php
 
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use h4cc\Multipart\Parser\MultipartParser;
 
 /**
  * Class for logging single http request and it's response
@@ -21,10 +22,10 @@ class HttpRequestLog extends MongoDocument
     /**
      * Create instance
      *
-     * @param ServerRequestInterface $request
+     * @param RequestInterface $request
      * @param ResponseInterface $response 
      */
-    public function __construct(ServerRequestInterface $request, ResponseInterface $response)
+    public function __construct(RequestInterface $request, ResponseInterface $response = null)
     {
         $this->request = $request;
         $this->response = $response;
@@ -37,7 +38,7 @@ class HttpRequestLog extends MongoDocument
      */
     public function cast()
     {
-        if ($this->request instanceof ServerRequestInterface) {
+        if ($this->request instanceof RequestInterface) {
             $this->request = [
                 'uri' => (string)$this->request->getUri(),
                 'method' => $this->request->getMethod(),
@@ -58,7 +59,7 @@ class HttpRequestLog extends MongoDocument
     /**
      * Format body of request or response
      *
-     * @param ServerRequestInterface|ResponseInterface $message
+     * @param RequestInterface|ResponseInterface $message
      * @return array|string
      */
     protected function formatBody($message)
@@ -72,11 +73,35 @@ class HttpRequestLog extends MongoDocument
         switch ($match[1] ?? null) {
             case 'application/json': 
                 return json_decode($body, true);
-            case 'multipart/form-data': 
             case 'application/x-www-form-urlencoded': 
-                return $message instanceof ServerRequestInterface ? $message->getParsedBody() : $body;
+                parse_str($body, $values);
+
+                return $values;
+            case 'multipart/form-data': 
+                return $this->parseMultipartBody($body);
         }
 
         return $body;
+     }
+
+    /**
+     * Parse multipart body
+     *
+     * @param string $body
+     * @return array
+     */
+    protected function parseMultipartBody(string $body): array
+    {
+        preg_match('|^--(\S*)|', $body, $match);
+
+        $boundary = $match[1] ?? null;
+        if (empty($boundary)) {
+            return $body;
+        }
+
+        $parser = new MultipartParser();
+        $parser->setBoundary($boundary);
+
+        return $parser->parse($body);
      }
 }

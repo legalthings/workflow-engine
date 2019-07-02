@@ -16,6 +16,11 @@ class ProcessStepperTest extends \Codeception\Test\Unit
     protected $updater;
 
     /**
+     * @var ActionInstantiator
+     **/
+    protected $actionInstantiator;
+
+    /**
      * @var ProcessStepper
      */
     protected $stepper;
@@ -23,7 +28,8 @@ class ProcessStepperTest extends \Codeception\Test\Unit
     public function _before()
     {
         $this->updater = $this->createMock(ProcessUpdater::class);
-        $this->stepper = new ProcessStepper($this->updater);
+        $this->actionInstantiator = $this->createMock(ActionInstantiator::class);
+        $this->stepper = new ProcessStepper($this->updater, $this->actionInstantiator);
     }
 
     protected function createScenario(): Scenario
@@ -116,6 +122,11 @@ class ProcessStepperTest extends \Codeception\Test\Unit
     public function testStep()
     {
         $process = $this->createProcess();
+        $action = $process->scenario->actions['first'];
+
+        $this->actionInstantiator->expects($this->once())->method('enrichAction')
+            ->with($this->identicalTo($action), $this->identicalTo($process))
+            ->willReturn($action);
 
         $dispatcher = $this->createMock(EventDispatcher::class);
         $dispatcher->expects($this->once())->method('trigger')

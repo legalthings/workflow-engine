@@ -12,8 +12,13 @@
                     "type": "string"
                 },
                 "identity": {
-                    "type": "string",
-                    "default": "foo_id"
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "default": "foo_id"
+                        }
+                    }
                 }
             }
         },
@@ -29,8 +34,13 @@
                     "type": "string"
                 },
                 "identity": {
-                    "type": "string",
-                    "default": "bar_id"
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "default": "bar_id"
+                        }
+                    }
                 }
             }
         }

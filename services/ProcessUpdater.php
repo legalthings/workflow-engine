@@ -158,11 +158,6 @@ class ProcessUpdater
         }
 
         $scenarioState = $scenario->getState($transition->transition);
-
-        // Temporary current state during instantiating the current state.
-        $process->current = new CurrentState();
-        $process->current->key = $scenarioState->key;
-
         $process->current = $this->stateInstantiator->instantiate($scenarioState, $process);
     }
 

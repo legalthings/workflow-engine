@@ -25,3 +25,5 @@ lto:
 
 event_chain:
   url: http://foo-event-chain-service/
+
+http_request_log: true

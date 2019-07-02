@@ -20,3 +20,5 @@ lto:
       secretkey: BnjFJJarge15FiqcxrB7Mzt68nseBXXR4LQ54qFBsWHG
       publickey: BVv1ZuE3gKFa6krwWJQwEmrLYUESuUabNCXgYTmCoBt6
   network: T
+
+http_request_log: true

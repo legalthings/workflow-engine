@@ -116,7 +116,7 @@ class Http extends AbstractTrigger
         $method = strtoupper($info->method ?? $this->method);
         $url = $info->url ?? $this->url;
         $options = $this->getRequestOptions(
-            array_merge($this->headers, (array)($info->headers ?? [])),
+            array_merge((array)$this->headers, (array)($info->headers ?? [])),
             array_merge($this->query, (array)($info->query ?? [])),
             i\type_cast($info->auth ?? $this->auth, 'array'),
             $info->data ?? null

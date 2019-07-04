@@ -15,9 +15,8 @@ class DataInstructionTest extends \Codeception\Test\Unit
     public function fromDataProvider()
     {
         return [
-            ['!eval foo.bar == null', ['<eval>' => 'foo.bar == null']],
-            ["!ref foo.bar == 'test' && foo.baz == 'rest'", ['<ref>' => "foo.bar == 'test' && foo.baz == 'rest'"]],
-            [['<eval>' => 'foo.bar == null'], ['<eval>' => 'foo.bar == null']],
+            [['<eval>' => 'foo.bar == null']],
+            [(object)['<eval>' => 'foo.bar == null']],
         ];
     }
 
@@ -26,48 +25,23 @@ class DataInstructionTest extends \Codeception\Test\Unit
      *
      * @dataProvider fromDataProvider
      */
-    public function testFromData($data, $expected)
+    public function testFromData($data)
     {
         $result = DataInstruction::fromData($data);
         $vars = get_object_vars($result);
+
+        $expected = ['<eval>' => 'foo.bar == null'];
 
         $this->assertInstanceOf(DataInstruction::class, $result);
         $this->assertEquals($expected, $vars);
     }
 
     /**
-     * Provide data for testing 'fromData' method, when exception is thrown
+     * Provide data for testing 'getInstruction' method
      *
      * @return array
      */
-    public function fromDataExceptionProvider()
-    {
-        return [
-            ['eval foo.bar == null'],
-            ['!eval2 foo.bar == null'],
-            ['!eval'],
-            ['!eval ']
-        ];
-    }
-
-    /**
-     * Test 'fromData' method, when exception is thrown
-     *
-     * @dataProvider fromDataExceptionProvider
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid format for data instruction
-     */
-    public function testFromDataException($data)
-    {
-        DataInstruction::fromData($data);
-    }
-
-    /**
-     * Provide data for testing '__toString' method
-     *
-     * @return array
-     */
-    public function toStringProvider()
+    public function getInstructionProvider()
     {
         $instruction = new DataInstruction();
         $instruction2 = new DataInstruction();
@@ -81,15 +55,15 @@ class DataInstructionTest extends \Codeception\Test\Unit
     }
 
     /**
-     * Test '__toString' method
+     * Test 'getInstruction' method
      *
-     * @dataProvider toStringProvider
+     * @dataProvider getInstructionProvider
      */
-    public function testToString($instruction, $expected)
+    public function testGetInstruction($instruction, $expected)
     {
         $instruction->foo = 'bar';
 
-        $result = (string)$instruction;
+        $result = $instruction->getInstruction();
 
         $this->assertSame($expected, $result);
     }

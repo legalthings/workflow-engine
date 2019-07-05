@@ -54,7 +54,7 @@
         "ramsey/uuid": "^3.8",
         "jasny/immutable": "^1.0",
         "jasny/dummy-middleware": "^1.1",
-        "h4cc/multipart": "dev-master#12079b8f30dc677c03e13b1dacb448d09a672800"
+        "riverline/multipart-parser": "^2.0"
     },
     "require-dev" : {
         "jasny/php-code-quality" : "^2.0.0",

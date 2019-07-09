@@ -17,4 +17,22 @@ class DataInstruction extends BasicEntity implements Dynamic
     {
         return parent::fromData(objectify($data));
     }
+
+    /**
+     * Get instruction as string
+     *
+     * @return string
+     */
+    public function getInstruction(): string
+    {
+        $vars = get_object_vars($this);
+
+        foreach ($vars as $key => $value) {
+            if (strpos($key, '<') === 0) {
+                return $value;
+            }
+        }
+
+        return '';
+    }
 }

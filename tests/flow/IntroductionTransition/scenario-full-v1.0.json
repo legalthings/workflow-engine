@@ -1,4 +1,6 @@
 {
+    "$schema": "https://specs.livecontracts.io/v0.2.0/scenario/schema.json#",
+    "title": "A proper introduction",
     "actors": {
         "initiator": {
             "$schema": "http://json-schema.org/schema#",
@@ -51,17 +53,34 @@
                 "initiator",
                 "recipient"
             ],
+            "condition": {
+                "<eval>": "current.actor.name == null"
+            },
             "update": "current.actor"
         }
     },
     "states": {
         "initial": {
             "action": "introduce",
-            "transition": "wait_on_recipient"
+            "transitions": [
+                {
+                    "transition": "wait_on_recipient",
+                    "condition": {
+                        "<eval>": "current.actor.name != null"
+                    }
+                }
+            ]
         },
         "wait_on_recipient": {
             "action": "introduce",
-            "transition": ":success"
+            "transitions": [
+                {
+                    "transition": ":success",
+                    "condition": {
+                        "<eval>": "actors.initiator.name != null && actors.recipient.name != null"
+                    }
+                }
+            ]
         }
     }
 }

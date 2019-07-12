@@ -3,6 +3,7 @@
 namespace JsonSchema\Validator;
 
 use stdClass;
+use RuntimeException;
 use JsonSchema\Validator;
 use JsonSchema\Constraints\Constraint;
 
@@ -18,6 +19,22 @@ class Repository
     protected $cache = [];
 
     /**
+     * Loaders of json schemas from different sources
+     * @var string
+     **/
+    protected $loaders;
+
+    /**
+     * Constructor
+     *
+     * @param array $loaders
+     */
+    public function __construct(array $loaders)
+    {
+        $this->loaders = $loaders;
+    }
+
+    /**
      * Get schema contents
      *
      * @param string $url
@@ -25,13 +42,15 @@ class Repository
      */
     public function get(string $url): ?stdClass
     {
-        if (isset($this->cache[$url])) {
+        if (array_key_exists($url, $this->cache)) {
             return $this->cache[$url];
         }
         
         $schema = $this->fetch($url);
-        $schema = $this->expandNestedSchemas($schema);
-
+        if ($schema !== null) {
+            $schema = $this->expandNestedSchemas($schema);
+        }
+        
         $this->cache[$url] = $schema;
 
         return $schema;
@@ -45,56 +64,26 @@ class Repository
      */
     protected function fetch(string $url): ?stdClass
     {
-        $path = $this->getLocalPath($url);
-        if (!file_exists($path)) {
-            return null;
+        if (!isset($this->loaders['file'])) {
+            throw new RuntimeException('Json schema file loader is not set');
         }
 
-        $content = file_get_contents($path);
-        if (!is_string($content)) {
-            trigger_error("Error obtaining schema from path: $path", E_USER_WARNING);
-            return null;
-        }
-
-        $schema = json_decode($content);
-        if ($schema === null) {
-            $error = json_last_error_msg();
-            if (strtolower($error) === 'no error') {
-                $error = "data: $content";
-            }
-
-            trigger_error("Invalid JSON Schema in path $path: $error", E_USER_WARNING);
-            return null;
-        }
+        $loader = $this->loaders['file'];
+        $path = $loader->toLocalPath($url);
+        $schema = isset($path) ? $loader->fetch($path) : null;
 
         return $schema;
-    }
-
-    /**
-     * Derive schema local path from schema url
-     *
-     * @param string $url
-     * @return string
-     */
-    protected function getLocalPath(string $url): ?string
-    {
-        if (!is_schema_link_valid($url)) {
-            return null;
-        }
-
-        $path = parse_url($url, PHP_URL_PATH);
-
-        return 'config/schemas' . $path;
     }
 
     /**
      * Resolve references to other schemas
      *
      * @param stdClass|array|null $data
-     * @return stdClass
+     * @return stdClass|array|null
      */
-    protected function expandNestedSchemas($data): ?stdClass
+    protected function expandNestedSchemas($data)
     {
+        $isObject = is_object($data);
         $data = (array)$data;
 
         foreach ($data as $key => $item) {
@@ -107,6 +96,10 @@ class Repository
             }
         }
 
-        return (object)$data;
+        if ($isObject) {
+            $data = (object)$data;
+        }
+
+        return $data;
     }
 }

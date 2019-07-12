@@ -11,8 +11,10 @@ use StateTransition;
 use Asset;
 use AssocEntitySet;
 use Jasny\DB\EntitySet;
+use Jasny\ValidationResult;
 use JsonSchema\Validator;
 use JsonSchema\Constraints\Constraint;
+use JsonSchema\Exception\ValidationException;
 
 /**
  * @covers JsonSchema\Validator\Wrapper
@@ -26,6 +28,8 @@ class WrapperTest extends \Codeception\Test\Unit
      */
     public function testInvoke()
     {
+        $validation = new ValidationResult();
+
         $validator = $this->createMock(Validator::class);
         $repository = $this->createMock(Repository::class);
         $scenario = $this->getScenario();
@@ -38,7 +42,10 @@ class WrapperTest extends \Codeception\Test\Unit
             ->with($expectedData, $schema, Constraint::CHECK_MODE_EXCEPTIONS);
 
         $validatorWrapper = new Wrapper($validator, $repository);
-        $validatorWrapper($scenario);
+        $result = $validatorWrapper($scenario, $validation);
+
+        $this->assertSame($result, $validation);
+        $this->assertEquals([], $result->getErrors());
     }
 
     /**
@@ -46,6 +53,8 @@ class WrapperTest extends \Codeception\Test\Unit
      */
     public function testInvokeNullSchema()
     {
+        $validation = new ValidationResult();
+
         $validator = $this->createMock(Validator::class);
         $repository = $this->createMock(Repository::class);
         $scenario = $this->getScenario();
@@ -55,7 +64,38 @@ class WrapperTest extends \Codeception\Test\Unit
         $validator->expects($this->never())->method('validate');
 
         $validatorWrapper = new Wrapper($validator, $repository);
-        $validatorWrapper($scenario);
+        $result = $validatorWrapper($scenario, $validation);
+
+        $this->assertSame($result, $validation);
+        $this->assertEquals([], $result->getErrors());
+    }
+
+    /**
+     * Test '__invoke' method, if validator throws an exception
+     */
+    public function testInvokeException()
+    {
+        $validation = new ValidationResult();
+
+        $validator = $this->createMock(Validator::class);
+        $repository = $this->createMock(Repository::class);
+        $scenario = $this->getScenario();
+        $expectedData = $this->getExpectedData();
+        $schema = (object)['foo' => 'bar'];
+
+        $repository->expects($this->once())->method('get')->with($scenario->schema)->willReturn($schema);
+        $validator->expects($this->once())->method('reset');
+        $validator->expects($this->once())->method('validate')
+            ->with($expectedData, $schema, Constraint::CHECK_MODE_EXCEPTIONS)
+            ->will($this->returnCallback(function() {
+                throw new ValidationException('Foo error message');
+            }));
+
+        $validatorWrapper = new Wrapper($validator, $repository);
+        $result = $validatorWrapper($scenario, $validation);
+
+        $this->assertSame($result, $validation);
+        $this->assertEquals(['Foo error message'], $result->getErrors());
     }
 
     /**

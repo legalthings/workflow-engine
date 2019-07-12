@@ -5,6 +5,8 @@ namespace JsonSchema\Validator;
 use Scenario;
 use JsonSchema\Validator;
 use JsonSchema\Constraints\Constraint;
+use JsonSchema\Exception\ValidationException;
+use Jasny\ValidationResult;
 
 /**
  * Validate json schemas of scenario
@@ -38,14 +40,23 @@ class Wrapper
      *
      * @param Scenario $scenario
      */
-    public function __invoke(Scenario $scenario): void
+    public function __invoke(Scenario $scenario, ValidationResult $validation): ValidationResult
     {
         $data = json_decode(json_encode($scenario));
         $schema = $this->repository->get($scenario->schema);
 
-        if ($schema !== null) {
-            $this->validator->reset();
-            $this->validator->validate($data, $schema, Constraint::CHECK_MODE_EXCEPTIONS);            
+        if ($schema === null) {
+            return $validation;
         }
+
+        $this->validator->reset();
+
+        try {
+            $this->validator->validate($data, $schema, Constraint::CHECK_MODE_EXCEPTIONS);            
+        } catch (ValidationException $e) {
+            $validation->addError($e->getMessage());
+        }
+
+        return $validation;
     }
 }

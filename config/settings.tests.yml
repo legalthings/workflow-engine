@@ -25,3 +25,5 @@ lto:
 
 event_chain:
   url: http://foo-event-chain-service/
+
+json_schema_path: tests/_data/json-schema

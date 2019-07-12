@@ -12,6 +12,21 @@ use JsonSchema\Constraints\Constraint;
 class FileSource
 {
     /**
+     * @var string
+     **/
+    protected $basePath;
+
+    /**
+     * Constructor
+     *
+     * @param string $basePath
+     */
+    public function __construct(string $basePath)
+    {
+        $this->basePath = $basePath;
+    }
+
+    /**
      * Fetch schema
      *
      * @param string $path
@@ -54,6 +69,6 @@ class FileSource
 
         $path = parse_url($url, PHP_URL_PATH);
 
-        return 'config/schemas' . $path;
+        return $this->basePath . $path;
     }
 }

@@ -12,3 +12,5 @@ db:
     database: lto_workflow
 
 event_chain: null
+
+json_schema_path: config/schemas

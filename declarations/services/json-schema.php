@@ -15,9 +15,10 @@ return [
 
         return new JsonSchemaValidator($validator, $repository);
     },
-    JsonSchemaRepository::class => static function() {
+    JsonSchemaRepository::class => static function(AutowireContainerInterface $container) {
+        $config = $container->get('config');
         $loaders = [
-            'file' => new FileSource()
+            'file' => new FileSource($config->json_schema_path)
         ];
 
         return new JsonSchemaRepository($loaders);

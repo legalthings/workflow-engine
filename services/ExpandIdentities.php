@@ -46,6 +46,10 @@ class ExpandIdentities
      */
     protected function expand($identity): ?Identity
     {
+        if (!isset($identity)) {
+            return null;
+        }
+
         if ($identity instanceof Identity && !$identity->isGhost()) {
             return $identity;
         }

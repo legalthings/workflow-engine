@@ -279,7 +279,7 @@ class Http extends AbstractTrigger
      */
     protected function getRequestOptions(array $headers, array $query, ?array $auth = [], $data = null): array
     {
-        $options = ['headers' => $headers, 'query' => $query, 'http_errors' => false];
+        $options = ['headers' => $headers, 'query' => $query];
         
         if ($auth !== null) {
             $options['auth'] = array_values(array_only($auth, ['username', 'password', 'type']));

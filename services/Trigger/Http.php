@@ -60,7 +60,12 @@ class Http extends AbstractTrigger
      * @var array|null
      */
     protected $auth;
-    
+
+    /**
+     * Additional data to use in request
+     * @var array|null
+     **/
+    protected $data;    
 
     /**
      * Http trigger constructor.
@@ -86,9 +91,8 @@ class Http extends AbstractTrigger
      */
     public function withConfig($settings, ContainerInterface $container)
     {
-        return $this->cloneConfigure($settings, ['url', 'method', 'query', 'headers', 'auth', 'projection']);
+        return $this->cloneConfigure($settings, ['url', 'method', 'query', 'headers', 'auth', 'projection', 'data']);
     }
-
 
     /**
      * Invoke for an action.
@@ -98,9 +102,14 @@ class Http extends AbstractTrigger
      */
     public function apply(\Action $action): ?\Response
     {
+        $info = $this->project($action);
+        if (isset($info->data) && isset($this->data)) {
+            $info->data = array_merge((array)$info->data, (array)$this->data);
+        }
+
         return isset($action->requests)
-            ? $this->sendConcurrentRequests($action, $this->project($action))
-            : $this->sendSingleRequest($action, $this->project($action));
+            ? $this->sendConcurrentRequests($action, $info)
+            : $this->sendSingleRequest($action, $info);
     }
     
     /**
@@ -270,7 +279,7 @@ class Http extends AbstractTrigger
      */
     protected function getRequestOptions(array $headers, array $query, ?array $auth = [], $data = null): array
     {
-        $options = ['headers' => $headers, 'query' => $query];
+        $options = ['headers' => $headers, 'query' => $query, 'http_errors' => false];
         
         if ($auth !== null) {
             $options['auth'] = array_values(array_only($auth, ['username', 'password', 'type']));

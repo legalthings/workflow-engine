@@ -675,6 +675,28 @@ db.getCollection("processes").insert([
             "key": ":success"
         }
     },
+    {
+        "_id": "8fd21874-c3f3-11e9-91e2-237252395578",
+        "schema": "https://specs.livecontracts.io/v0.2.0/process/schema.json#",
+        "title": "Basic system and user",
+        "scenario": "6uk7288s-afe4-7398-8dbh-7914ffd930pl",
+        "chain": "2c83KDmRCJwaKWky1jmtTRYmsgXAhmuDC8P12KpqqbrQKkY6UMECmKeZE5m8Rx",
+        "actors": [
+            {
+                "key": "user",
+                "title": "User",
+                "identity": "1237288f-8u6f-3edt-8d2d-4f4ffd938vk"
+            },
+            {
+                "key": "organization",
+                "title": "Organization",
+                "identity": "e8a1479e-d40f-4b54-a31d-15f39bdb00f5"
+            }
+        ],
+        "current": {
+            "key": ":success"
+        }
+    },
 ]);
 
 db.getCollection("identities").insert([
@@ -688,6 +710,7 @@ db.getCollection("identities").insert([
         "encryptkey" : "9fSos8krst114LtaYGHQPjC3h1CQEHUQWEkYdbykrhHv"
     },
     {
+        /* user */
         "_id": "e2d54eef-3748-4ceb-b723-23ff44a2512b",
         "signkeys": {
             "default": "AZeQurvj5mFHkPihiFa83nS2Fzxv3M75N7o9m5KQHUmo",
@@ -701,6 +724,7 @@ db.getCollection("identities").insert([
         }
     },
     {
+        /* organzation */
         "_id": "e8a1479e-d40f-4b54-a31d-15f39bdb00f5",
         "signkeys": {
             "system": "3UDCFY6MojrPKaayHgAEqrnp99JhviSAiraJX8J1fJ9E"

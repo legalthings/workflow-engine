@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Improved as i;
 use Jasny\DB\Entity;
@@ -59,14 +61,25 @@ class IdentityGateway implements Gateway
      * @param array     $sort
      * @param int|array $limit  Limit or [limit, offset]
      * @param array     $opts
-     * @return IdentitySet
+     * @return EntitySet
      */
-    public function fetchAll(array $filter = [], $sort = [], $limit = null, array $opts = []): IdentitySet
+    public function fetchAll(array $filter = [], $sort = [], $limit = null, array $opts = []): EntitySet
     {
-        /** @var EntitySet $set */
-        $set = Identity::fetchAll($filter, $sort, $limit, $opts);
+        return Identity::fetchAll($filter, $sort, $limit, $opts);
+    }
 
-        return $set;
+    /**
+     * Fetch all identities as data (no ORM).
+     *
+     * @param array     $filter
+     * @param array     $sort
+     * @param int|array $limit  Limit or [limit, offset]
+     * @param array     $opts
+     * @return array
+     */
+    public function fetchList(array $filter = [], $sort = [], $limit = null, array $opts = []): array
+    {
+        return Identity::fetchList($filter, $sort, $limit, $opts);
     }
 
     /**

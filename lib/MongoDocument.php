@@ -1,7 +1,9 @@
 <?php
 
+use Jasny\DB\Dataset\Sorted;
 use Jasny\DB\Mongo;
 use Jasny\DB\Entity\Enrichable;
+use Jasny\DB\Mongo\DB;
 use function Jasny\object_get_properties;
 
 /**
@@ -58,5 +60,50 @@ abstract class MongoDocument extends Mongo\Document implements Enrichable
         $data = parent::toData();
 
         return array_intersect_key($data, ['_id' => null] + object_get_properties($this, true));
+    }
+
+    /**
+     * Fetch all documents as data (no ORM).
+     *
+     * @param array     $filter
+     * @param array     $sort
+     * @param int|array $limit  Limit or [limit, offset]
+     * @param array     $opts
+     * @return array
+     */
+    public static function fetchList(array $filter = [], $sort = [], $limit = null, array $opts = []): array
+    {
+        $collection = static::getCollection();
+
+        // Sort
+        if (is_a(get_called_class(), Sorted::class, true)) {
+            $sort = (array)$sort + static::getDefaultSorting();
+        }
+
+        $sort = DB::sortToQuery($sort);
+
+        // Limit / skip
+        list($limit, $skip) = (array)$limit + [null, null];
+
+        // Find options
+        $findOpts = [];
+        if ($sort) {
+            $findOpts['sort'] = $sort;
+        }
+        if (isset($limit)) {
+            $findOpts['limit'] = $limit;
+        }
+        if (isset($skip)) {
+            $findOpts['skip'] = $skip;
+        }
+        if (isset($opts['fields'])) {
+            $findOpts['projection'] = array_fill_keys($opts['fields'], 1);
+        }
+
+        // Query
+        $query = static::filterToQuery($filter, $opts);
+        $cursor = $collection->find($query, $findOpts);
+
+        return $cursor->toArrayCast();
     }
 }

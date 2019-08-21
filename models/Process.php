@@ -377,4 +377,29 @@ class Process extends MongoDocument
 
         return $object;
     }
+
+    /**
+     * Convert a filter to a MongoDB query
+     *
+     * @param array $filter
+     * @param array $opts
+     * @return array
+     */
+    protected static function filterToQuery($filter, array $opts = [])
+    {
+        $query = [];
+
+        if (isset($filter['status']) && in_array($filter['status'], ['running', 'finished'])) {
+            $op = $filter['status'] === 'finished' ? '$in' : '$nin';
+            $query['current.key'] = [$op => self::getFinishedStates()];
+        }
+
+        if (isset($filter['actor']) && $filter['actor'] instanceof Identity) {
+            $query['actors'] = ['$elemMatch' => ['identity' => $filter['actor']->id]];
+        }
+
+        $query += parent::filterToQuery(array_without($filter, ['status', 'actor']));
+
+        return $query;
+    }
 }

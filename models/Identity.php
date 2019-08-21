@@ -80,7 +80,7 @@ class Identity extends MongoDocument implements Identifiable
     public static function fromAccount(Account $account): Identity
     {
         $identity = new Identity();
-        $identity->signkeys['system'] = $account->getPublicSignKey();
+        $identity->signkeys['system'] = $account->getPublicSignKey(); // TODO: This doesn't seem right. We don't know which key has been used
 
         return $identity;
     }

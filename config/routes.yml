@@ -6,6 +6,7 @@
 /scenarios +POST:                          { controller: scenario, action: add }
 /scenarios/* +GET:                         { controller: scenario, action: get, id: $2 }
 
+/processes +GET:                           { controller: process, action: list }
 /processes +POST:                          { controller: process, action: start }
 /processes/* +DELETE:                      { controller: process, action: delete, id: $2 }
 /processes/* +GET:                         { controller: process, action: get, id: $2 }

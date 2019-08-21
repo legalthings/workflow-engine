@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Jasny\ValidationException;
 
@@ -85,6 +87,22 @@ class ProcessController extends BaseController
         }
 
         $this->chain = $this->request->getAttribute('event-chain');
+    }
+
+    /**
+     * List processes (the current identity has a role in).
+     */
+    public function listAction(): void
+    {
+        $identity = Identity::fetch(['signkeys.default' => $this->account->getPublicSignKey()]);
+
+        if ($identity === null) {
+            $this->output([]);
+            return;
+        }
+
+        $processes = $this->processes->fetchList(['actor' => $identity]);
+        $this->output($processes);
     }
 
     /**

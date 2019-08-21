@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Scenario controller.
  *
@@ -24,6 +26,8 @@ class ScenarioController extends BaseController
 
     /**
      * Add a scenario
+     *
+     * @throws \Jasny\ValidationException
      */
     public function addAction()
     {
@@ -32,7 +36,8 @@ class ScenarioController extends BaseController
 
         $exists = isset($scenario->id) && $this->scenarios->exists($scenario->id);
         if ($exists) {
-            return $this->noContent();
+            $this->noContent();
+            return;
         }
 
         $this->scenarios->save($scenario);
@@ -43,6 +48,7 @@ class ScenarioController extends BaseController
      * Get a scenario.
      *
      * @param string $id  Scenario id
+     * @throws EntityNotFoundException
      */
     public function getAction(string $id)
     {

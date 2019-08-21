@@ -22,20 +22,4 @@ $I->signRequestAs('organization', 'POST', $path);
 $I->haveHttpHeader('Content-Type', 'application/json');
 $I->sendPOST($path, ['id' => '98kgh356-108e-fk69-8d2d-7914ffddf45h']);
 
-$I->seeResponseCodeIs(200);
-$I->seeResponseIsJson();
-
-$I->seeResponseContainsJson(['id' => $chain['id']]);
-$I->seeResponseChainEventsCount(2);
-
-$I->seeResponseChainEventHasBody(0, [
-    '$schema' => 'https://specs.livecontracts.io/v0.2.0/identity/schema.json#',
-    'key' => 'foo_identity',
-    'node' => 'localhost',
-    'signkeys' => [
-        'user' => 'foo',
-        'system' => 'bar',
-    ]
-]);
-
-$I->seeResponseChainEventContainsJson(1, ['action' => ['key' => 'step1']]);
+$I->seeResponseCodeIs(204);

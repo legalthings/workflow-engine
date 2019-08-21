@@ -47,6 +47,17 @@ interface Gateway
     public function fetchAll(array $filter = [], $sort = [], $limit = null, array $opts = []);
 
     /**
+     * Fetch all entities as data (no ORM).
+     *
+     * @param array     $filter
+     * @param array     $sort
+     * @param int|array $limit  Limit or [limit, offset]
+     * @param array     $opts
+     * @return array
+     */
+    public function fetchList(array $filter = [], $sort = [], $limit = null, array $opts = []): array;
+
+    /**
      * Count all entities in the collection
      *
      * @param array $filter

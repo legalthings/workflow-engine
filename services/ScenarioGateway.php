@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Improved as i;
 use Jasny\DB\Entity;
@@ -93,6 +95,20 @@ class ScenarioGateway implements Gateway
         }
 
         return $set;
+    }
+
+    /**
+     * Fetch all scenarios as data (no ORM).
+     *
+     * @param array     $filter
+     * @param array     $sort
+     * @param int|array $limit  Limit or [limit, offset]
+     * @param array     $opts
+     * @return array
+     */
+    public function fetchList(array $filter = [], $sort = [], $limit = null, array $opts = []): array
+    {
+        return Scenario::fetchList($filter, $sort, $limit, $opts);
     }
 
     /**

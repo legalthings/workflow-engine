@@ -8,6 +8,7 @@
 
 /processes +GET:                           { controller: process, action: list }
 /processes +POST:                          { controller: process, action: start }
+/processes +DELETE:                        { controller: process, action: reset }
 /processes/* +DELETE:                      { controller: process, action: delete, id: $2 }
 /processes/* +GET:                         { controller: process, action: get, id: $2 }
 /processes/*/invoke +POST:                 { controller: process, action: invoke, id: $2 }

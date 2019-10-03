@@ -607,8 +607,7 @@ class ScenarioTest extends \Codeception\Test\Unit
                     'height' => 10,
                     'width' => 15,
                 ]
-            ],
-            'meta' => (object)[],
+            ]
         ];
 
         return [
@@ -770,7 +769,6 @@ class ScenarioTest extends \Codeception\Test\Unit
                 ]
             ],
             'allow_actions' => ['bar'],
-            'meta' => [],
         ];
 
         $serialized = json_encode($scenario);
@@ -790,7 +788,6 @@ class ScenarioTest extends \Codeception\Test\Unit
             'assets' => [],
             'definitions' => [],
             'allow_actions' => [],
-            'meta' => [],
         ];
 
         $serialized = json_encode($this->scenario);

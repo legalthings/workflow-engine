@@ -39,13 +39,13 @@ class ProcessController extends BaseController
 
     /**
      * Account that signed the request.
-     * @var \LTO\Account
+     * @var LTO\Account
      */
     protected $account;
 
     /**
      * Account that signed the request.
-     * @var \LTO\EventChain|null
+     * @var LTO\EventChain|null
      */
     protected $chain;
 
@@ -58,25 +58,22 @@ class ProcessController extends BaseController
      * Class constructor for DI.
      */
     public function __construct(
+        LTO\Account $node,
         ProcessGateway $processes,
         ScenarioGateway $scenarios,
+        IdentityGateway $identities,
         ProcessInstantiator $instantiator,
         ProcessStepper $stepper,
         TriggerManager $triggerManager,
         JsonView $jsonView,
         EventChainRepository $chainRepository
     ) {
-        $this->processes = $processes;
-        $this->scenarios = $scenarios;
-        $this->instantiator = $instantiator;
-        $this->stepper = $stepper;
-        $this->triggerManager = $triggerManager;
-        $this->jsonView = $jsonView;
-        $this->chainRepository = $chainRepository;
+        object_init($this, get_defined_vars());
     }
 
     /**
      * Executed before each action.
+     * @throws AuthException
      */
     public function before()
     {
@@ -94,9 +91,9 @@ class ProcessController extends BaseController
      */
     public function listAction(): void
     {
-        $identity = Identity::fetch(['signkeys.default' => $this->account->getPublicSignKey()]);
-
-        if ($identity === null) {
+        try {
+            $identity = $this->identities->fetch(['signkeys.default' => $this->account->getPublicSignKey()]);
+        } catch (EntityNotFoundException $exception) {
             $this->output([]);
             return;
         }
@@ -107,6 +104,9 @@ class ProcessController extends BaseController
 
     /**
      * Start a new process
+     * @throws AuthException
+     * @throws ValidationException
+     * @throws EntityNotFoundException
      */
     public function startAction(): void
     {
@@ -126,6 +126,8 @@ class ProcessController extends BaseController
      * Get a process
      *
      * @param string $id  Process id
+     * @throws AuthException
+     * @throws EntityNotFoundException
      */
     public function getAction(?string $id = null): void
     {
@@ -137,6 +139,9 @@ class ProcessController extends BaseController
 
     /**
      * Handle a new response.
+     * @throws AuthException
+     * @throws ValidationException
+     * @throws EntityNotFoundException
      */
     public function handleResponseAction(?string $id = null): void
     {
@@ -156,14 +161,17 @@ class ProcessController extends BaseController
     /**
      * Invoke the triggers for the default action in a state.
      *
-     * @param string $id  Process id
+     * @param string $id Process id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @throws AuthException
      */
     public function invokeAction(string $id): void
     {
         $process = $this->getProcessFromInput($id);
         $this->authzForAccount($process);
 
-        $actor = $this->getActorForAccount($process);
+        $actor = $this->getActorForAccount();
         $response = $this->triggerManager->invoke($process, null, $actor);
 
         if ($response !== null) {
@@ -202,6 +210,9 @@ class ProcessController extends BaseController
      * Delete process
      *
      * @param string $id
+     * @throws AuthException
+     * @throws ValidationException
+     * @throws EntityNotFoundException
      */
     public function deleteAction(string $id): void
     {
@@ -216,6 +227,8 @@ class ProcessController extends BaseController
      * Get the scenario id from the posted data and fetch the scenario.
      *
      * @return Scenario
+     * @throws ValidationException
+     * @throws EntityNotFoundException
      */
     protected function getScenarioFromInput(): Scenario
     {
@@ -234,6 +247,8 @@ class ProcessController extends BaseController
      *
      * @param string|null $idFromPath
      * @return Process
+     * @throws ValidationException
+     * @throws EntityNotFoundException
      */
     protected function getProcessFromInput(?string $dir): Process
     {
@@ -257,14 +272,23 @@ class ProcessController extends BaseController
      * Check if the account that signed request is an actor in the process.
      *
      * @param Process $process
+     * @throws AuthException
      */
     protected function authzForAccount(Process $process): void
     {
         $actor = $this->getActorForAccount();
 
-        if (!$process->hasActor($actor) && $process->hasKnownActors()) {
+        // Existing process
+        if ($process->hasActor($actor)) {
+            return;
+        }
+
+        if ($process->hasKnownActors()) {
             throw new AuthException("Process doesn't have " . $actor->describe());
         }
+
+        // New process
+        $this->authz(Identity::AUTHZ_USER, "Signing identity isn't allowed to create a process");
     }
 
     /**

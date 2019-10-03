@@ -12,9 +12,10 @@ $data = [
         'system' => 'FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y',
     ],
     'encryptkey' => 'CLpT61PqmYNpPH5CpJQnYKLpq4kaegjPSG4vY9rGtfm3',
+    'authz' => 'participant'
 ];
 
-
+$I->am('organization');
 $I->haveHttpHeader('Content-Type', 'application/json');
 $I->sendPOST('/identities', $data);
 

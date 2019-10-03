@@ -1,6 +1,7 @@
 <?php
 
 $I = new ApiTester($scenario);
+$I->am('organization');
 $I->wantTo('add a scenario');
 
 $scenario = [

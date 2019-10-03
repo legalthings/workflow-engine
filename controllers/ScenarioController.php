@@ -16,12 +16,29 @@ class ScenarioController extends BaseController
     protected $scenarios;
 
     /**
+     * ScenarioController constructor for DI.
+     *
+     * @param LTO\Account $account
      * @param ScenarioGateway $scenarios
+     * @param IdentityGateway $identities
+     * @param JsonView $jsonView
      */
-    public function __construct(ScenarioGateway $scenarios, JsonView $jsonView)
+    public function __construct(
+        LTO\Account $node,
+        ScenarioGateway $scenarios,
+        IdentityGateway $identities,
+        JsonView $jsonView
+    ) {
+        object_init($this, get_defined_vars());
+    }
+
+    /**
+     * Executed before each action.
+     * @throws AuthException
+     */
+    public function before()
     {
-        $this->scenarios = $scenarios;
-        $this->jsonView = $jsonView;
+        $this->authz(Identity::AUTHZ_USER, "Signing identity isn't allowed to manage scenarios");
     }
 
     /**

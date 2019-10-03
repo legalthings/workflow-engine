@@ -79,12 +79,6 @@ class Process extends MongoDocument
     public $definitions = [];
 
     /**
-     * Meta information. Can be specified by each node and isn't shared.
-     * @var Meta
-     */
-    public $meta = [];
-
-    /**
      * @var \Jasny\EventDispatcher\EventDispatcher
      * {@internal FQCN instead of only the class name, because of issue with TypeCast}}
      */

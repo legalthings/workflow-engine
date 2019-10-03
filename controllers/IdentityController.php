@@ -8,38 +8,37 @@ declare(strict_types=1);
 class IdentityController extends BaseController
 {
     /**
-     * @var IdentityGateway
-     */
-    protected $identities;
-
-    /**
+     * @param LTO\Account     $node
      * @param IdentityGateway $identities
      */
-    public function __construct(IdentityGateway $identities)
+    public function __construct(LTO\Account $node, IdentityGateway $identities)
     {
-        $this->identities = $identities;
+        object_init($this, get_defined_vars());
+    }
+
+    /**
+     * Executed before each action.
+     *
+     * @throws AuthException
+     */
+    public function before()
+    {
+        $this->authz(Identity::AUTHZ_ADMIN, "Signing identity isn't allowed to manage identities");
     }
 
     /**
      * Add or update identity
+     * @throws Jasny\ValidationException
      */
     public function putAction(): void
     {
-        $data = $this->getInput();
-        $identity = $this->identities->create()->setValues($data);
+        $input = $this->getInput();
+        $identity = $this->identities->create();
 
-        try {
-            $existing = $this->identities->fetch($data['id']);       
-        } catch (EntityNotFoundException $e) {
-            $existing = null;
-        };
-
-        if (isset($existing)) {
-            $identity = $existing->setValues($identity->getValues());
-        }
-
+        $identity->setValues($input);
         $identity->validate()->mustSucceed();
-        $this->identities->save($identity);
+
+        $this->identities->save($identity, ['existing' => 'replace']);
 
         $this->output($identity);
     }
@@ -47,7 +46,8 @@ class IdentityController extends BaseController
     /**
      * Get an identity.
      *
-     * @param string $id  Identity id
+     * @param string $id Identity id
+     * @throws EntityNotFoundException
      */
     public function getAction(string $id): void
     {
@@ -60,6 +60,7 @@ class IdentityController extends BaseController
      * Delete identity
      *
      * @param string $id
+     * @throws EntityNotFoundException
      */
     public function deleteAction(string $id): void
     {

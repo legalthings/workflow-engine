@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Jasny\DB\Entity\Identifiable;
 use LTO\Account;
@@ -7,7 +9,11 @@ use LTO\Account;
  * Identity entity
  */
 class Identity extends MongoDocument implements Identifiable
-{    
+{
+    public const AUTHZ_PARTICIPANT = 0;
+    public const AUTHZ_USER = 1;
+    public const AUTHZ_ADMIN = 10;
+
     /**
      * Unique identifier
      * @var string
@@ -34,7 +40,14 @@ class Identity extends MongoDocument implements Identifiable
      * @var string
      */
     public $encryptkey;
-    
+
+    /**
+     * Authorization level.
+     * @var int
+     */
+    public $authz = self::AUTHZ_USER;
+
+
     /**
      * Get id property
      *
@@ -56,6 +69,25 @@ class Identity extends MongoDocument implements Identifiable
             ($this->id !== null ? "identity '{$this->id}'" : null) ??
             ($this->signkeys !== null ? "signkey '" . reset($this->signkeys) . "'" : null) ??
             'unknown identity';
+    }
+
+    /**
+     * Set the values of the Identity
+     *
+     * @param array|object $values
+     * @return $this
+     */
+    public function setValues($values)
+    {
+        $values = (array)$values;
+
+        if (isset($values['authz']) && is_string($values['authz'])) {
+            $values['authz'] = value_from_const(__CLASS__ . '::AUTHZ_%s', $values['authz']);
+        }
+
+        parent::setValues($values);
+
+        return $this;
     }
 
     /**
@@ -83,5 +115,24 @@ class Identity extends MongoDocument implements Identifiable
         $identity->signkeys['system'] = $account->getPublicSignKey(); // TODO: This doesn't seem right. We don't know which key has been used
 
         return $identity;
+    }
+
+    /**
+     * @return object
+     */
+    public function jsonSerialize()
+    {
+        $object = parent::jsonSerialize();
+        $object->authz = [0 => 'participant', 1 => 'user', 10 => 'admin'][$object->authz];
+
+        return $object;
+    }
+
+    /**
+     * @internal
+     */
+    public function replaceExisting(): void
+    {
+        $this->markAsPersisted();
     }
 }

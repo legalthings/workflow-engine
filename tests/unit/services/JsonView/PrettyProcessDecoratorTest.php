@@ -124,7 +124,6 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
             'title' => 'Basic system and user',
             'assets' => (object)[],
             'definitions' => (object)[],
-            'meta' => (object)[]
         ];
 
         $process->actors = [
@@ -136,8 +135,9 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
                     'id' => 'e2d54eef-3748-4ceb-b723-23ff44a2512b',
                     'signkeys' => (object)[
                         'default' => 'AZeQurvj5mFHkPihiFa83nS2Fzxv3M75N7o9m5KQHUmo',
-                        'system' => 'C47Qse1VRCGnn978WB1kqvkcsd1oG8p9SfJXUbwVZ9vV'
-                    ]
+                        'system' => 'C47Qse1VRCGnn978WB1kqvkcsd1oG8p9SfJXUbwVZ9vV',
+                    ],
+                    'authz' => 'user',
                 ]
             ],
             'organization' => (object)[
@@ -147,8 +147,9 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
                 'identity' => (object)[
                     'id' => '6uk7288s-afe4-7398-8dbh-7914ffd930pl',
                     'signkeys' => (object)[
-                        'default' => '57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn'
-                    ]
+                        'default' => '57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn',
+                    ],
+                    'authz' => 'admin',
                 ]
             ]
         ];
@@ -182,7 +183,8 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
                         'id' => '6uk7288s-afe4-7398-8dbh-7914ffd930pl',
                         'signkeys' => (object)[
                             'default' => '57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn'
-                        ]
+                        ],
+                        'authz' => 'admin',
                     ]
                 ]
             ]
@@ -200,7 +202,8 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
                     'id' => '6uk7288s-afe4-7398-8dbh-7914ffd930pl',
                     'signkeys' => (object)[
                         'default' => '57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn'
-                    ]
+                    ],
+                    'authz' => 'admin',
                 ]
             ],
             'actions' => [

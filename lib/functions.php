@@ -79,6 +79,38 @@ function object_copy_properties($from, $to)
 }
 
 /**
+ * Set the properties (including protected and private) of an object.
+ * This should only be called by the object itself.
+ *
+ * @param object $object
+ * @param array  $values
+ */
+function object_init($object, array $values): void
+{
+    $init = function ($values) {
+        foreach ($values as $prop => $value) {
+            $this->{$prop} = $value;
+        }
+    };
+
+    $init->call($object, $values);
+}
+
+/**
+ * Get the value from a constant based on the (partial) constant name.
+ *
+ * @param string $format
+ * @param mixed  $value
+ * @return mixed
+ */
+function value_from_const(string $format, $value)
+{
+    $const = sprintf($format, strtoupper($value));
+
+    return defined($const) ? constant($const) : $value;
+}
+
+/**
  * Keep only specified properties in stdClass object
  * @param  stdClass $object
  * @param  array    $with

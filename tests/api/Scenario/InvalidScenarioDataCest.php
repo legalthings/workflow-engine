@@ -87,6 +87,7 @@ class InvalidScenarioDataCest
      */
     protected function test(ApiTester $I, $message, $code = 500)
     {
+        $I->am('organization');
         $I->haveHttpHeader('Content-Type', 'application/json');
         $I->sendPOST('/scenarios', $this->data);
 

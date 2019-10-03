@@ -15,7 +15,8 @@ class DefaultController extends BaseController
     protected $app;
 
     /**
-     * @var string  application environment
+     * Application environment
+     * @var string
      */
     protected $env;
 

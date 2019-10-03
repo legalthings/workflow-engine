@@ -701,13 +701,15 @@ db.getCollection("processes").insert([
 
 db.getCollection("identities").insert([
     {
+        /* organization */
         "_id": "1237288f-8u6f-3edt-8d2d-4f4ffd938vk",
         "node" : "amqps://localhost",
         "signkeys" : {
-            "user" : "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn",
-            "system" : "FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y"
+            "default": "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn",
+            "system": "FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y"
         },
-        "encryptkey" : "9fSos8krst114LtaYGHQPjC3h1CQEHUQWEkYdbykrhHv"
+        "encryptkey" : "9fSos8krst114LtaYGHQPjC3h1CQEHUQWEkYdbykrhHv",
+        "authz": 10
     },
     {
         /* user */
@@ -716,18 +718,30 @@ db.getCollection("identities").insert([
             "default": "AZeQurvj5mFHkPihiFa83nS2Fzxv3M75N7o9m5KQHUmo",
             "system": "C47Qse1VRCGnn978WB1kqvkcsd1oG8p9SfJXUbwVZ9vV"
         }
+        /* authz not set */
     },
     {
+        /* organization */
         "_id": "6uk7288s-afe4-7398-8dbh-7914ffd930pl",
         "signkeys": {
             "default": "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn"
-        }
+        },
+        "authz": 1
     },
     {
-        /* organzation */
+        /* node */
         "_id": "e8a1479e-d40f-4b54-a31d-15f39bdb00f5",
         "signkeys": {
             "system": "3UDCFY6MojrPKaayHgAEqrnp99JhviSAiraJX8J1fJ9E"
-        }
+        },
+        "authz": 10
+    },
+    {
+        /* participant */
+        "_id": "14134336-e5e8-11e9-b414-778e97bfed1a",
+        "signkeys": {
+            "default": "AWDABMBzKd2oGoL8sxGxGGvL28dNzSibVkira6CHpuTX"
+        },
+        "authz": 0
     }
 ]);

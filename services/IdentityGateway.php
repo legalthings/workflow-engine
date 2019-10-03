@@ -29,9 +29,9 @@ class IdentityGateway implements Gateway
      *
      * @param string|array $id  ID or filter
      * @param array        $opts
-     * @return Identity|null
+     * @return Identity
      */
-    public function fetch($id, array $opts = []): ?Identity
+    public function fetch($id, array $opts = []): Identity
     {
         $identity = Identity::fetch($id, $opts);
 
@@ -40,6 +40,20 @@ class IdentityGateway implements Gateway
         }
 
         return $identity;
+    }
+
+    /**
+     * Fetch an identity or create a new one if it can't be found.
+     *
+     * @param string|array $id  ID or filter
+     * @param array        $opts
+     * @return Identity
+     */
+    public function fetchOrCreate($id, array $opts = []): Identity
+    {
+        $identity = $id !== null ? Identity::fetch($id, $opts) : null;
+
+        return $identity ?? $this->create()->setValues(['id' => $id]);
     }
 
     /**
@@ -104,6 +118,10 @@ class IdentityGateway implements Gateway
     public function save(Entity $entity, array $opts = []): void
     {
         i\type_check($entity, Identity::class);
+
+        if (($opts['existing'] ?? null) === 'replace') {
+            $entity->replaceExisting();
+        }
 
         $entity->save($opts);
     }

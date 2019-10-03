@@ -127,7 +127,7 @@ class Flow extends \Codeception\Module
     protected function createIdentityGatewayMock()
     {
         return new class() extends IdentityGateway {
-            public function fetch($id, array $opts = []): ?Identity
+            public function fetch($id, array $opts = []): Identity
             {
                 return (new Identity)->setValues(['id' => $id]);
             }

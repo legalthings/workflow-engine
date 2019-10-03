@@ -1,60 +1,56 @@
-<?php declare(strict_types=1);
+<?php
 
+declare(strict_types=1);
+
+use Jasny\DB\Mongo\DB;
+use Jasny\DB\Mongo\Collection;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Riverline\MultiPartParser\StreamedPart;
 
 /**
- * Class for logging single http request and it's response
+ * Log http requests to the database.
  */
-class HttpRequestLog extends MongoDocument
+class HttpRequestLogger
 {
-    /**
-     * @var array 
-     **/
-    public $request;
+    /** @var Collection */
+    protected $collection;
 
     /**
-     * @var array
-     **/
-    public $response;
+     * HttpLogGateway constructor.
+     *
+     * @param DB $db
+     */
+    public function __construct(DB $db)
+    {
+        $this->collection = $db->selectCollection('http_request_logs');
+    }
 
     /**
-     * Create instance
+     * Log request and response
      *
      * @param RequestInterface $request
-     * @param ResponseInterface $response 
+     * @param ResponseInterface $response
      */
-    public function __construct(RequestInterface $request, ResponseInterface $response = null)
+    public function log(RequestInterface $request, ResponseInterface $response)
     {
-        $this->request = $request;
-        $this->response = $response;
+        $data = [
+            'request' => [
+                'uri' => (string)$request->getUri(),
+                'method' => $request->getMethod(),
+                'headers' => $request->getHeaders(),
+                'body' => $this->formatBody($request)
+            ],
+            'response' => [
+                'status' => $response->getStatusCode(),
+                'headers' => $response->getHeaders(),
+                'body' => $this->formatBody($response)
+            ]
+        ];
 
-        $this->cast();
+        $this->collection->save($data, ['w' => 0]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function cast()
-    {
-        if ($this->request instanceof RequestInterface) {
-            $this->request = [
-                'uri' => (string)$this->request->getUri(),
-                'method' => $this->request->getMethod(),
-                'headers' => $this->request->getHeaders(),
-                'body' => $this->formatBody($this->request)
-            ];
-        }
-
-        if ($this->response instanceof ResponseInterface) {
-            $this->response = [
-                'status' => $this->response->getStatusCode(),
-                'headers' => $this->response->getHeaders(),
-                'body' => $this->formatBody($this->response)
-            ];
-        }
-    }
 
     /**
      * Format body of request or response
@@ -63,7 +59,7 @@ class HttpRequestLog extends MongoDocument
      * @return array|string
      */
     protected function formatBody($message)
-    {        
+    {
         $body = (string)$message->getBody();
         $contentType = $message->getHeaderLine('Content-Type');
 
@@ -71,13 +67,12 @@ class HttpRequestLog extends MongoDocument
         preg_match($regexp, $contentType, $match);
 
         switch ($match[1] ?? null) {
-            case 'application/json': 
+            case 'application/json':
                 return json_decode($body, true);
-            case 'application/x-www-form-urlencoded': 
+            case 'application/x-www-form-urlencoded':
                 parse_str($body, $values);
-
                 return $values;
-            case 'multipart/form-data': 
+            case 'multipart/form-data':
                 $body = $this->normalizeMultipartBody($body);
                 return $this->parseMultipartBody($body);
         }
@@ -125,16 +120,9 @@ class HttpRequestLog extends MongoDocument
         $parts = $document->getParts();
 
         foreach ($parts as $part) {
-            $name = $part->getName();
-            $value = $part->getBody();
-            $headers = $part->getHeaders();
-
-            $result[$name] = [
-                'value' => $value,
-                'headers' => $headers
-            ];
+            $result[$part->getName()] = $part->getBody();
         }
 
         return $result;
-     }
+    }
 }

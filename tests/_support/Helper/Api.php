@@ -28,7 +28,17 @@ class Api extends \Codeception\Module
     {
         return $this->getModule('\Jasny\Codeception\Module');
     }
-    
+
+    protected function grabPrivateKey(string $role): string
+    {
+        if (!isset($this->privateKeys[$role])) {
+            throw new \InvalidArgumentException("Role '$role' is not defined");
+        }
+
+        return $this->privateKeys[$role];
+    }
+
+
     public function signRequest(string $method, string $path)
     {
         $account = $this->getJasnyModule()->container->get(\LTO\Account::class);
@@ -41,11 +51,7 @@ class Api extends \Codeception\Module
 
     public function signRequestAs(string $role, string $method, string $path)
     {
-        if (!isset($this->privateKeys[$role])) {
-            throw new \InvalidArgumentException("Role '$role' is not defined");
-        }
-
-        $privateKey = $this->privateKeys[$role];
+        $privateKey = $this->grabPrivateKey($role);
 
         $accountFactory = $this->getJasnyModule()->container->get(\LTO\AccountFactory::class);
         $account = $accountFactory->create($privateKey, 'base58');
@@ -97,11 +103,7 @@ class Api extends \Codeception\Module
      */
     public function amSignatureAuthenticatedAs(string $role)
     {
-        if (!isset($this->privateKeys[$role])) {
-            throw new \InvalidArgumentException("Role '$role' is not defined");
-        }
-
-        $privateKey = $this->privateKeys[$role];
+        $privateKey = $this->grabPrivateKey($role);
 
         $module = $this->getJasnyModule();
 

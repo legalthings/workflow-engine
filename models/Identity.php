@@ -22,9 +22,8 @@ class Identity extends MongoDocument implements Identifiable
     public $id;
     
     /**
-     * Live contracts node the identity is using
-     * @var string
-     * @required
+     * LTO Network node the identity is using
+     * @var string|null
      */
     public $node;
 

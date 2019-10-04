@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  mongo:
+    image: "mongo:3"
+    ports:
+      - 27747:27017
+    networks:
+      - lto
+
+  legalflow:
+    image: legalthings/nginx
+    environment:
+      - PHP_HOST=legalflow-fpm
+    ports:
+      - 3000:80
+    networks:
+      - lto
+    depends_on:
+      - legalflow-fpm
+
+  legalflow-fpm:
+    build: .
+    environment:
+      - APPLICATION_ENV=docker.dev
+    networks:
+      - lto
+    depends_on:
+      - mongo
+
+networks:
+  lto:
+    driver: bridge

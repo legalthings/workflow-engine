@@ -23,6 +23,8 @@ services:
     build: .
     environment:
       - APPLICATION_ENV=docker.dev
+    volumes:
+      - .:/app
     networks:
       - lto
     depends_on:

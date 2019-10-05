@@ -13,7 +13,7 @@ $I->seeResponseCodeIs(200);
 $I->seeResponseContainsJson(['id' => $id]);
 
 $I->sendDELETE('/processes/' . $id);
-$I->seeResponseCodeIs(200);
+$I->seeResponseCodeIs(204);
 
 $I->sendGET('/processes/' . $id);
 $I->seeResponseCodeIs(404);

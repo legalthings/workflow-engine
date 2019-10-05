@@ -4,7 +4,6 @@ $I = new ApiTester($scenario);
 $I->wantTo('list all processes');
 
 $I->signRequestAs('user', 'GET', '/processes');
-
 $I->sendGET('/processes/');
 
 $I->seeResponseIsJson();

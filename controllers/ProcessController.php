@@ -8,10 +8,15 @@ use Jasny\ValidationException;
  * Process controller.
  *
  * `NotFoundMiddleware` and `ValidationMiddleware` are responsible for giving 40x responses for exceptions thrown by
- * the model related services.
+ *   the model related services.
  */
 class ProcessController extends BaseController
 {
+    /**
+     * @var bool
+     */
+    protected $allowFullReset;
+
     /**
      * @var ProcessGateway
      */
@@ -56,8 +61,11 @@ class ProcessController extends BaseController
 
     /**
      * Class constructor for DI.
+     *
+     * @param bool|mixed $allowFullReset  "allow_full_reset"
      */
     public function __construct(
+        $allowFullReset,
         LTO\Account $node,
         ProcessGateway $processes,
         ScenarioGateway $scenarios,
@@ -68,6 +76,7 @@ class ProcessController extends BaseController
         JsonView $jsonView,
         EventChainRepository $chainRepository
     ) {
+        $allowFullReset = (bool)$allowFullReset;
         object_init($this, get_defined_vars());
     }
 
@@ -104,6 +113,7 @@ class ProcessController extends BaseController
 
     /**
      * Start a new process
+     *
      * @throws AuthException
      * @throws ValidationException
      * @throws EntityNotFoundException
@@ -125,7 +135,6 @@ class ProcessController extends BaseController
     /**
      * Get a process
      *
-     * @param string $id  Process id
      * @throws AuthException
      * @throws EntityNotFoundException
      */
@@ -139,6 +148,7 @@ class ProcessController extends BaseController
 
     /**
      * Handle a new response.
+     *
      * @throws AuthException
      * @throws ValidationException
      * @throws EntityNotFoundException
@@ -161,7 +171,6 @@ class ProcessController extends BaseController
     /**
      * Invoke the triggers for the default action in a state.
      *
-     * @param string $id Process id
      * @throws ValidationException
      * @throws EntityNotFoundException
      * @throws AuthException
@@ -185,7 +194,6 @@ class ProcessController extends BaseController
      * Persist new events.
      * Output the events for the current chain.
      *
-     * @param string|null $chainId
      * @throws RuntimeException if event chain uri is not configured and changes are made for other chains.
      */
     protected function persistNewEvents(?string $chainId = null): void
@@ -209,7 +217,6 @@ class ProcessController extends BaseController
     /**
      * Delete process
      *
-     * @param string $id
      * @throws AuthException
      * @throws ValidationException
      * @throws EntityNotFoundException
@@ -220,13 +227,34 @@ class ProcessController extends BaseController
         $this->authzForAccount($process);
 
         $this->processes->delete($process);
+
+        $this->noContent();
+    }
+
+    /**
+     * Reset all chains.
+     */
+    public function resetAction(): void
+    {
+        $identity = Identity::fetch(['signkeys.default' => $this->account->getPublicSignKey()]);
+
+        if ($identity === null) {
+            $this->output([]);
+            return;
+        }
+
+        $processes = $this->processes->fetchList(['actor' => $identity]);
+        foreach ($processes as $process) {
+            $this->processes->delete($process);
+        }
+
+        $this->noContent();
     }
 
 
     /**
      * Get the scenario id from the posted data and fetch the scenario.
      *
-     * @return Scenario
      * @throws ValidationException
      * @throws EntityNotFoundException
      */
@@ -245,8 +273,6 @@ class ProcessController extends BaseController
     /**
      * Get the process id from the posted data and fetch the process.
      *
-     * @param string|null $idFromPath
-     * @return Process
      * @throws ValidationException
      * @throws EntityNotFoundException
      */
@@ -271,7 +297,6 @@ class ProcessController extends BaseController
     /**
      * Check if the account that signed request is an actor in the process.
      *
-     * @param Process $process
      * @throws AuthException
      */
     protected function authzForAccount(Process $process): void
@@ -293,8 +318,6 @@ class ProcessController extends BaseController
 
     /**
      * Get actor from id or public sign key from the HTTP request.
-     *
-     * @return Actor
      */
     protected function getActorForAccount(): Actor
     {

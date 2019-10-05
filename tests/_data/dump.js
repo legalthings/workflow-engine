@@ -498,17 +498,6 @@ db.getCollection("processes").insert([
                 "identity": "6uk7288s-afe4-7398-8dbh-7914ffd930pl"
             }
         ],
-        "definitions": [
-            {
-                "schema": "https://specs.livecontracts.io/v0.2.0/asset/schema.json#",
-                "key": "foo_identity",
-                "node": "localhost",
-                "signkeys" : {
-                    "user" : "foo",
-                    "system" : "bar"
-                }
-            }
-        ],
         "current": {
             "key": "initial",
             "actions": [
@@ -518,14 +507,11 @@ db.getCollection("processes").insert([
                     "key": "step1",
                     "body": {
                         "\\u0024schema": "https://specs.livecontracts.io/v0.2.0/identity/schema.json#",
-                        "key": {
-                            "<ref>": "definitions.foo_identity.key"
-                        },
-                        "node": {
-                            "<ref>": "definitions.foo_identity.node"
-                        },
+                        "key": "foo_identity",
+                        "node": "localhost",
                         "signkeys": {
-                            "<ref>": "definitions.foo_identity.signkeys"
+                            "user" : "foo",
+                            "system" : "bar"
                         }
                     },
                     "responses": {
@@ -571,27 +557,6 @@ db.getCollection("processes").insert([
                 "identity": "6uk7288s-afe4-7398-8dbh-7914ffd930pl"
             }
         ],
-        "definitions": [
-            {
-                "schema": "https://specs.livecontracts.io/v0.2.0/asset/schema.json#",
-                "key": "foo_identity",
-                "node": "localhost",
-                "signkeys" : {
-                    "user" : "foo",
-                    "system" : "bar"
-                }
-            },
-            {
-                "schema": "https://specs.livecontracts.io/v0.2.0/asset/schema.json#",
-                "key": "bar_identity",
-                "node": "localhost",
-                "signkeys" : {
-                    "user" : "foo_bar",
-                    "system" : "bar_baz"
-                },
-                "encryptkey": "zoo"
-            }
-        ],
         "current": {
             "key": "initial",
             "actions": [
@@ -602,30 +567,22 @@ db.getCollection("processes").insert([
                     "body": [
                         {
                             "\\u0024schema": "https://specs.livecontracts.io/v0.2.0/identity/schema.json#",
-                            "key": {
-                                "<ref>": "definitions.foo_identity.key"
-                            },
-                            "node": {
-                                "<ref>": "definitions.foo_identity.node"
-                            },
+                            "key": "foo_identity",
+                            "node": "localhost",
                             "signkeys": {
-                                "<ref>": "definitions.foo_identity.signkeys"
+                                "user" : "foo",
+                                "system" : "bar"
                             }
                         },
                         {
                             "\\u0024schema": "https://specs.livecontracts.io/v0.2.0/identity/schema.json#",
-                            "key": {
-                                "<ref>": "definitions.bar_identity.key"
-                            },
-                            "node": {
-                                "<ref>": "definitions.bar_identity.node"
-                            },
+                            "key": "bar_identity",
+                            "node": "localhost",
                             "signkeys": {
-                                "<ref>": "definitions.bar_identity.signkeys"
+                                "user" : "foo_bar",
+                                "system" : "bar_baz"
                             },
-                            "encryptkey": {
-                                "<ref>": "definitions.bar_identity.encryptkey"
-                            }
+                            "encryptkey": "zoo"
                         }
                     ],
                     "responses": {

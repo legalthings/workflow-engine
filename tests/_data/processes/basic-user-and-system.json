@@ -23,7 +23,7 @@
                 "signkeys": {
                     "default": "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn"
                 },
-                "authz": "user"
+                "authz": "admin"
             }
         }
     },

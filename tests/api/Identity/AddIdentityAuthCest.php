@@ -2,15 +2,11 @@
 
 class AddIdentityAuthCest
 {
-    /**
-     * @var string
-     */
     protected $identity = [
-        'id' => 'e2d54eef-3748-4ceb-b723-23ff44a2512b',
+        'id' => 'da7cd9f6-e7a5-11e9-a143-d366c360f563',
         'signkeys' => [
             'default' => '5LucyTBFqSeg8qg4e33uuLY93RZqSQZjmrtsUydUNYgg'
-        ],
-        'authz' => 'participant',
+        ]
     ];
 
     public function withoutSignature(\ApiTester $I)
@@ -36,9 +32,10 @@ class AddIdentityAuthCest
     protected function underPrivilegedProvider()
     {
         return [
-            ['role' => 'participant'],
-            ['role' => 'user'],
-            ['role' => 'stranger'],
+            ['role' => 'participant', 'authz' => 'participant'],
+            ['role' => 'stranger', 'authz' => 'participant'],
+            ['role' => 'user', 'authz' => 'user'],
+            ['role' => 'user', 'authz' => 'admin'],
         ];
     }
 
@@ -50,17 +47,31 @@ class AddIdentityAuthCest
         $I->expect("the identity isn't returned if signed by {$example['role']}");
 
         $I->signRequestAs($example['role'], 'POST', '/identities');
-        $I->sendPOST('/identities', $this->identity);
+        $I->sendPOST('/identities', $this->identity + ['authz' => $example['authz']]);
 
         $I->seeResponseCodeIs(403);
     }
 
-    public function signedAsAdmin(\ApiTester $I)
-    {
-        $I->expect("the identity is returned if signed by organization");
 
-        $I->signRequestAs('organization', 'POST', '/identities');
-        $I->sendPOST('/identities', $this->identity);
+    protected function privilegedProvider()
+    {
+        return [
+            ['role' => 'user', 'authz' => 'participant'],
+            ['role' => 'organization', 'authz' => 'participant'],
+            ['role' => 'organization', 'authz' => 'user'],
+            ['role' => 'organization', 'authz' => 'admin'],
+        ];
+    }
+
+    /**
+     * @dataProvider privilegedProvider
+     */
+    public function signedAsPrivileged(\ApiTester $I, \Codeception\Example $example)
+    {
+        $I->expect("the identity is returned if signed by {$example['role']}");
+
+        $I->signRequestAs($example['role'], 'POST', '/identities');
+        $I->sendPOST('/identities', $this->identity + ['authz' => $example['authz']]);
 
         $I->seeResponseCodeIs(200);
         $I->seeResponseIsJson();

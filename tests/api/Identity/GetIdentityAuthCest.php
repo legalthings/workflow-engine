@@ -21,7 +21,6 @@ class GetIdentityAuthCest
         $I->expect('the identity is returned when supplying signature auth');
 
         $I->signRequest('GET', '/identities/' . $this->identityId);
-
         $I->sendGET('/identities/' . $this->identityId);
 
         $I->seeResponseCodeIs(200);
@@ -32,7 +31,6 @@ class GetIdentityAuthCest
     {
         return [
             ['role' => 'participant'],
-            ['role' => 'user'],
             ['role' => 'stranger'],
         ];
     }
@@ -50,11 +48,22 @@ class GetIdentityAuthCest
         $I->seeResponseCodeIs(403);
     }
 
-    public function signedAsAdmin(\ApiTester $I)
+    protected function privilegedProvider()
     {
-        $I->expect("the identity is returned if signed by organization");
+        return [
+            ['role' => 'user'],
+            ['role' => 'organization'],
+        ];
+    }
 
-        $I->signRequestAs('organization', 'GET', '/identities/' . $this->identityId);
+    /**
+     * @dataProvider privilegedProvider
+     */
+    public function signedAsPrivileged(\ApiTester $I, \Codeception\Example $example)
+    {
+        $I->expect("the identity is returned if signed by {$example['role']}");
+
+        $I->signRequestAs($example['role'], 'GET', '/identities/' . $this->identityId);
         $I->sendGET('/identities/' . $this->identityId);
 
         $I->seeResponseCodeIs(200);

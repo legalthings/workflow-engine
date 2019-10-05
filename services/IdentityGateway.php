@@ -119,10 +119,6 @@ class IdentityGateway implements Gateway
     {
         i\type_check($entity, Identity::class);
 
-        if (($opts['existing'] ?? null) === 'replace') {
-            $entity->replaceExisting();
-        }
-
         $entity->save($opts);
     }
 

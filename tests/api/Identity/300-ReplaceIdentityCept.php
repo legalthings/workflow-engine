@@ -27,7 +27,7 @@ $expected = [
         'system' => '2gYvvF9nyjaC5Qv3mUDFkbqXNEWDtoJxZKwnHEtGRDzP',
     ],
     'encryptkey' => null,
-    'authz' => 'user'
+    'authz' => 'participant'
 ];
 
 $I->seeResponseContainsJson($expected);

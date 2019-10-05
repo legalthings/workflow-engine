@@ -23,10 +23,10 @@ abstract class BaseController extends Jasny\Controller
     protected $jsonView;
 
     /**
-     * Check if signer is authorized.
+     * Assert that signer is authorized.
      *
-     * @param int         $level    Minimum authorization level.
-     * @param string      $message
+     * @param int    $level    Minimum authorization level.
+     * @param string $message  Exception message
      * @throws AuthException
      */
     protected function authz(int $level, string $message): void
@@ -55,6 +55,37 @@ abstract class BaseController extends Jasny\Controller
         if (!$signerIsAuth) {
             throw new AuthException($message, 403);
         }
+    }
+
+    /**
+     * Check if signer is authorized.
+     *
+     * @param int $level  Minimum authorization level.
+     * @throws AuthException
+     */
+    protected function isAuthz(int $level): bool
+    {
+        if (!isset($this->identities)) {
+            throw new BadMethodCallException("Identity gateway not configured for this controller");
+        }
+
+        /** @var LTO\Account|null $account */
+        $account = $this->request->getAttribute('account');
+
+        if ($account === null) {
+            return false;
+        }
+
+        $originalSignKey = $this->request->getAttribute('signature_key_id') ?? $account->getPublicSignKey();
+
+        if ($this->node !== null && $this->node->getPublicSignKey() === $originalSignKey) {
+            return true;
+        }
+
+        $filter = ['signkeys.default' => $account->getPublicSignKey()] +
+            ($level === 1 ? ['authz(not)' => 0] : ['authz(min)' => $level]); // BC for identities without authz prop
+
+        return $this->identities->exists($filter);
     }
 
     /**

@@ -40,7 +40,7 @@ states:
       - response: ok
         transition: second
       - response: error
-        transition: -
+        transition: "-"
   second:
     action: step2
     transitions:

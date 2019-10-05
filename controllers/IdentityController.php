@@ -23,22 +23,30 @@ class IdentityController extends BaseController
      */
     public function before()
     {
-        $this->authz(Identity::AUTHZ_ADMIN, "Signing identity isn't allowed to manage identities");
+        $this->authz(Identity::AUTHZ_USER, "Signing identity isn't allowed to manage identities");
     }
 
     /**
      * Add or update identity
      * @throws Jasny\ValidationException
+     * @throws AuthException
      */
     public function putAction(): void
     {
-        $input = $this->getInput();
-        $identity = $this->identities->create();
+        $input = $this->getInput()
+            + get_class_vars(Identity::class); // Replace instead of update
+
+        $identity = $this->identities->fetchOrCreate($input['id'] ?? null);
+        $oldAuthz = $identity->authz;
 
         $identity->setValues($input);
-        $identity->validate()->mustSucceed();
 
-        $this->identities->save($identity, ['existing' => 'replace']);
+        if ($identity->authz > Identity::AUTHZ_PARTICIPANT || $oldAuthz > Identity::AUTHZ_PARTICIPANT) {
+            $this->authz(Identity::AUTHZ_ADMIN, "Signing identity is only allowed to manage participant identities");
+        }
+
+        $identity->validate()->mustSucceed();
+        $this->identities->save($identity);
 
         $this->output($identity);
     }
@@ -48,11 +56,11 @@ class IdentityController extends BaseController
      *
      * @param string $id Identity id
      * @throws EntityNotFoundException
+     * @throws AuthException
      */
     public function getAction(string $id): void
     {
         $identity = $this->identities->fetch($id);
-
         $this->output($identity);
     }
 
@@ -61,11 +69,15 @@ class IdentityController extends BaseController
      *
      * @param string $id
      * @throws EntityNotFoundException
+     * @throws AuthException
      */
     public function deleteAction(string $id): void
     {
-        $identity = $this->identities->fetch($id);
+        $this->authz(Identity::AUTHZ_ADMIN, "Signing identity isn't allowed to remove identities");
 
+        $identity = $this->identities->fetch($id);
         $this->identities->delete($identity);
+
+        $this->noContent();
     }
 }

@@ -709,7 +709,7 @@ db.getCollection("identities").insert([
             "system": "FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y"
         },
         "encryptkey" : "9fSos8krst114LtaYGHQPjC3h1CQEHUQWEkYdbykrhHv",
-        "authz": 10
+        "authz": 0
     },
     {
         /* user */
@@ -717,8 +717,8 @@ db.getCollection("identities").insert([
         "signkeys": {
             "default": "AZeQurvj5mFHkPihiFa83nS2Fzxv3M75N7o9m5KQHUmo",
             "system": "C47Qse1VRCGnn978WB1kqvkcsd1oG8p9SfJXUbwVZ9vV"
-        }
-        /* authz not set */
+        },
+        "authz": 1
     },
     {
         /* organization */
@@ -726,7 +726,7 @@ db.getCollection("identities").insert([
         "signkeys": {
             "default": "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn"
         },
-        "authz": 1
+        "authz": 10
     },
     {
         /* node */

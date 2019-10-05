@@ -44,7 +44,7 @@ class Identity extends MongoDocument implements Identifiable
      * Authorization level.
      * @var int
      */
-    public $authz = self::AUTHZ_USER;
+    public $authz = self::AUTHZ_PARTICIPANT;
 
 
     /**
@@ -125,13 +125,5 @@ class Identity extends MongoDocument implements Identifiable
         $object->authz = [0 => 'participant', 1 => 'user', 10 => 'admin'][$object->authz];
 
         return $object;
-    }
-
-    /**
-     * @internal
-     */
-    public function replaceExisting(): void
-    {
-        $this->markAsPersisted();
     }
 }

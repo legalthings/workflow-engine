@@ -9,6 +9,7 @@ addons:
     - sourceline: ppa:ondrej/php
     packages:
     - libsodium-dev
+    - libyaml-dev
 
 services: mongodb
 
@@ -21,6 +22,7 @@ branches:
 before_install:
 - pecl install --soft libsodium
 - echo "extension = mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+- echo | pecl install --soft yaml
 
 install:
 - composer install

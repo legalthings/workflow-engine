@@ -1,6 +1,7 @@
 <?php
 
 $I = new ApiTester($scenario);
+$I->am('organization');
 $I->wantTo('get a scenario not prettyfied');
 
 $I->haveHttpHeader('Accept', 'application/json;view=complete');

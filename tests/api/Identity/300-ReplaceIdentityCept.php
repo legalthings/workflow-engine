@@ -1,7 +1,8 @@
 <?php
 
 $I = new ApiTester($scenario);
-$I->wantTo('replace an identity');
+$I->am('node');
+$I->wantTo('replace the organization identity');
 
 $id = '1237288f-8u6f-3edt-8d2d-4f4ffd938vk';
 
@@ -10,9 +11,9 @@ $I->sendPOST('/identities', [
     'id' => $id,
     'node' => 'amqps://example.com',
     'signkeys' => [
-        'user' => '57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn',
+        'default' => '57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn',
         'system' => '2gYvvF9nyjaC5Qv3mUDFkbqXNEWDtoJxZKwnHEtGRDzP',
-    ]
+    ],
 ]);
 
 $I->seeResponseIsJson();
@@ -22,10 +23,11 @@ $expected = [
     'id' => '1237288f-8u6f-3edt-8d2d-4f4ffd938vk',
     'node' => 'amqps://example.com',
     'signkeys' => [
-        'user' => '57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn',
+        'default' => '57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn',
         'system' => '2gYvvF9nyjaC5Qv3mUDFkbqXNEWDtoJxZKwnHEtGRDzP',
     ],
     'encryptkey' => null,
+    'authz' => 'participant'
 ];
 
 $I->seeResponseContainsJson($expected);

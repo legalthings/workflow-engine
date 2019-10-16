@@ -73,7 +73,6 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
             'assets' => (object)[],
             'definitions' => (object)[],
             'allow_actions' => [],
-            'meta' => (object)[]
         ];
 
         $scenario->actors = [

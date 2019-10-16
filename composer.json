@@ -69,7 +69,7 @@
     },
     "autoload": {
         "psr-0": {
-            "": ["lib/", "models/", "services/", "controllers/"]
+            "": ["lib/", "models/", "services/", "middleware/", "controllers/"]
         },
         "files": [
             "vendor/jasny/php-functions/global.php",

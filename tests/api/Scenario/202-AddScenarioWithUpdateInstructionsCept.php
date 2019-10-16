@@ -1,6 +1,7 @@
 <?php
 
 $I = new ApiTester($scenario);
+$I->am('organization');
 $I->wantTo('add a scenario with prettified update instructions');
 
 $scenario = $I->getEntityDump('scenarios', 'basic-user-and-system.update-instructions');

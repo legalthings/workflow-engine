@@ -1,12 +1,13 @@
 <?php
 
 $I = new ApiTester($scenario);
-$I->wantTo('delete an identity');
+$I->am('node');
+$I->wantTo('delete the organization identity');
 
 $id = '1237288f-8u6f-3edt-8d2d-4f4ffd938vk';
 
 $I->sendDELETE('/identities/' . $id);
-$I->seeResponseCodeIs(200);
+$I->seeResponseCodeIs(204);
 
 $I->expectTo('see that changes have been persisted');
 

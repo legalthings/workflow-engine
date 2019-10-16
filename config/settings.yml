@@ -2,6 +2,7 @@ locale: en_US
 debug: false
 digest: required
 noauth: false
+http_request_log: false
 allow_full_reset: !env ALLOW_FULL_RESET
 
 triggers: []

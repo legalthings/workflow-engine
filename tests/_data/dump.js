@@ -498,17 +498,6 @@ db.getCollection("processes").insert([
                 "identity": "6uk7288s-afe4-7398-8dbh-7914ffd930pl"
             }
         ],
-        "definitions": [
-            {
-                "schema": "https://specs.livecontracts.io/v0.2.0/asset/schema.json#",
-                "key": "foo_identity",
-                "node": "localhost",
-                "signkeys" : {
-                    "user" : "foo",
-                    "system" : "bar"
-                }
-            }
-        ],
         "current": {
             "key": "initial",
             "actions": [
@@ -518,14 +507,11 @@ db.getCollection("processes").insert([
                     "key": "step1",
                     "body": {
                         "\\u0024schema": "https://specs.livecontracts.io/v0.2.0/identity/schema.json#",
-                        "key": {
-                            "<ref>": "definitions.foo_identity.key"
-                        },
-                        "node": {
-                            "<ref>": "definitions.foo_identity.node"
-                        },
+                        "key": "foo_identity",
+                        "node": "localhost",
                         "signkeys": {
-                            "<ref>": "definitions.foo_identity.signkeys"
+                            "user" : "foo",
+                            "system" : "bar"
                         }
                     },
                     "responses": {
@@ -571,27 +557,6 @@ db.getCollection("processes").insert([
                 "identity": "6uk7288s-afe4-7398-8dbh-7914ffd930pl"
             }
         ],
-        "definitions": [
-            {
-                "schema": "https://specs.livecontracts.io/v0.2.0/asset/schema.json#",
-                "key": "foo_identity",
-                "node": "localhost",
-                "signkeys" : {
-                    "user" : "foo",
-                    "system" : "bar"
-                }
-            },
-            {
-                "schema": "https://specs.livecontracts.io/v0.2.0/asset/schema.json#",
-                "key": "bar_identity",
-                "node": "localhost",
-                "signkeys" : {
-                    "user" : "foo_bar",
-                    "system" : "bar_baz"
-                },
-                "encryptkey": "zoo"
-            }
-        ],
         "current": {
             "key": "initial",
             "actions": [
@@ -602,30 +567,22 @@ db.getCollection("processes").insert([
                     "body": [
                         {
                             "\\u0024schema": "https://specs.livecontracts.io/v0.2.0/identity/schema.json#",
-                            "key": {
-                                "<ref>": "definitions.foo_identity.key"
-                            },
-                            "node": {
-                                "<ref>": "definitions.foo_identity.node"
-                            },
+                            "key": "foo_identity",
+                            "node": "localhost",
                             "signkeys": {
-                                "<ref>": "definitions.foo_identity.signkeys"
+                                "user" : "foo",
+                                "system" : "bar"
                             }
                         },
                         {
                             "\\u0024schema": "https://specs.livecontracts.io/v0.2.0/identity/schema.json#",
-                            "key": {
-                                "<ref>": "definitions.bar_identity.key"
-                            },
-                            "node": {
-                                "<ref>": "definitions.bar_identity.node"
-                            },
+                            "key": "bar_identity",
+                            "node": "localhost",
                             "signkeys": {
-                                "<ref>": "definitions.bar_identity.signkeys"
+                                "user" : "foo_bar",
+                                "system" : "bar_baz"
                             },
-                            "encryptkey": {
-                                "<ref>": "definitions.bar_identity.encryptkey"
-                            }
+                            "encryptkey": "zoo"
                         }
                     ],
                     "responses": {
@@ -701,13 +658,15 @@ db.getCollection("processes").insert([
 
 db.getCollection("identities").insert([
     {
+        /* organization */
         "_id": "1237288f-8u6f-3edt-8d2d-4f4ffd938vk",
         "node" : "amqps://localhost",
         "signkeys" : {
-            "user" : "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn",
-            "system" : "FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y"
+            "default": "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn",
+            "system": "FkU1XyfrCftc4pQKXCrrDyRLSnifX1SMvmx1CYiiyB3Y"
         },
-        "encryptkey" : "9fSos8krst114LtaYGHQPjC3h1CQEHUQWEkYdbykrhHv"
+        "encryptkey" : "9fSos8krst114LtaYGHQPjC3h1CQEHUQWEkYdbykrhHv",
+        "authz": 0
     },
     {
         /* user */
@@ -715,19 +674,31 @@ db.getCollection("identities").insert([
         "signkeys": {
             "default": "AZeQurvj5mFHkPihiFa83nS2Fzxv3M75N7o9m5KQHUmo",
             "system": "C47Qse1VRCGnn978WB1kqvkcsd1oG8p9SfJXUbwVZ9vV"
-        }
+        },
+        "authz": 1
     },
     {
+        /* organization */
         "_id": "6uk7288s-afe4-7398-8dbh-7914ffd930pl",
         "signkeys": {
             "default": "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn"
-        }
+        },
+        "authz": 10
     },
     {
-        /* organzation */
+        /* node */
         "_id": "e8a1479e-d40f-4b54-a31d-15f39bdb00f5",
         "signkeys": {
             "system": "3UDCFY6MojrPKaayHgAEqrnp99JhviSAiraJX8J1fJ9E"
-        }
+        },
+        "authz": 10
+    },
+    {
+        /* participant */
+        "_id": "14134336-e5e8-11e9-b414-778e97bfed1a",
+        "signkeys": {
+            "default": "AWDABMBzKd2oGoL8sxGxGGvL28dNzSibVkira6CHpuTX"
+        },
+        "authz": 0
     }
 ]);

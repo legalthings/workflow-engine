@@ -108,6 +108,5 @@
             "action": "step3",
             "transition": ":success"
         }
-    },
-    "meta": { }
+    }
 }

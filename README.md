@@ -72,13 +72,11 @@ service locally._
 ```
 POST   /scenarios/                Create a new scenario
 GET    /scenarios/{id}            Get a specific scenario
-POST   /scenarios/{id}/meta       Update the meta information of the scenario
 
 POST   /processes/                Create a process
 GET    /processes/{id}            Get a specific process
 POST   /processes/{id}/invoke     Invoke a system action if possible
 POST   /processes/{id}/response   Submit a response for a running process
-POST   /processes/{id}/meta       Update the meta information of the process
 DELETE /processes/{id}            Remove a process
 
 POST   /identities/               Register an identity (overwrites)

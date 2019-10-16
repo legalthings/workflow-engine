@@ -1,6 +1,7 @@
 <?php
 
 $I = new ApiTester($scenario);
+$I->am('organization');
 $I->wantTo('get a prettified scenario');
 
 $I->haveHttpHeader('Accept', 'application/json;view=pretty');

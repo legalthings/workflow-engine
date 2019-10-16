@@ -10,19 +10,16 @@ use Jasny\HttpSignature\ClientMiddleware as HttpSignatureMiddleware;
 
 return [
     HandlerStack::class => static function(ContainerInterface $container) {
-        $config = $container->get('config');
+        $config = $container->get('config.http_request_log');
 
         $stack = HandlerStack::create();
         $stack->setHandler(new CurlHandler());
 
-        $digestMiddleware = $container->get(HttpDigestMiddleware::class);
-        $stack->push($digestMiddleware->forGuzzle());
+        $stack->push($container->get(HttpDigestMiddleware::class)->forGuzzle());
+        $stack->push($container->get(HttpSignatureMiddleware::class)->forGuzzle());
 
-        $signatureMiddleware = $container->get(HttpSignatureMiddleware::class);
-        $stack->push($signatureMiddleware->forGuzzle());
-
-        if (!empty($config->http_request_log)) {
-            $logMiddleware = $container->get(HttpLogMiddleware::class);
+        if ($config->http_request_log ?? false) {
+            $logMiddleware = $container->get(HttpRequestLogMiddleware::class);
             $stack->push($logMiddleware);            
         }
 

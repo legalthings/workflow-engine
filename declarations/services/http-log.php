@@ -3,7 +3,12 @@
 use Psr\Container\ContainerInterface;
 
 return [
-    HttpLogMiddleware::class => static function(ContainerInterface $container) {
-        return new HttpLogMiddleware();
+    HttpRequestLogMiddleware::class => static function (ContainerInterface $container) {
+        $logger = $container->get(HttpRequestLogger::class);
+        return new HttpRequestLogMiddleware($logger);
+    },
+    HttpRequestLogger::class => static function (ContainerInterface $container) {
+        $db = $container->get('db.default');
+        return new HttpRequestLogger($db);
     }
 ];

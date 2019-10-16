@@ -11,7 +11,8 @@
                 "signkeys": {
                     "default": "AZeQurvj5mFHkPihiFa83nS2Fzxv3M75N7o9m5KQHUmo",
                     "system": "C47Qse1VRCGnn978WB1kqvkcsd1oG8p9SfJXUbwVZ9vV"
-                }
+                },
+                "authz": "user"
             }
         },
         "organization": {
@@ -21,7 +22,8 @@
                 "id": "6uk7288s-afe4-7398-8dbh-7914ffd930pl",
                 "signkeys": {
                     "default": "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn"
-                }
+                },
+                "authz": "admin"
             }
         }
     },
@@ -41,7 +43,8 @@
                     "id": "6uk7288s-afe4-7398-8dbh-7914ffd930pl",
                     "signkeys": {
                         "default": "57FWtEbXoMKXj71FT84hcvCxN5z1CztbZ8UYJ2J49Gcn"
-                    }
+                    },
+                    "authz": "admin"
                 }
             }
         }
@@ -74,6 +77,5 @@
             "display": "always",
             "actors": []
         }
-    ],
-    "meta": {}
+    ]
 }

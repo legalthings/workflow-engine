@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 use Improved\IteratorPipeline\Pipeline;
 use Jasny\DB\Entity;

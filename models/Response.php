@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 use Jasny\DB\Entity\Meta;
 
@@ -7,15 +8,13 @@ use Jasny\DB\Entity\Meta;
  */
 class Response extends BasicEntity implements Meta
 {
-    public const BASE_SCHEMA = 'https://specs.livecontracts.io/v0.2.0/response/schema.json#';
-
     use DeepClone;
     use Meta\Implementation;
 
     /**
      * @var string
      */
-    public $schema = self::BASE_SCHEMA;
+    public $schema;
 
     /**
      * The title that will be displayed in the process if the action is performed.
@@ -60,6 +59,23 @@ class Response extends BasicEntity implements Meta
      */
     public $receipt;
 
+    /**
+     * Response constructor.
+     *
+     * @param Action|null $action
+     * @param string|null key
+     */
+    public function __construct(?Action $action = null, ?string $key = null)
+    {
+        parent::__construct();
+
+        if ($action !== null) {
+            $key === null || $action->getResponse($key); // Assert that action has response.
+
+            $this->action = $action;
+            $this->key = $key ?? $action->default_response;
+        }
+    }
 
     /**
      * Cast all properties.

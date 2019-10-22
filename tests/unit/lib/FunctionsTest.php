@@ -100,6 +100,7 @@ class FunctionsTest extends \Codeception\Test\Unit
         $from->zoo = (object)$from->zoo;
 
         $result = object_copy_properties($from, $to);
+        $this->assertSame($to, $result);
 
         $this->assertSame('foo_value', $to->foo);
         $this->assertFalse(isset($to->bar));
@@ -108,8 +109,14 @@ class FunctionsTest extends \Codeception\Test\Unit
         $this->assertEquals((object)['zoo' => 'baz'], $to->zoo);
         $this->assertNotSame($from->zoo, $to->zoo);
 
-        $this->assertAttributeSame(null, 'boom', $to);
-        $this->assertAttributeSame('bah_2', 'booh', $to);
+        // Also get private properties
+        $getProperties = Closure::bind(function () {
+            return get_object_vars($this);
+        }, $to, $to);
+        $props = $getProperties();
+
+        $this->assertSame(null, $props['boom']);
+        $this->assertSame('bah_2', $props['booh']);
     }
 
     /**

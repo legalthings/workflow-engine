@@ -5,7 +5,7 @@ use GuzzleHttp\Psr7\Response as HttpResponse;
 class BasicSystemAndUserCest
 {
     /**
-     * @example { "scenario": "scenario-v1.0.json" }
+     * @example { "scenario": "scenario-v0.2.json" }
      */
     public function stepOk(\FlowTester $I, \Codeception\Example $example)
     {

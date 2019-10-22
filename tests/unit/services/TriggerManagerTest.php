@@ -39,9 +39,9 @@ class TriggerManagerTest extends \Codeception\Test\Unit
             $this->identicalTo($process),
             $this->callback(function ($arg) use ($action, $actor) {
                 $this->assertInstanceOf(Action::class, $arg);
-                $this->assertAttributeEquals($action->key, 'key', $arg);
-                $this->assertAttributeEquals($action->title, 'title', $arg);
-                $this->assertAttributeEquals($actor, 'actor', $arg);
+                $this->assertEquals($action->key, $arg->key);
+                $this->assertEquals($action->title, $arg->title);
+                $this->assertEquals($actor, $arg->actor);
 
                 return true;
             }));
@@ -136,10 +136,10 @@ class TriggerManagerTest extends \Codeception\Test\Unit
         $this->assertSame($expected, $response);
 
         if ($response !== null) {
-            $this->assertAttributeEquals($action, 'action', $response);
-            $this->assertAttributeNotSame($action, 'action', $response);
-            $this->assertAttributeEquals($process->actors['client'], 'actor', $response);
-            $this->assertAttributeNotSame($process->actors['client'], 'actor', $response);
+            $this->assertEquals($action, $response->action);
+            $this->assertNotSame($action, $response->action);
+            $this->assertEquals($process->actors['client'], $response->actor);
+            $this->assertNotSame($process->actors['client'], $response->actor);
         }
     }
 
@@ -237,14 +237,14 @@ class TriggerManagerTest extends \Codeception\Test\Unit
         $response = $manager->invoke($process, 'foo', 'client');
 
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertAttributeEquals('error', 'key', $response);
-        $this->assertAttributeEquals('An error occured', 'title', $response);
-        $this->assertAttributeEquals((object)['message' => 'Some error'], 'data', $response);
+        $this->assertEquals('error', $response->key);
+        $this->assertEquals('An error occured', $response->title);
+        $this->assertEquals((object)['message' => 'Some error'], $response->data);
 
-        $this->assertAttributeInstanceOf(Action::class, 'action', $response);
-        $this->assertAttributeEquals('foo', 'key', $response->action);
-        $this->assertAttributeEquals('Foo', 'title', $response->action);
-        $this->assertAttributeEquals($process->getActor('client'), 'actor', $response);
+        $this->assertInstanceOf(Action::class, $response->action);
+        $this->assertEquals('foo', $response->action->key);
+        $this->assertEquals('Foo', $response->action->title);
+        $this->assertEquals($process->getActor('client'), $response->actor);
     }
 
     public function testValidationErrorResponse()
@@ -260,17 +260,17 @@ class TriggerManagerTest extends \Codeception\Test\Unit
         $response = $manager->invoke($process, 'foo', 'client');
 
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertAttributeEquals('error', 'key', $response);
-        $this->assertAttributeEquals('An error occured', 'title', $response);
+        $this->assertEquals('error', $response->key);
+        $this->assertEquals('An error occured', $response->title);
         $this->assertAttributeEquals((object)[
             'message' => "Validation failed",
             'errors' => ['Some error'],
         ], 'data', $response);
 
-        $this->assertAttributeInstanceOf(Action::class, 'action', $response);
-        $this->assertAttributeEquals('foo', 'key', $response->action);
-        $this->assertAttributeEquals('Foo', 'title', $response->action);
-        $this->assertAttributeEquals($process->getActor('client'), 'actor', $response);
+        $this->assertInstanceOf(Action::class, $response->action);
+        $this->assertEquals('foo', $response->action->key);
+        $this->assertEquals('Foo', $response->action->title);
+        $this->assertEquals($process->getActor('client'), $response->actor);
     }
 
     public function testDispatcher()

@@ -3,6 +3,15 @@ digest: optional
 allow_full_reset: true
 
 triggers:
+  # v0.3
+  - schema: https://specs.letsflow.io/v0.3.0/action/nop#
+    type: nop
+  - schema: https://specs.letsflow.io/v0.3.0/action/http#
+    type: http
+  - schema: https://specs.letsflow.io/v0.3.0/action/event#
+    type: event
+
+  # v0.2
   - schema: https://specs.livecontracts.io/v0.2.0/action/nop/schema.json#
     type: nop
   - schema: https://specs.livecontracts.io/v0.2.0/action/http/schema.json#

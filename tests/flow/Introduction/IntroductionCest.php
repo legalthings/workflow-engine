@@ -5,7 +5,7 @@ class IntroductionCest
     /**
      * Basic introduction flow
      * 
-     * @example { "scenario": "scenario-v1.0.json" }
+     * @example { "scenario": "scenario-v0.2.json" }
      */
     public function introduction(\FlowTester $I, \Codeception\Example $example)
     {
@@ -49,7 +49,7 @@ class IntroductionCest
     /**
      * Make sure actor can be updated using 'current.actor' reference
      * 
-     * @example { "scenario": "scenario-current-actor-update-v1.0.json" }
+     * @example { "scenario": "scenario-current-actor-update-v0.2.json" }
      */
     public function introductionCurrentActorUpdate(\FlowTester $I, \Codeception\Example $example)
     {
@@ -93,7 +93,7 @@ class IntroductionCest
     /**
      * Use action condition with reference to 'current.actor'
      * 
-     * @example { "scenario": "scenario-current-actor-condition-v1.0.json" }
+     * @example { "scenario": "scenario-current-actor-condition-v0.2.json" }
      */
     public function introductionCurrentActorCondition(\FlowTester $I, \Codeception\Example $example)
     {
@@ -137,7 +137,7 @@ class IntroductionCest
     /**
      * Use prettyfied format of update command for action
      * 
-     * @example { "scenario": "scenario-pretty-v1.0.json" }
+     * @example { "scenario": "scenario-pretty-v0.2.json" }
      */
     public function introductionPretty(\FlowTester $I, \Codeception\Example $example)
     {

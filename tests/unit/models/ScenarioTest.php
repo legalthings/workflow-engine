@@ -28,19 +28,19 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $scenario = new Scenario();
 
-        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'actors', $scenario);
+        $this->assertInstanceOf(AssocEntitySet::class, $scenario->actors);
         $this->assertSame(JsonSchema::class, $scenario->actors->getEntityClass());
 
-        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'assets', $scenario);
+        $this->assertInstanceOf(AssocEntitySet::class, $scenario->assets);
         $this->assertSame(JsonSchema::class, $scenario->assets->getEntityClass());
 
-        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'definitions', $scenario);
+        $this->assertInstanceOf(AssocEntitySet::class, $scenario->definitions);
         $this->assertSame(Asset::class, $scenario->definitions->getEntityClass());
 
-        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'actions', $scenario);
+        $this->assertInstanceOf(AssocEntitySet::class, $scenario->actions);
         $this->assertSame(Action::class, $scenario->actions->getEntityClass());
 
-        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'states', $scenario);
+        $this->assertInstanceOf(AssocEntitySet::class, $scenario->states);
         $this->assertSame(State::class, $scenario->states->getEntityClass());
 
         $this->assertContainsOnlyInstancesOf(State::class, $scenario->states->getArrayCopy());
@@ -53,10 +53,10 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $scenario = new Scenario();
 
-        $manager = new JsonSchema(['$ref' => 'https://specs.livecontracts.io/v0.2.0/actor/schema.json#']);
+        $manager = new JsonSchema(['$ref' => 'https://specs.letsflow.io/v0.3.0/actor#']);
         $scenario->actors['manager'] = $manager;
 
-        $worker = new JsonSchema(['$ref' => 'https://specs.livecontracts.io/v0.2.0/actor/schema.json#']);
+        $worker = new JsonSchema(['$ref' => 'https://specs.letsflow.io/v0.3.0/actor#']);
         $scenario->actors['worker'] = $worker;
 
         $this->assertSame($manager, $scenario->getActor('manager'));
@@ -71,7 +71,7 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $scenario = new Scenario();
 
-        $manager = new JsonSchema(['$ref' => 'https://specs.livecontracts.io/v0.2.0/actor/schema.json#']);
+        $manager = new JsonSchema(['$ref' => 'https://specs.letsflow.io/v0.3.0/actor#']);
         $scenario->actors['manager'] = $manager;
 
         $scenario->getActor('walker');
@@ -183,11 +183,11 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $scenario->cast();
 
-        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'actions', $scenario);
+        $this->assertInstanceOf(AssocEntitySet::class, $scenario->actions);
         $this->assertSame(Action::class, $scenario->actions->getEntityClass());
         $this->assertArrayHasKey('one', $scenario->actions->getArrayCopy());
         $this->assertArrayHasKey('two', $scenario->actions->getArrayCopy());
-        $this->assertAttributeEquals('action 1', 'title', $scenario->actions['one']);
+        $this->assertEquals('action 1', $scenario->actions['one']->title);
 
         $this->assertCount(2, $scenario->actions);
     }
@@ -199,11 +199,11 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $scenario->cast();
 
-        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'states', $scenario);
+        $this->assertInstanceOf(AssocEntitySet::class, $scenario->states);
         $this->assertSame(State::class, $scenario->states->getEntityClass());
         $this->assertArrayHasKey('foo', $scenario->states->getArrayCopy());
         $this->assertArrayHasKey('bar', $scenario->states->getArrayCopy());
-        $this->assertAttributeEquals('state Foo', 'title', $scenario->states['foo']);
+        $this->assertEquals('state Foo', $scenario->states['foo']->title);
 
         $this->assertArrayHasKey(':success', $scenario->states->getArrayCopy());
         $this->assertArrayHasKey(':failed', $scenario->states->getArrayCopy());
@@ -219,11 +219,11 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $scenario->cast();
 
-        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'actors', $scenario);
+        $this->assertInstanceOf(AssocEntitySet::class, $scenario->actors);
         $this->assertSame(JsonSchema::class, $scenario->actors->getEntityClass());
         $this->assertArrayHasKey('manager', $scenario->actors->getArrayCopy());
         $this->assertArrayHasKey('client', $scenario->actors->getArrayCopy());
-        $this->assertAttributeEquals('Client', 'title', $scenario->actors['client']);
+        $this->assertEquals('Client', $scenario->actors['client']->title);
 
         $this->assertCount(2, $scenario->actors);
     }
@@ -235,10 +235,10 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $scenario->cast();
 
-        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'assets', $scenario);
+        $this->assertInstanceOf(AssocEntitySet::class, $scenario->assets);
         $this->assertSame(JsonSchema::class, $scenario->assets->getEntityClass());
         $this->assertArrayHasKey('report', $scenario->assets->getArrayCopy());
-        $this->assertAttributeEquals('XYZ Report', 'title', $scenario->assets['report']);
+        $this->assertEquals('XYZ Report', $scenario->assets['report']->title);
 
         $this->assertCount(1, $scenario->assets);
     }
@@ -260,75 +260,76 @@ class ScenarioTest extends \Codeception\Test\Unit
 
     protected function assertScenario(Scenario $scenario)
     {
-        $this->assertAttributeEquals('7d7d0444-f6d7-473e-b715-f5cd8a3cc632', 'id', $scenario);
-        $this->assertAttributeEquals(
-            'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#',
-            'schema',
-            $scenario
+        $this->assertEquals('7d7d0444-f6d7-473e-b715-f5cd8a3cc632', $scenario->id);
+        $this->assertEquals(
+            'https://specs.letsflow.io/v0.3.0/scenario#',
+            $scenario->schema
         );
-        $this->assertAttributeEquals('A unit test case', 'title', $scenario);
-        $this->assertAttributeEquals('This scenario is for testing', 'description', $scenario);
+        $this->assertEquals('A unit test case', $scenario->title);
+        $this->assertEquals('This scenario is for testing', $scenario->description);
     }
 
     protected function assertScenarioActions(Scenario $scenario)
     {
-        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'actions', $scenario);
+        $this->assertInstanceOf(AssocEntitySet::class, $scenario->actions);
         $this->assertEquals(Action::class, $scenario->actions->getEntityClass());
 
         $this->assertArrayHasKey('foo', $scenario->actions->getArrayCopy());
         $this->assertInstanceOf(Action::class, $scenario->actions['foo']);
-        $this->assertAttributeEquals('Foo', 'title', $scenario->actions['foo']);
-        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'responses', $scenario->actions['foo']);
+        $this->assertEquals('Foo', $scenario->actions['foo']->title);
+        $this->assertInstanceOf(AssocEntitySet::class, $scenario->actions['foo']->responses);
         $this->assertArrayHasKey('ok', $scenario->actions['foo']->responses->getArrayCopy());
 
         $this->assertArrayHasKey('bar', $scenario->actions->getArrayCopy());
         $this->assertInstanceOf(Action::class, $scenario->actions['bar']);
-        $this->assertAttributeEquals('Bar', 'title', $scenario->actions['bar']);
-        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'responses', $scenario->actions['bar']);
+        $this->assertEquals('Bar', $scenario->actions['bar']->title);
+        $this->assertInstanceOf(AssocEntitySet::class, $scenario->actions['bar']->responses);
         $this->assertArrayHasKey('ok', $scenario->actions['bar']->responses->getArrayCopy());
     }
 
     protected function assertScenarioStates(Scenario $scenario)
     {
-        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'states', $scenario);
+        $this->assertInstanceOf(AssocEntitySet::class, $scenario->states);
         $this->assertEquals(State::class, $scenario->states->getEntityClass());
 
         $this->assertArrayHasKey('initial', $scenario->states->getArrayCopy());
         $this->assertInstanceOf(State::class, $scenario->states['initial']);
-        $this->assertAttributeEquals('First', 'title', $scenario->states['initial']);
-        $this->assertAttributeEquals(['foo'], 'actions', $scenario->states['initial']);
+        $this->assertEquals('First', $scenario->states['initial']->title);
+
+        $this->assertCount(1, $scenario->states['initial']->transitions);
+        $this->assertEquals('foo.ok', $scenario->states['initial']->transitions[0]->on);
     }
 
     protected function assertScenarioActors(Scenario $scenario)
     {
-        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'actors', $scenario);
+        $this->assertInstanceOf(AssocEntitySet::class, $scenario->actors);
         $this->assertEquals(JsonSchema::class, $scenario->actors->getEntityClass());
 
         $this->assertArrayHasKey('manager', $scenario->actors->getArrayCopy());
         $this->assertInstanceOf(JsonSchema::class, $scenario->actors['manager']);
-        $this->assertAttributeEquals('Operational manager', 'title', $scenario->actors['manager']);
+        $this->assertEquals('Operational manager', $scenario->actors['manager']->title);
     }
 
     protected function assertScenarioAssets(Scenario $scenario)
     {
-        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'assets', $scenario);
+        $this->assertInstanceOf(AssocEntitySet::class, $scenario->assets);
         $this->assertEquals(JsonSchema::class, $scenario->assets->getEntityClass());
 
         $this->assertArrayHasKey('report', $scenario->assets->getArrayCopy());
         $this->assertInstanceOf(JsonSchema::class, $scenario->assets['report']);
-        $this->assertAttributeEquals('http://json-schema.org/draft-07/schema#', 'schema', $scenario->assets['report']);
-        $this->assertAttributeEquals('object', 'type', $scenario->assets['report']);
+        $this->assertEquals('http://json-schema.org/draft-07/schema#', $scenario->assets['report']->schema);
+        $this->assertEquals('object', $scenario->assets['report']->type);
     }
 
     protected function assertScenarioDefinitions(Scenario $scenario)
     {
-        $this->assertAttributeInstanceOf(AssocEntitySet::class, 'definitions', $scenario);
+        $this->assertInstanceOf(AssocEntitySet::class, $scenario->definitions);
         $this->assertEquals(Asset::class, $scenario->definitions->getEntityClass());
 
         $this->assertArrayHasKey('dimensions', $scenario->definitions->getArrayCopy());
         $this->assertInstanceOf(Asset::class, $scenario->definitions['dimensions']);
-        $this->assertAttributeEquals(10, 'height', $scenario->definitions['dimensions']);
-        $this->assertAttributeEquals(15, 'width', $scenario->definitions['dimensions']);
+        $this->assertEquals(10, $scenario->definitions['dimensions']->height);
+        $this->assertEquals(15, $scenario->definitions['dimensions']->width);
     }
 
 
@@ -336,7 +337,7 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $fullScenario = [
             'id' => '7d7d0444-f6d7-473e-b715-f5cd8a3cc632',
-            '$schema' => 'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#',
+            '$schema' => 'https://specs.letsflow.io/v0.3.0/scenario#',
             'title' => 'A unit test case',
             'description' => 'This scenario is for testing',
             'foo' => 'bar', // to be ignored
@@ -365,21 +366,19 @@ class ScenarioTest extends \Codeception\Test\Unit
             'states' => [
                 'initial' => [
                     'title' => 'First',
-                    'actions' => ['foo'],
                     'transitions' => [
                         [
-                            'action' => 'foo',
-                            'response' => 'ok',
-                            'transition' => 'second',
+                            'on' => 'foo.ok',
+                            'goto' => 'second',
                         ],
                     ],
                 ],
                 'second' => [
                     'title' => 'Second',
-                    'actions' => ['bar'],
                     'transitions' => [
                         [
-                            'transition' => ':success',
+                            'on' => 'bar',
+                            'goto' => ':success',
                         ],
                     ],
                 ],
@@ -406,7 +405,7 @@ class ScenarioTest extends \Codeception\Test\Unit
 
         $compactScenario = [
             'id' => '7d7d0444-f6d7-473e-b715-f5cd8a3cc632',
-            '$schema' => 'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#',
+            '$schema' => 'https://specs.letsflow.io/v0.3.0/scenario#',
             'title' => 'A unit test case',
             'description' => 'This scenario is for testing',
             'foo' => 'bar', // to be ignored
@@ -428,19 +427,17 @@ class ScenarioTest extends \Codeception\Test\Unit
                 [
                     'key' => 'initial',
                     'title' => 'First',
-                    'action' => 'foo',
                     'transitions' => [
                         [
-                            'action' => 'foo',
-                            'response' => 'ok',
-                            'transitions' => 'second',
+                            'on' => 'foo.ok',
+                            'goto' => 'second',
                         ],
                     ],
                     [
                         'key' => 'second',
                         'title' => 'Second',
-                        'action' => 'bar',
-                        'transition' => ':success',
+                        'on' => 'bar',
+                        'goto' => ':success',
                     ],
                 ],
             ],
@@ -522,7 +519,7 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $data = [
             '_id' => '7d7d0444-f6d7-473e-b715-f5cd8a3cc632',
-            'schema' => 'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#',
+            'schema' => 'https://specs.letsflow.io/v0.3.0/scenario#',
             'title' => 'A unit test case',
             'description' => 'This scenario is for testing',
             'actions' => [
@@ -549,21 +546,18 @@ class ScenarioTest extends \Codeception\Test\Unit
             'states' => [
                 [
                     'key' => ':success',
-                    'actions' => [],
                     'transitions' => [],
                     'instructions' => [],
                     'display' => 'always',
                 ],
                 [
                     'key' => ':failed',
-                    'actions' => [],
                     'transitions' => [],
                     'instructions' => [],
                     'display' => 'always',
                 ],
                 [
                     'key' => ':cancelled',
-                    'actions' => [],
                     'transitions' => [],
                     'instructions' => [],
                     'display' => 'always',
@@ -574,9 +568,8 @@ class ScenarioTest extends \Codeception\Test\Unit
                     'actions' => ['foo'],
                     'transitions' => [
                         [
-                            'action' => 'foo',
-                            'response' => 'ok',
-                            'transition' => ':success',
+                            'on' => 'foo.ok',
+                            'goto' => ':success',
                         ],
                     ],
                     'instructions' => [
@@ -622,7 +615,7 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $scenario = new Scenario();
 
-        $scenario->schema = "https://specs.livecontracts.io/v1.0.0/scenario/schema.json#";
+        $scenario->schema = "https://specs.letsflow.io/v0.3.0/scenario#";
         $scenario->id = '7d7d0444-f6d7-473e-b715-f5cd8a3cc632';
         $scenario->title = "A unit test case";
         $scenario->description = "This scenario is for testing";
@@ -642,7 +635,7 @@ class ScenarioTest extends \Codeception\Test\Unit
                 'title' => "First",
                 'actions' => ['foo'],
                 'transitions' => [
-                    ['action' => 'foo', 'response' => 'ok', 'transition' => ':success'],
+                    ['on' => 'foo.ok', 'goto' => ':success'],
                 ],
                 'instructions' => [
                     'manager' => 'Do something',
@@ -688,7 +681,7 @@ class ScenarioTest extends \Codeception\Test\Unit
     {
         $scenario = new Scenario();
 
-        $scenario->schema = 'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#';
+        $scenario->schema = 'https://specs.letsflow.io/v0.3.0/scenario#';
         $scenario->id = '7d7d0444-f6d7-473e-b715-f5cd8a3cc632';
         $scenario->title = 'Foo Bar test';
         $scenario->description = 'This scenario is for testing';
@@ -729,7 +722,7 @@ class ScenarioTest extends \Codeception\Test\Unit
             ->willReturn(['height' => 10, 'width' => 15]);
 
         $expected = [
-            '$schema' => 'https://specs.livecontracts.io/v1.0.0/scenario/schema.json#',
+            '$schema' => 'https://specs.letsflow.io/v0.3.0/scenario#',
             'id' => '7d7d0444-f6d7-473e-b715-f5cd8a3cc632',
             'title' => 'Foo Bar test',
             'description' => 'This scenario is for testing',
@@ -778,7 +771,7 @@ class ScenarioTest extends \Codeception\Test\Unit
     public function testJsonSerializeBlank()
     {
         $expected = [
-            '$schema' => 'https://specs.livecontracts.io/v0.2.0/scenario/schema.json#',
+            '$schema' => null,
             'id' => null,
             'title' => null,
             'description' => null,
@@ -895,11 +888,9 @@ class ScenarioTest extends \Codeception\Test\Unit
         $this->scenario->actions = $actions;
         $this->scenario->allow_actions = $allowActions;
         $this->scenario->states = [
-            'foo' => $this->createMock(State::class),
-            'bar' => $this->createMock(State::class)
+            'foo' => $this->createConfiguredMock(State::class, ['getActions' => []]),
+            'bar' => $this->createConfiguredMock(State::class, ['getActions' => $stateActions])
         ];
-
-        $this->scenario->states['bar']->actions = $stateActions;
 
         $result = $this->scenario->getActionsForState('bar');
         $asArray = $result->getArrayCopy();
@@ -918,8 +909,7 @@ class ScenarioTest extends \Codeception\Test\Unit
         $this->scenario->actions = $actions;
         $this->scenario->allow_actions = $allowActions;
 
-        $state = $this->createMock(State::class);
-        $state->actions = $stateActions;
+        $state = $this->createConfiguredMock(State::class, ['getActions' => $stateActions]);
 
         $result = $this->scenario->getActionsForState($state);
         $asArray = $result->getArrayCopy();

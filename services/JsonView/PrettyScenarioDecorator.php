@@ -148,17 +148,13 @@ class PrettyScenarioDecorator
     {
         $state = std_object_only_with($state, ['display', 'transitions', 'actions']);
 
-        if (count($state->actions) === 1) {
-            $state->action = reset($state->actions);
-            unset($state->actions);
-        }
-
-        foreach ($state->transitions as $key => $transition) {            
+        foreach ($state->transitions as $key => $transition) {
             $state->transitions[$key] = $this->decorateTransition($transition);
         }
 
         if (count($state->transitions) === 1) {
-            $state->transition = $state->transitions[0]->transition;
+            $state->on = $state->transitions[0]->on;
+            $state->goto = $state->transitions[0]->goto;
             unset($state->transitions);
         }
 
@@ -177,8 +173,8 @@ class PrettyScenarioDecorator
      */
     protected function decorateTransition(stdClass $transition): stdClass
     {
-        $object = std_object_only_with($transition, ['action', 'response', 'transition']);
-        $this->removeEmptyProperties($object, ['action', 'response']);
+        $object = std_object_only_with($transition, ['on', 'goto', 'condition']);
+        $this->removeEmptyProperties($object, ['on', 'goto', 'condition']);
 
         return $object;
     }

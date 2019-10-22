@@ -23,6 +23,14 @@ class ExpandIdentities
     }
 
     /**
+     * Get the identity gateway.
+     */
+    public function getGateway(): IdentityGateway
+    {
+        return $this->gateway;
+    }
+
+    /**
      * Invoke this event handler.
      *
      * @param Process $process

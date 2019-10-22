@@ -3,7 +3,7 @@
 class HandshakeCest
 {
     /**
-     * @example { "scenario": "scenario-v1.0.json" }
+     * @example { "scenario": "scenario-v0.2.json" }
      */
     public function completeAtOnce(\FlowTester $I, \Codeception\Example $example)
     {
@@ -64,7 +64,7 @@ class HandshakeCest
     }
 
     /**
-     * @example { "scenario": "scenario-v1.0.json" }
+     * @example { "scenario": "scenario-v0.2.json" }
      */
     public function longConversation(\FlowTester $I, \Codeception\Example $example)
     {

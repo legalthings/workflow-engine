@@ -5,7 +5,7 @@ class IntroductionTransitionCest
     /**
      * Check transition condition
      * 
-     * @example { "scenario": "scenario-v1.0.json" }
+     * @example { "scenario": "scenario-v0.2.json" }
      */
     public function transitionCondition(\FlowTester $I, \Codeception\Example $example)
     {
@@ -75,7 +75,7 @@ class IntroductionTransitionCest
     /**
      * Full introduction with action and state transition conditions
      * 
-     * @example { "scenario": "scenario-full-v1.0.json" }
+     * @example { "scenario": "scenario-full-v0.2.json" }
      */
     public function full(\FlowTester $I, \Codeception\Example $example)
     {

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 use Jasny\DB\Entity\Dynamic;
 
@@ -12,7 +13,7 @@ class Asset extends BasicEntity implements Dynamic
     /**
      * @var string
      */
-    public $schema = 'https://specs.livecontracts.io/v0.2.0/asset/schema.json#';
+    public $schema;
 
     /**
      * @var string

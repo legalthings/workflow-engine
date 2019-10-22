@@ -59,7 +59,7 @@ class ProcessSimulator
 
         while ($action !== null) {
             $transition = isset($action) ? $this->getTransition($state, $action, $process) : null;
-            $state = isset($transition) ? $scenario->getState($transition->transition) : null;
+            $state = isset($transition) ? $scenario->getState($transition->goto) : null;
 
             if ($state === null) {
                 break;
@@ -94,7 +94,7 @@ class ProcessSimulator
         $scenario = $process->scenario;
 
         try {
-            return Pipeline::with($state->actions)
+            return Pipeline::with($state->getActions())
                 ->map(function(string $actionKey) use ($scenario) {
                     return $scenario->getAction($actionKey);
                 })
@@ -121,12 +121,12 @@ class ProcessSimulator
      */
     protected function getTransition(State $state, Action $action, Process $process): ?StateTransition
     {
+        $defaultResponse = new Response($action);
+
         try {
             return Pipeline::with($state->transitions)
-                ->filter(function(StateTransition $transition) use ($action) {
-                    return
-                        ($transition->action === $action->key || $transition->action === null) &&
-                        ($transition->response === $action->default_response || $transition->response === null);
+                ->filter(function(StateTransition $transition) use ($defaultResponse) {
+                    return $transition->appliesTo($defaultResponse);
                 })
                 ->filter(function(StateTransition $transition) use ($process) {
                     if ($transition->condition instanceof DataInstruction) {
@@ -155,6 +155,7 @@ class ProcessSimulator
      */
     protected function instantiateNextState(State $state, Process $process, $actors = []): NextState
     {
+        /** @var NextState $nextState */
         $nextState = object_copy_properties($state, new NextState());
         $nextState->actors = $actors;
 

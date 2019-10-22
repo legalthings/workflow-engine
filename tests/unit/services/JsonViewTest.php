@@ -19,13 +19,9 @@ class JsonViewTest extends \Codeception\Test\Unit
         $result = $view->withDecorator('baz');
 
         $this->assertInstanceOf(JsonView::class, $result);
-        $this->assertAttributeEquals(['baz' => 'bad'], 'decorators', $result);
-        $this->assertAttributeEquals([], 'decorators', $view);
 
         $result2 = $result->withDecorator('baz');
-
         $this->assertSame($result, $result2);
-        $this->assertAttributeEquals(['baz' => 'bad'], 'decorators', $result2);
     }
 
     /**
@@ -51,13 +47,11 @@ class JsonViewTest extends \Codeception\Test\Unit
         $result = $view->withoutDecorator('baz');
 
         $this->assertInstanceOf(JsonView::class, $result);
-        $this->assertAttributeEquals(['foo' => 'bar'], 'decorators', $result);   
-        $this->assertAttributeEquals(['foo' => 'bar', 'baz' => 'bad'], 'decorators', $view);   
+        $this->assertAttributeEquals(['foo' => 'bar', 'baz' => 'bad'], 'decorators', $view);
 
         $result2 = $result->withoutDecorator('baz');
 
         $this->assertSame($result, $result2);
-        $this->assertAttributeEquals(['foo' => 'bar'], 'decorators', $result2);
     }
 
     /**

@@ -1,11 +1,11 @@
 <?php
+declare(strict_types=1);
 
 use Improved as i;
 use Improved\IteratorPipeline\Pipeline;
 use Jasny\DB\Entity\Dynamic;
 use Jasny\EventDispatcher\EventDispatcher;
 use Jasny\ValidationResult;
-use Jasny\ValidationException;
 
 /**
  * A scenario is the blueprint of a process.
@@ -19,7 +19,7 @@ class Scenario extends MongoDocument implements Dynamic
     /**
      * @var string
      */
-    public $schema = 'https://specs.livecontracts.io/v0.2.0/scenario/schema.json#';
+    public $schema;
     
     /**
      * @var string
@@ -210,7 +210,7 @@ class Scenario extends MongoDocument implements Dynamic
         i\type_check($state, ['string', State::class]);
         $state = is_string($state) ? $this->getState($state) : $state;
 
-        $actions = Pipeline::with(array_merge($state->actions, $this->allow_actions))
+        $actions = Pipeline::with(array_merge($state->getActions(), $this->allow_actions))
             ->unique()
             ->map(function($name) {
                 return $this->actions[$name] ?? null;
@@ -262,8 +262,6 @@ class Scenario extends MongoDocument implements Dynamic
      */
     public function setValues($values): self
     {
-        $values = array_rename_key((array)$values, '$schema', 'schema');
-
         if ($this->dispatcher !== null) {
             $values = $this->dispatcher->trigger('setValues', $this, $values);
         }

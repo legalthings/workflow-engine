@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 use Jasny\DB\Entity\Dynamic;
 use Jasny\DB\Entity\Validation;

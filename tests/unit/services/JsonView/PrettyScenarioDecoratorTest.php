@@ -68,7 +68,7 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
     {
         $scenario = (object)[
             'id' => '2557288f-108e-4398-8d2d-7914ffd93150',
-            '$schema' => 'https://specs.livecontracts.io/v0.2.0/scenario/schema.json#',
+            '$schema' => 'https://specs.letsflow.io/v0.3.0/scenario#',
             'title' => 'Basic system and user with update instructions',
             'assets' => (object)[],
             'definitions' => (object)[],
@@ -107,7 +107,7 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
     {
         return [
             'step1' => (object)[
-                '$schema' => 'https://specs.livecontracts.io/v0.2.0/action/http/schema.json#',
+                '$schema' => 'https://specs.letsflow.io/v0.3.0/action/http#',
                 'key' => 'step1',
                 'title' => 'Step1',
                 'description' => 'Step1',
@@ -126,7 +126,7 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
                 ]
             ],
             'step2' => (object)[
-                '$schema' => 'https://specs.livecontracts.io/v0.2.0/action/nop/schema.json#',
+                '$schema' => 'https://specs.letsflow.io/v0.3.0/action/nop#',
                 'key' => 'step2',
                 'title' => 'Step2',
                 'description' => 'Step2',
@@ -144,7 +144,7 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
                 ]
             ],
             'step3' => (object)[
-                '$schema' => 'https://specs.livecontracts.io/v0.2.0/action/schema.json#',
+                '$schema' => 'https://specs.letsflow.io/v0.3.0/action#',
                 'key' => 'step3',
                 'title' => 'Step3',
                 'description' => 'Step3',
@@ -172,7 +172,6 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
         return [
             'initial' => (object)[
                 'key' => 'initial',
-                'actions' => ['step1'],
                 'title' => 'First state',
                 'description' => 'First state',
                 'instructions' => [],
@@ -180,20 +179,17 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
                 'display' => 'always',
                 'transitions' => [
                     (object)[
-                        'action' => 'step1',
-                        'response' => 'ok',
-                        'transition' => 'second'
+                        'on' => 'step1.ok',
+                        'goto' => 'second'
                     ],
                     (object)[
-                        'action' => 'step1',
-                        'response' => 'error',
-                        'transition' => ':failed'
+                        'on' => 'step1.error',
+                        'goto' => ':failed'
                     ]
                 ]
             ],
             'second' => (object)[
                 'key' => 'second',
-                'actions' => ['step2'],
                 'title' => 'Second state',
                 'description' => 'Second state',
                 'instructions' => [],
@@ -201,20 +197,17 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
                 'display' => 'always',
                 'transitions' => [
                     (object)[
-                        'action' => 'step2',
-                        'response' => 'ok',
-                        'transition' => 'third'
+                        'on' => 'step2.ok',
+                        'goto' => 'third'
                     ],
                     (object)[
-                        'action' => 'step2',
-                        'response' => 'error',
-                        'transition' => ':failed'
+                        'on' => 'step2.error',
+                        'goto' => ':failed'
                     ]
                 ]
             ],
             'third' => (object)[
                 'key' => 'third',
-                'actions' => ['step3'],
                 'title' => 'Third state',
                 'description' => 'Third state',
                 'instructions' => [],
@@ -222,7 +215,8 @@ class PrettyScenarioDecoratorTest extends \Codeception\Test\Unit
                 'display' => 'always',
                 'transitions' => [
                     (object)[
-                        'transition' => ':success'
+                        'on' => 'step3',
+                        'goto' => ':success'
                     ]
                 ]
             ]

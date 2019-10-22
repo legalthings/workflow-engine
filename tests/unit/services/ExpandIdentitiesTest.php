@@ -17,7 +17,7 @@ class ExpandIdentitiesTest extends \Codeception\Test\Unit
         $identityGateway = $this->createMock(IdentityGateway::class);
         $service = new ExpandIdentities($identityGateway);
 
-        $this->assertAttributeEquals($identityGateway, 'gateway', $service);
+        $this->assertEquals($identityGateway, $service->getGateway());
     }
 
     /**

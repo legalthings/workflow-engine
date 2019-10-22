@@ -31,7 +31,7 @@ class ProcessTest extends \Codeception\Test\Unit
     {
         $idRegexp = '/[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-(8|9|a|b)[a-f0-9]{3}-[a-f0-9]{12}/';
 
-        $this->assertAttributeInstanceOf(EventDispatcher::class, 'dispatcher', $this->process);
+        $this->assertInstanceOf(EventDispatcher::class, $this->process->dispatcher);
         $this->assertTrue((bool)preg_match($idRegexp, $this->process->id));
     }
 
@@ -43,7 +43,7 @@ class ProcessTest extends \Codeception\Test\Unit
         $dispatcher = $this->createMock(EventDispatcher::class);
         $this->process->setDispatcher($dispatcher);
 
-        $this->assertAttributeSame($dispatcher, 'dispatcher', $this->process);
+        $this->assertSame($dispatcher, $this->process->dispatcher);
     }
 
     /**

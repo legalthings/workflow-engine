@@ -1,5 +1,5 @@
 {
-    "$schema": "https://specs.livecontracts.io/v0.2.0/scenario/schema.json#",
+    "$schema": "https://specs.letsflow.io/v0.3.0/scenario#",
     "title": "Basic system and user with update instructions",
     "actors": {
         "user": {
@@ -13,7 +13,7 @@
     },
     "actions": {
         "step1": {
-            "$schema": "https://specs.livecontracts.io/v0.2.0/action/http/schema.json#",
+            "$schema": "https://specs.letsflow.io/v0.3.0/action/http#",
             "title": "Step1",
             "actor": "organization",
             "url": "https://www.example.com",
@@ -38,7 +38,7 @@
             }
         },
         "step2": {
-            "$schema": "https://specs.livecontracts.io/v0.2.0/action/nop/schema.json#",
+            "$schema": "https://specs.letsflow.io/v0.3.0/action/nop#",
             "title": "Step2",
             "trigger_response": "ok",
             "data": "second response",
@@ -56,7 +56,7 @@
             }
         },
         "step3": {
-            "$schema": "https://specs.livecontracts.io/v0.2.0/action/schema.json#",
+            "$schema": "https://specs.letsflow.io/v0.3.0/action#",
             "title": "Step3",
             "actor": "user",
             "responses": {
@@ -75,38 +75,32 @@
     },
     "states": {
         "initial": {
-            "action": "step1",
             "transitions": [
                 {
-                    "action": "step1",
-                    "response": "ok",
-                    "transition": "second"
+                    "on": "step1.ok",
+                    "goto": "second"
                 },
                 {
-                    "action": "step1",
-                    "response": "error",
-                    "transition": ":failed"
+                    "on": "step1.error",
+                    "goto": ":failed"
                 }
             ]
         },
         "second": {
-            "action": "step2",
             "transitions": [
                 {
-                    "action": "step2",
-                    "response": "ok",
-                    "transition": "third"
+                    "on": "step2.ok",
+                    "goto": "third"
                 },
                 {
-                    "action": "step2",
-                    "response": "error",
-                    "transition": ":failed"
+                    "on": "step2.error",
+                    "goto": ":failed"
                 }
             ]
         },
         "third": {
-            "action": "step3",
-            "transition": ":success"
+            "on": "step3",
+            "goto": ":success"
         }
     }
 }

@@ -1,9 +1,10 @@
 <?php
+declare(strict_types=1);
 
+use Improved\IteratorPipeline\Pipeline;
 use Jasny\DB\Data;
 use Jasny\DB\Entity\Validation;
 use Jasny\DB\EntitySet;
-use Jasny\DB\Entity\Identifiable;
 use Jasny\ValidationResult;
 use function Jasny\object_get_properties;
 
@@ -38,12 +39,6 @@ class State extends BasicEntity implements Validation
     public $instructions = [];
     
     /**
-     * Set of possible actions in this state
-     * @var string[]
-     */
-    public $actions = [];
-
-    /**
      * Set of state transitions resulting from an action response
      * @var StateTransition[]|\Jasny\DB\EntitySet
      */
@@ -72,11 +67,7 @@ class State extends BasicEntity implements Validation
      */
     public function cast()
     {
-        if (is_string($this->transitions)) {
-            $this->transitions = [['transition' => $this->transitions]];
-        }
-
-        if (is_array($this->transitions)) {            
+        if (is_array($this->transitions)) {
             $this->transitions = EntitySet::forClass(
                 StateTransition::class,
                 $this->transitions,
@@ -86,6 +77,23 @@ class State extends BasicEntity implements Validation
         }
 
         return parent::cast();
+    }
+
+    /**
+     * Get a list of actions
+     * @return string[]
+     */
+    public function getActions(): array
+    {
+        return Pipeline::with($this->transitions)
+            ->map(static function (StateTransition $transition) {
+                return $transition->getActionKey();
+            })
+            ->filter(static function (string $action) {
+                return $action !== '*';
+            })
+            ->unique()
+            ->toArray();
     }
 
     /**
@@ -127,17 +135,5 @@ class State extends BasicEntity implements Validation
         }
 
         return $data;
-    }
-
-    /**
-     * @param array|object $values
-     * @return State
-     */
-    public static function fromData($values)
-    {
-        $values = array_rename_key((array)$values, 'action', 'actions');
-        $values = array_rename_key($values, 'transition', 'transitions');
-
-        return parent::fromData($values);
     }
 }

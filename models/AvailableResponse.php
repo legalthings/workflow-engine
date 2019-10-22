@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Jasny\DB\Entity\Validation;
 use Jasny\DB\Entity\Meta;
 use Jasny\DB\EntitySet;

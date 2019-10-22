@@ -17,48 +17,46 @@ class ProcessSimulatorTest extends \Codeception\Test\Unit
 
         $scenario->states['initial'] = State::fromData([
             'title' => 'Initial',
-            'actions' => ['first'],
             'transitions' => [
-                ['transition' => 'basic_step'],
+                [
+                    'on' => 'first',
+                    'goto' => 'basic_step',
+                ],
             ],
         ]);
         $scenario->states['basic_step'] = State::fromData([
             'title' => 'Step 1',
             'description' => 'Describe this step',
             'timeout' => '6h',
-            'actions' => ['second', 'alt'],
             'transitions' => [
                 [
-                    'action' => 'second',
-                    'transition' => ':success',
+                    'on' => 'second',
+                    'goto' => ':success',
                 ],
                 [
-                    'action' => 'alt',
-                    'transition' => 'alt_step',
+                    'on' => 'alt',
+                    'goto' => 'alt_step',
                 ],
                 [
-                    'action' => ':timeout',
-                    'transition' => ':failed'
+                    'on' => ':timeout',
+                    'goto' => ':failed'
                 ]
             ]
         ]);
         $scenario->states['alt_step'] = State::fromData([
             'title' => 'Alternative route',
-            'actions' => ['alt', 'skip'],
             'transitions' => [
                 [
-                    'action' => 'alt',
-                    'response' => 'cancel',
-                    'transition' => ':cancelled',
+                    'on' => 'alt.cancel',
+                    'goto' => ':cancelled',
                 ],
                 [
-                    'action' => 'alt',
-                    'response' => 'retry',
-                    'transition' => 'basic_step',
+                    'on' => 'alt.retry',
+                    'goto' => 'basic_step',
                 ],
                 [
-                    'action' => 'skip',
-                    'transition' => ':success',
+                    'on' => 'skip',
+                    'goto' => ':success',
                 ],
             ]
         ]);
@@ -111,14 +109,14 @@ class ProcessSimulatorTest extends \Codeception\Test\Unit
         $this->assertEquals(['basic_step', ':success'], $next->key);
 
         $this->assertInstanceOf(NextState::class, $next[0]);
-        $this->assertAttributeEquals('basic_step', 'key', $next[0]);
-        $this->assertAttributeEquals('Step 1', 'title', $next[0]);
-        $this->assertAttributeEquals('Describe this step', 'description', $next[0]);
-        $this->assertAttributeEquals('6h', 'timeout', $next[0]);
-        $this->assertAttributeEquals(['manager'], 'actors', $next[0]);
+        $this->assertEquals('basic_step', $next[0]->key);
+        $this->assertEquals('Step 1', $next[0]->title);
+        $this->assertEquals('Describe this step', $next[0]->description);
+        $this->assertEquals('6h', $next[0]->timeout);
+        $this->assertEquals(['manager'], $next[0]->actors);
 
         $this->assertInstanceOf(NextState::class, $next[1]);
-        $this->assertAttributeEquals(':success', 'key', $next[1]);
+        $this->assertEquals(':success', $next[1]->key);
     }
 
     public function altResponseProvider()
@@ -131,6 +129,7 @@ class ProcessSimulatorTest extends \Codeception\Test\Unit
 
     /**
      * @dataProvider altResponseProvider
+     * @throws \PHPUnit\Framework\MockObject\RuntimeException
      */
     public function testStartingFromAltStep(string $defaultResponse, array $expected)
     {
@@ -159,10 +158,10 @@ class ProcessSimulatorTest extends \Codeception\Test\Unit
     {
         $altTransitions = $scenario->states['alt_step']->transitions;
 
-        $altTransitions[0]->response = null;
+        $altTransitions[0]->on = 'alt';
         $altTransitions[0]->condition = DataInstruction::fromData(['<eval>' => 'false']);
 
-        $altTransitions[1]->response = null;
+        $altTransitions[1]->on = 'alt';
         $altTransitions[1]->condition = DataInstruction::fromData(['<eval>' => 'true']);
     }
 

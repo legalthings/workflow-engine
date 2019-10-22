@@ -1,5 +1,5 @@
 {
-    "$schema": "https://specs.livecontracts.io/v0.2.0/scenario/schema.json#",
+    "$schema": "https://specs.letsflow.io/v0.3.0/scenario#",
     "title": "Basic user",
     "actors": {
         "user": {
@@ -9,7 +9,7 @@
     },
     "actions": {
         "step1": {
-            "$schema": "https://specs.livecontracts.io/v0.2.0/action/schema.json#",
+            "$schema": "https://specs.letsflow.io/v0.3.0/action#",
             "title": "Step1",
             "actor": "user",
             "responses": {
@@ -20,15 +20,14 @@
     },
     "states": {
         "initial": {
-            "action": "step1",
             "transitions": [
                 {
-                    "response": "ok",
-                    "transition": ":success"
+                    "on": "step1.ok",
+                    "goto": ":success"
                 },
                 {
-                    "response": "cancel",
-                    "transition": ":failed"
+                    "on": "step1.cancel",
+                    "goto": ":failed"
                 }
 
             ]

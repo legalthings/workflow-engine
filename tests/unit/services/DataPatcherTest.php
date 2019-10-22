@@ -220,7 +220,8 @@ class DataPatcherTest extends \Codeception\Test\Unit
         // Adding actors and assets is possible, but shouldn't be done. Should throw exception or caught by validation.
         // Note that actors and assets are associative entity sets. Items can be references via the key.
 
-        return Process::fromData([
+        /** @var Process $process */
+        $process = Process::fromData([
             'id' => '00000000-0000-0000-0000-000000000000',
             'actors' => [
                 [
@@ -256,6 +257,8 @@ class DataPatcherTest extends \Codeception\Test\Unit
             ],
             'current' => ['key' => 'initial'],
         ]);
+
+        return $process;
     }
 
     public function testSetProcessActorInfo()
@@ -264,7 +267,7 @@ class DataPatcherTest extends \Codeception\Test\Unit
 
         $this->patcher->set($process, 'actors.client.name', 'John Doe', true);
 
-        $this->assertAttributeEquals('John Doe', 'name', $process->actors['client']);
+        $this->assertEquals('John Doe', $process->actors['client']->name);
 
         // Assert nothing else changed
         $expected = $this->createProcess();
@@ -309,7 +312,7 @@ class DataPatcherTest extends \Codeception\Test\Unit
         $this->patcher->set($process, 'assets.data', $value);
 
         $expected = [
-            'schema' => 'https://specs.livecontracts.io/v0.2.0/asset/schema.json#',
+            'schema' => null,
             'key' => 'data',
             'I' => 'one',
             'II' => 'two',

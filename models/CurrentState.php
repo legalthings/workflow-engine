@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Improved as i;
 use Jasny\DB\EntitySet;
@@ -73,8 +75,8 @@ class CurrentState extends State
     public function cast()
     {
         if ($this->due_date instanceof DateTime) {
-            $this->due_date = DateTimeImmutable::createFromMutable($this->due_date);
-        }        
+            $this->due_date = CarbonImmutable::createFromMutable($this->due_date);
+        }
 
         return parent::cast();
     }
@@ -109,17 +111,13 @@ class CurrentState extends State
     /**
      * Get the transition for a given response.
      *
-     * @param string $action    Action key
-     * @param string $response  Response key
+     * @param Response $response
      * @return StateTransition|null
      */
-    public function getTransition(string $action, string $response): ?StateTransition
+    public function getTransition(Response $response): ?StateTransition
     {
-        return i\iterable_find($this->transitions, function(StateTransition $transition) use ($action, $response) {
-            return
-                (!isset($transition->action) || $transition->action === $action) &&
-                (!isset($transition->response) || $transition->response === $response) &&
-                (!isset($transition->condition) || (bool)$transition->condition === true);
+        return i\iterable_find($this->transitions, function(StateTransition $transition) use ($response) {
+            return $transition->appliesTo($response) && $transition->meetsCondition();
         });
     }
 }

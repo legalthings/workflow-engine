@@ -5,7 +5,8 @@ use GuzzleHttp\Psr7\Response as HttpResponse;
 class BasicSystemCest
 {
     /**
-     * @example { "scenario": "scenario-v1.0.json" }
+     * @example { "scenario": "scenario-v0.2.json" }
+     * @example { "scenario": "scenario-v0.3.json" }
      */
     public function stepOk(\FlowTester $I, \Codeception\Example $example)
     {
@@ -41,7 +42,8 @@ class BasicSystemCest
     }
 
     /**
-     * @example { "scenario": "scenario-v1.0.json" }
+     * @example { "scenario": "scenario-v0.2.json" }
+     * @example { "scenario": "scenario-v0.3.json" }
      */
     public function stepError(\FlowTester $I, \Codeception\Example $example)
     {

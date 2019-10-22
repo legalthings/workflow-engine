@@ -144,20 +144,19 @@ class ProcessUpdater
     protected function changeCurrentState(Process $process): void
     {
         $response = $process->current->response;
-        $action = $response->action;
         $scenario = $process->scenario;
 
         $process->previous[] = $response;
 
         $this->stateInstantiator->recalcTransitions($process);
-        $transition = $process->current->getTransition($action->key, $response->key);
+        $transition = $process->current->getTransition($response);
 
-        // No state transition in this state for given action and response.
+        // No state transition in this state for given response.
         if ($transition === null) {
             return;
         }
 
-        $scenarioState = $scenario->getState($transition->transition);
+        $scenarioState = $scenario->getState($transition->goto);
         $process->current = $this->stateInstantiator->instantiate($scenarioState, $process);
     }
 

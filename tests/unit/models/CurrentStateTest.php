@@ -1,6 +1,5 @@
 <?php
 
-use Jasny\ValidationResult;
 use Jasny\DB\EntitySet;
 use Carbon\CarbonImmutable;
 
@@ -27,7 +26,7 @@ class CurrentStateTest extends \Codeception\Test\Unit
         $transitions = $state->transitions;
 
         $this->assertInstanceOf(EntitySet::class, $transitions);
-        $this->assertAttributeEquals(StateTransition::class, 'entityClass', $transitions);
+        $this->assertEquals(StateTransition::class, $transitions->getEntityClass());
 
         $this->assertCount(2, $transitions);        
         $this->assertSame($transition1, $transitions[0]);
@@ -97,86 +96,38 @@ class CurrentStateTest extends \Codeception\Test\Unit
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * Provide data for testing 'getTransition' method
-     *
-     * @return array
-     */
-    public function getTransitionProvider()
+    public function testGetTransition()
     {
-        $transitions = $this->getTransitions();
+        $response = $this->createMock(Response::class);
 
-        $transitions2 = $transitions;
-        unset($transitions2[3]);
+        $currentState = new CurrentState();
 
-        return [
-            [$transitions, 'bar', 'error', $transitions[0]],
-            [$transitions, 'not_set', 'test', $transitions[1]],
-            [$transitions, 'zoo', 'not_set', $transitions[2]],
-            [$transitions, 'not_set', 'not_set_too', $transitions[3]],
-            [$transitions, 'do', 'ok', $transitions[3]],
-            [$transitions, 'foo', 'ok', $transitions[3]],
-            [$transitions, 'baz', 'other', $transitions[3]],
-            [$transitions2, 'do', 'ok', $transitions2[4]],
-            [$transitions2, 'foo', 'ok', null],
-            [$transitions2, 'baz', 'other', null],
-        ];
-    }
+        $currentState->transitions[0] = $this->createMock(StateTransition::class);
+        $currentState->transitions[0]->expects($this->once())->method('appliesTo')
+            ->with($this->identicalTo($response))
+            ->willReturn(false);
+        $currentState->transitions[0]->expects($this->never())->method('meetsCondition');
 
-    /**
-     * Test 'getTransition' method
-     *
-     * @dataProvider getTransitionProvider
-     */
-    public function testGetTransition($transitions, $action, $response, $expected)
-    {
-        $state = new CurrentState();        
-        $state->transitions = $transitions;
+        $currentState->transitions[1] = $this->createMock(StateTransition::class);
+        $currentState->transitions[1]->expects($this->once())->method('appliesTo')
+            ->with($this->identicalTo($response))
+            ->willReturn(true);
+        $currentState->transitions[1]->expects($this->once())->method('meetsCondition')
+            ->willReturn(false);
 
-        $result = $state->getTransition($action, $response);
+        $currentState->transitions[2] = $this->createMock(StateTransition::class);
+        $currentState->transitions[2]->expects($this->once())->method('appliesTo')
+            ->with($this->identicalTo($response))
+            ->willReturn(true);
+        $currentState->transitions[2]->expects($this->once())->method('meetsCondition')
+            ->willReturn(true);
 
-        $this->assertSame($expected, $result);
-    }
+        $currentState->transitions[3] = $this->createMock(StateTransition::class);
+        $currentState->transitions[3]->expects($this->never())->method('appliesTo');
+        $currentState->transitions[3]->expects($this->never())->method('meetsCondition');
 
-    /**
-     * Get mocked transitions
-     *
-     * @return array
-     */
-    protected function getTransitions()
-    {
-        $transitions = [
-            $this->createMock(StateTransition::class),
-            $this->createMock(StateTransition::class),
-            $this->createMock(StateTransition::class),
-            $this->createMock(StateTransition::class),
-            $this->createMock(StateTransition::class),
-            $this->createMock(StateTransition::class),
-            $this->createMock(StateTransition::class)
-        ];
+        $transition = $currentState->getTransition($response);
 
-        $transitions[0]->action = 'bar';
-        $transitions[0]->response = 'error';
-        $transitions[0]->condition = true;
-
-        $transitions[1]->response = 'test';
-        $transitions[1]->condition = 'bar';
-
-        $transitions[2]->action = 'zoo';
-        $transitions[2]->condition = 1;
-
-        $transitions[4]->action = 'do';
-        $transitions[4]->response = 'ok';
-        $transitions[4]->condition = true;
-
-        $transitions[5]->action = 'foo';
-        $transitions[5]->response = 'ok';
-        $transitions[5]->condition = false;
-
-        $transitions[6]->action = 'baz';
-        $transitions[6]->response = 'other';
-        $transitions[6]->condition = 0;
-
-        return $transitions;
+        $this->assertSame($currentState->transitions[2], $transition);
     }
 }

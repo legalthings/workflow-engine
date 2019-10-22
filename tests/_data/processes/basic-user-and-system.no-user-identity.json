@@ -1,15 +1,13 @@
 {
-    "$schema": "https://specs.livecontracts.io/v0.2.0/process/schema.json#",
+    "$schema": "https://specs.letsflow.io/v0.3.0/process#",
     "title": "Basic system and user",
     "scenario": "2557288f-108e-4398-8d2d-7914ffd93150",
     "actors": {
         "user": {
-            "$schema": "https://specs.livecontracts.io/v0.2.0/asset/actor.json#",
             "title": "User",
             "identity": null
         },
         "organization": {
-            "$schema": "https://specs.livecontracts.io/v0.2.0/asset/actor.json#",
             "title": "Organization",
             "identity": {
                 "id": "6uk7288s-afe4-7398-8dbh-7914ffd930pl",
@@ -25,14 +23,12 @@
         "key": "initial",
         "transitions": [
             {
-                "action": "step1",
-                "response": "ok",
-                "transition": "second"
+                "on": "step1.ok",
+                "goto": "second"
             },
             {
-                "action": "step1",
-                "response": "error",
-                "transition": ":failed"
+                "on": "step1.error",
+                "goto": ":failed"
             }
         ],
         "action": "step1"

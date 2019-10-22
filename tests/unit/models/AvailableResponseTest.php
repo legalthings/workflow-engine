@@ -46,7 +46,7 @@ class AvailableResponseTest extends \Codeception\Test\Unit
         $update = $response->update;
 
         $this->assertInstanceOf(EntitySet::class, $update);
-        $this->assertAttributeEquals(UpdateInstruction::class, 'entityClass', $update);
+        $this->assertEquals(UpdateInstruction::class, $update->getEntityClass());
 
         $this->assertCount(3, $update);
         
@@ -93,7 +93,7 @@ class AvailableResponseTest extends \Codeception\Test\Unit
         $update = $response->update;
 
         $this->assertInstanceOf(EntitySet::class, $update);
-        $this->assertAttributeEquals(UpdateInstruction::class, 'entityClass', $update);
+        $this->assertEquals(UpdateInstruction::class, $update->getEntityClass());
 
         $this->assertCount(1, $update);
         
@@ -115,7 +115,7 @@ class AvailableResponseTest extends \Codeception\Test\Unit
         $update = $response->update;
 
         $this->assertInstanceOf(EntitySet::class, $update);
-        $this->assertAttributeEquals(UpdateInstruction::class, 'entityClass', $update);
+        $this->assertEquals(UpdateInstruction::class, $update->getEntityClass());
 
         $this->assertCount(2, $update);
         
@@ -143,7 +143,7 @@ class AvailableResponseTest extends \Codeception\Test\Unit
         $update = $response->update;
 
         $this->assertInstanceOf(EntitySet::class, $update);
-        $this->assertAttributeEquals(UpdateInstruction::class, 'entityClass', $update);
+        $this->assertEquals(UpdateInstruction::class, $update->getEntityClass());
 
         $this->assertCount(1, $update);
         

@@ -90,16 +90,16 @@ class ProcessInstantiatorTest extends \Codeception\Test\Unit
 
         $process = $instantiator->instantiate($scenario);
 
-        $this->assertAttributeSame($scenario, 'scenario', $process);
-        $this->assertAttributeEquals('Do the test', 'title', $process);
+        $this->assertSame($scenario, $process->scenario);
+        $this->assertEquals('Do the test', $process->title);
 
         $this->assertAssets($process->assets);
 
         // Definitions should be a clone from scenario
-        $this->assertAttributeEquals($scenario->definitions, 'definitions', $process);
+        $this->assertEquals($scenario->definitions, $process->definitions);
         $this->assertNotSame($scenario->definitions->getArrayCopy(), $process->definitions->getArrayCopy());
 
-        $this->assertAttributeSame($currentState, 'current', $process);
+        $this->assertSame($currentState, $process->current);
     }
 
     /**
@@ -113,13 +113,13 @@ class ProcessInstantiatorTest extends \Codeception\Test\Unit
 
         $this->assertArrayHasKey('manager', $actors->getArrayCopy());
         $this->assertInstanceOf(Actor::class, $actors['manager']);
-        $this->assertAttributeEquals('Manager', 'title', $actors['manager']);
-        $this->assertAttributeSame(null, 'identity', $actors['manager']);
+        $this->assertEquals('Manager', $actors['manager']->title);
+        $this->assertSame(null, $actors['manager']->identity);
 
         $this->assertArrayHasKey('client', $actors->getArrayCopy());
         $this->assertInstanceOf(Actor::class, $actors['client']);
-        $this->assertAttributeEquals('Client', 'title', $actors['client']);
-        $this->assertAttributeSame(null, 'identity', $actors['client']);
+        $this->assertEquals('Client', $actors['client']->title);
+        $this->assertSame(null, $actors['client']->identity);
     }
 
     /**
@@ -133,17 +133,17 @@ class ProcessInstantiatorTest extends \Codeception\Test\Unit
 
         $this->assertArrayHasKey('doc', $assets->getArrayCopy());
         $this->assertInstanceOf(Asset::class, $assets['doc']);
-        $this->assertAttributeEquals('Document', 'title', $assets['doc']);
-        $this->assertAttributeEquals('The final document', 'description', $assets['doc']);
-        $this->assertAttributeSame(null, 'content', $assets['doc']);
+        $this->assertEquals('Document', $assets['doc']->title);
+        $this->assertEquals('The final document', $assets['doc']->description);
+        $this->assertSame(null, $assets['doc']->content);
 
         $this->assertArrayHasKey('book', $assets->getArrayCopy());
         $this->assertInstanceOf(Asset::class, $assets['book']);
-        $this->assertAttributeEquals('Book', 'title', $assets['book']);
+        $this->assertEquals('Book', $assets['book']->title);
 
         $this->assertArrayHasKey('attachments', $assets->getArrayCopy());
         $this->assertInstanceOf(Asset::class, $assets['attachments']);
-        $this->assertAttributeEquals('Attachments', 'title', $assets['attachments']);
-        $this->assertAttributeSame([], 'files', $assets['attachments']);
+        $this->assertEquals('Attachments', $assets['attachments']->title);
+        $this->assertSame([], $assets['attachments']->files);
     }
 }

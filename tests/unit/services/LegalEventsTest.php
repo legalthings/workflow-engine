@@ -27,20 +27,6 @@ class LegalEventsTest extends \Codeception\Test\Unit
     }
 
     /**
-     * Test '__construct' method
-     *
-     * @dataProvider constructProvider
-     */
-    public function testConstruct($url, $expectedBaseUrl)
-    {
-        $client = $this->createMock(HttpClient::class);
-        $api = new LegalEvents($client, $url);
-
-        $this->assertAttributeEquals($client, 'client', $api);
-        $this->assertAttributeEquals($expectedBaseUrl, 'baseUri', $api);
-    }
-
-    /**
      * Test '__construct' method, if exception should be thrown
      *
      * @expectedException ConfigException

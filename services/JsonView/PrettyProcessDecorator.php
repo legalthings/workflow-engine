@@ -144,8 +144,8 @@ class PrettyProcessDecorator
             $transition = $this->decorateTransition($transition);
         }
 
-        if (count((array)$state->transitions) === 1) {
-            $state->transition = reset($state->transitions);
+        if (count($state->transitions) === 1) {
+            $state->goto = $state->transitions[0]->goto;
             unset($state->transitions);
         }
 
@@ -166,7 +166,7 @@ class PrettyProcessDecorator
      */
     protected function decorateTransition(stdClass $transition): stdClass
     {
-        return std_object_only_with($transition, ['action', 'response', 'transition']);
+        return std_object_only_with($transition, ['on', 'goto']);
     }
 
     /**

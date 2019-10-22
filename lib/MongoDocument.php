@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 use Jasny\DB\Dataset\Sorted;
 use Jasny\DB\Mongo;
@@ -27,7 +28,7 @@ abstract class MongoDocument extends Mongo\Document implements Enrichable
             
             foreach ($value as $k => $v) {
                 // Unescape special characters in keys
-                if (strpos($k, '\\\\') !== false || strpos($k, '\\u') !== false) {
+                if (is_string($k) && (strpos($k, '\\\\') !== false || strpos($k, '\\u') !== false)) {
                     $key = json_decode('"' . addcslashes($k, '"') . '"');
                 } else {
                     $key = $k;
@@ -40,6 +41,20 @@ abstract class MongoDocument extends Mongo\Document implements Enrichable
         }
         
         return $value;
+    }
+
+    /**
+     * Set values
+     *
+     * @param array|stdClass $values
+     * @return $this
+     */
+    public function setValues($values)
+    {
+        parent::setValues(array_rename_key((array)$values, '$schema', 'schema'));
+        $this->cast();
+
+        return $this;
     }
 
     /**

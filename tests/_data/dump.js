@@ -7,7 +7,7 @@ db = db.getSiblingDB('lto_workflow_tests');
 db.getCollection("scenarios").insert([
     {
         "_id": "2557288f-108e-4398-8d2d-7914ffd93150",
-        "schema": "https://specs.livecontracts.io/v0.2.0/scenario/schema.json#",
+        "schema": "https://specs.letsflow.io/v0.3.0/scenario#",
         "title": "Basic system and user",
         "actors": [
             {
@@ -118,7 +118,7 @@ db.getCollection("scenarios").insert([
     },
     {
         "_id": "rt5yh683-108e-5673-8d2d-7914ffd23e5t",
-        "schema": "https://specs.livecontracts.io/v0.2.0/scenario/schema.json#",
+        "schema": "https://specs.letsflow.io/v0.3.0/scenario#",
         "title": "Basic system and user with update instructions",
         "actors": [
             {
@@ -256,7 +256,7 @@ db.getCollection("scenarios").insert([
     },
     {
         "_id": "5gh893dv-108e-4398-8d2d-7914ffd934g8",
-        "schema": "https://specs.livecontracts.io/v0.2.0/scenario/schema.json#",
+        "schema": "https://specs.letsflow.io/v0.3.0/scenario#",
         "title": "Simple event trigger scenario",
         "actors": [
             {
@@ -331,7 +331,7 @@ db.getCollection("scenarios").insert([
     },
     {
         "_id": "rty6782c-108e-4398-8d2d-7914ffdqw4t7",
-        "schema": "https://specs.livecontracts.io/v0.2.0/scenario/schema.json#",
+        "schema": "https://specs.letsflow.io/v0.3.0/scenario#",
         "title": "Event trigger with array of events",
         "actors": [
             {

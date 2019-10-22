@@ -16,9 +16,8 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
 
         $scenario->states['initial'] = State::fromData([
             'title' => 'Initial',
-            'actions' => ['first'],
             'transitions' => [
-                ['transition' => 'basic_step'],
+                ['on' => 'first', 'goto' => 'basic_step'],
             ],
         ]);
         $scenario->states['basic_step'] = State::fromData([
@@ -28,17 +27,16 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
             'actions' => ['second', 'alt'],
             'transitions' => [
                 [
-                    'action' => 'second',
-                    'response' => 'ok',
-                    'transition' => ':success',
+                    'on' => 'second.ok',
+                    'goto' => ':success',
                 ],
                 [
-                    'action' => 'alt',
-                    'transition' => 'alt_step',
+                    'on' => 'alt',
+                    'goto' => 'alt_step',
                 ],
                 [
-                    'action' => ':timeout',
-                    'transition' => ':failed'
+                    'on' => '*.timeout',
+                    'goto' => ':failed'
                 ]
             ]
         ]);
@@ -47,18 +45,16 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
             'actions' => ['alt', 'skip'],
             'transitions' => [
                 [
-                    'action' => 'alt',
-                    'response' => 'cancel',
-                    'transition' => ':cancelled',
+                    'on' => 'alt.cancel',
+                    'goto' => ':cancelled',
                 ],
                 [
-                    'action' => 'alt',
-                    'response' => 'retry',
-                    'transition' => 'basic_step',
+                    'on' => 'alt.retry',
+                    'goto' => 'basic_step',
                 ],
                 [
-                    'action' => 'skip',
-                    'transition' => ':success',
+                    'on' => 'skip',
+                    'goto' => ':success',
                 ],
             ]
         ]);
@@ -122,7 +118,7 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         $process->current = new CurrentState();
         $process->current->key = 'initial';
         $process->current->actions['first'] = clone $process->scenario->actions['first'];
-        $process->current->transitions[] = StateTransition::fromData(['transition' => 'basic_step']);
+        $process->current->transitions[] = StateTransition::fromData(['on' => 'first', 'goto' => 'basic_step']);
 
         return $process;
     }
@@ -132,7 +128,7 @@ class ProcessUpdaterTest extends \Codeception\Test\Unit
         $state = new CurrentState();
         $state->key = $key;
 
-        foreach ($scenario->states[$key]->actions as $actionKey) {
+        foreach ($scenario->states[$key]->getActions() as $actionKey) {
             $state->actions[$actionKey] = clone $scenario->actions[$actionKey];
         }
 

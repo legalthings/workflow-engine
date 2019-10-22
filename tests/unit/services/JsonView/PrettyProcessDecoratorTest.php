@@ -50,7 +50,7 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
         unset($data->current->transitions[1]);
 
         $expected->id = $data->id;
-        $expected->current->transition = $expected->current->transitions[0];
+        $expected->current->goto = $expected->current->transitions[0]->goto;
         unset($expected->current->transitions);
 
         $decorator = new PrettyProcessDecorator();
@@ -120,7 +120,7 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
         $process = (object)[
             'id' => '4527288f-108e-fk69-8d2d-7914ffd93894',
             'scenario' => (object)['id' => '2557288f-108e-4398-8d2d-7914ffd93150'],
-            'schema' => 'https://specs.livecontracts.io/v0.2.0/process/schema.json#',
+            'schema' => 'https://specs.letsflow.io/v0.3.0/process#',
             'title' => 'Basic system and user',
             'assets' => (object)[],
             'definitions' => (object)[],
@@ -128,7 +128,6 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
 
         $process->actors = [
             'user' => (object)[
-                '$schema' => 'https://specs.livecontracts.io/v0.2.0/asset/actor.json#',
                 'key' => 'user',
                 'title' => 'User',
                 'identity' => (object)[
@@ -141,7 +140,6 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
                 ]
             ],
             'organization' => (object)[
-                '$schema' => 'https://specs.livecontracts.io/v0.2.0/asset/actor.json#',
                 'key' => 'organization',
                 'title' => 'Organization',
                 'identity' => (object)[
@@ -156,7 +154,6 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
 
         $process->previous = [
             (object)[
-                '$schema' => 'https://specs.livecontracts.io/v0.2.0/response/schema.json#',
                 'title' => null,
                 'action' => (object)[
                     '$schema' => 'https://specs.livecontracts.io/v0.2.0/action/http/schema.json#',
@@ -224,14 +221,12 @@ class PrettyProcessDecoratorTest extends \Codeception\Test\Unit
             ],
             'transitions' => [
                 (object)[
-                    'action' => 'step2',
-                    'response' => 'ok',
-                    'transition' => 'third',
+                    'on' => 'step2.ok',
+                    'goto' => 'third',
                 ],
                 (object)[
-                    'action' => 'step2',
-                    'response' => 'error',
-                    'transition' => ':failed',
+                    'on' => 'step2.error',
+                    'goto' => ':failed',
                 ]
             ]
         ];

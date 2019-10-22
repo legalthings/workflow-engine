@@ -64,10 +64,10 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
             'instructions' => [
                 'client' => 'Please fill out the form'
             ],
-            'actions' => ['fill-out-form'],
             'transitions' => [
                 [
-                    'transition' => ':success',
+                    'on' => 'fill-out-form',
+                    'goto' => ':success',
                 ],
             ],
             'timeout' => 'P1DT2H',
@@ -87,22 +87,23 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
         $current = $this->stateInstantiator->instantiate($state, $process);
 
         $this->assertInstanceOf(CurrentState::class, $current);
-        $this->assertAttributeEquals('client-form', 'key', $current);
-        $this->assertAttributeEquals('Fill out the form', 'title', $current);
-        $this->assertAttributeEquals('Client fills out the form', 'description', $current);
-        $this->assertAttributeEquals(['client' => 'Please fill out the form'], 'instructions', $current);
+        $this->assertEquals('client-form', $current->key);
+        $this->assertEquals('Fill out the form', $current->title);
+        $this->assertEquals('Client fills out the form', $current->description);
+        $this->assertEquals(['client' => 'Please fill out the form'], $current->instructions);
 
         $this->assertArrayHasKey('fill-out-form', $current->actions->getArrayCopy());
         $this->assertEquals($action, $current->actions['fill-out-form']);
         $this->assertNotSame($action, $current->actions['fill-out-form']);
 
-        $this->assertAttributeCount(1, 'transitions', $current);
-        $this->assertAttributeEquals(':success', 'transition', $current->transitions[0]);
+        $this->assertCount(1, $current->transitions);
+        $this->assertEquals('fill-out-form', $current->transitions[0]->on);
+        $this->assertEquals(':success', $current->transitions[0]->goto);
 
-        $this->assertAttributeInstanceOf(DateTimeInterface::class, 'due_date', $current);
+        $this->assertInstanceOf(DateTimeInterface::class, $current->due_date);
         $this->assertEquals('2018-01-02T02:00:00+0000', $current->due_date->format(DATE_ISO8601));
 
-        $this->assertAttributeEquals('always', 'display', $current);
+        $this->assertEquals('always', $current->display);
 
         $this->assertSame($actor, $current->actor);
     }
@@ -133,8 +134,8 @@ class StateInstantiatorTest extends \Codeception\Test\Unit
 
         $scenario->states['initial'] = new State();
         $scenario->states['initial']->actions = ['foo', 'bar'];
-        $scenario->states['initial']->transitions[0] = StateTransition::fromData(['transition' => ':success']);
-        $scenario->states['initial']->transitions[1] = StateTransition::fromData(['transition' => ':failed']);
+        $scenario->states['initial']->transitions[0] = StateTransition::fromData(['on' => 'foo', 'goto' => ':success']);
+        $scenario->states['initial']->transitions[1] = StateTransition::fromData(['on' => 'bar', 'goto' => ':failed']);
 
         $scenario->actions['foo'] = Action::fromData(['title' => 'Foo']);
         $scenario->actions['bar'] = Action::fromData(['title' => 'Bar']);

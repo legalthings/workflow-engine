@@ -11,6 +11,15 @@ addons:
     - libsodium-dev
     - libyaml-dev
 
+env:
+  global:
+    - DOCKER_REPO=letsflow
+    - STAGING_AWS_ACCESS_KEY_ID=AKIAIWFAXQWNDAHESRAA
+    - PRODUCTION_AWS_ACCESS_KEY_ID=AKIAJQQQ7NJVV6B67VCA
+    - STAGING_DOCKER_ECR=930677074220.dkr.ecr.eu-west-1.amazonaws.com
+    - PRODUCTION_DOCKER_ECR=044051773080.dkr.ecr.eu-west-1.amazonaws.com
+    - secure: "xUSNAIFubACskCTzvOqjmpRA8Nq+aPJ5s1D8ou+kXvpCH79w8YuZOeaUtFC5mTKS9aW0yGVJoOpbPp/cUgpTMrQ7gFBILZqE3QOnDtXYSwynE3BHjg9joDqCRtO7DmTVzrx8JqqVixzVYKeN18YdzBe1DWutRdqu+B84boo3KFhGr2YRFKzEmcG4dqcPKP+uppn0GyeDzZ81JqSi3XSnaNEb687ZwZy3GTGJAvECA1P/HyYloxbyxuPDH8XO0mzfWBGZhZTCu2nqZ5DFf/JZxA8SUWZMSblq4uDwqPuHe7w1KY1ZrjG5SI+QUueqb2W/oh5gPP9ZxJAwzWDm9A9nm0rnHAuobveHUOKy8lmYqps9jbs3xi6i8Vwb7VnKCsYExOgM30g7i/71bms5kWatmWBNHsjDpGo2lKhtuTlJfVp9GJtiMO2lyrjzlyiSh0wZkQ/lMUgv7SX34jI+3vM2XJ3NEypXEH8A+DYdF45GsahbTSENPsT925tUWbXB6kLtrui5PQcqgVBPDNvZKiPKHl9XxPWpaPkLFsE8dFMhPv5mWYF1C6ZPE9QxraWJgRqn1EjsxaChuHMoqivkEAQGza5bO1spUePMqtPdpU9Kwv6t9XA7ikseI4zmBN7Gwc8Eddt7DVd7eGR1F8YUpHfxCaV/wvO8hzW6BdF4hurbaQc="
+
 services: mongodb
 
 # Add your branch here to have it tested
@@ -34,3 +43,38 @@ before_script:
 script:
 - php bin/codecept run --coverage --coverage-xml
 
+after_success:
+  # Bump version
+  - npm install mversion -g
+  - pip install --user awscli
+  - test "$TRAVIS_BRANCH" != 'master' -o "$TRAVIS_PULL_REQUEST" != "false" || test -n "$(git tag --contains)" || bin/bump-version
+  - test "$TRAVIS_BRANCH" != 'master' -o "$TRAVIS_PULL_REQUEST" != "false" || docker build -t $DOCKER_REPO .
+
+before_deploy:
+  # Set environment variables for Elastic Beanstalk deploy
+  - export ELASTIC_BEANSTALK_ENV="letsflow-${TRAVIS_BRANCH}"
+  - export ELASTIC_BEANSTALK_LABEL=$(git tag --contains)
+  - export TAG=$(git tag --contains)
+  - test -n "$ELASTIC_BEANSTALK_LABEL" || export ELASTIC_BEANSTALK_LABEL="${TRAVIS_BRANCH}-${TRAVIS_COMMIT:0:7}"
+
+deploy:
+  # Staging
+  # Deploy docker image to ECR
+  - provider: script
+    script: bin/deploy-staging
+    skip_cleanup: true
+    on:
+      branch: master
+
+  - provider: elasticbeanstalk
+    access_key_id: AKIAIWFAXQWNDAHESRAA
+    secret_access_key:
+      secure: "eTW1yCDYSEIeT/GSbRDEWTpc0qLNyo/J/5dkLjzEgqc+1LXSzW17TT+ja8PwhDu6v60H4ngFdFqX1URvZaMp+OkzRUYu9jfYTzF6lvA74n10ugOQM+oAYdw6cGpsnsAgZjTYyYZy5+k3HxOsacQQUR6zuoD7s+odipOixMipxOHH/mbLBl0m4so5qhWeK98Q8p3EXdHP6X+ARVn+87xPPI71wmGJ2Mph/8VrjV733R5azRLKG5CBxaOgkrnVKRzRZCF9bMkjPrVQ+o7seVWNZDGewYrbdAHhcquZB2AAjzpOpNaDxx1e/wypJ2vzOrDnzlxjKeBbeME2BqHCpWbL6IA2nuXyEUcGnC8r20WbvUYSZGZ9qiRTqli9N+7hK13XH6p0RaH8nzYhT5CKIaxi3TY2VEDgWywS6LWLz/uhBfLX1zMASsN/ekEY8i2Gd/yLjx40WxoCNkmp5pxQz3gjrZmlHp25SHYwQsuEGUwWf10ny6+Jbciz63Gzp0srYMCU0R8/FY2w6ohz6SSCKjWiV/s+FBGVuS2h6ewPntrK+j+s7D4cuyTSQGbCkGDE15rntCwcZeoNKSqRt228sUR2bO7gWVEOzSjF0NNMrmegNSf3BUrB3c2D0IibQbAMdfc3sOh+c8v0r7qcOyMpepzJKpSaK3YfLOhiu0Be7tRD2t8="
+    region: eu-west-1
+    app: letsflow
+    zip_file: app.zip
+    bucket_name: elasticbeanstalk-eu-west-1-930677074220
+    skip_cleanup: true
+    bucket_path: letsflow
+    on:
+      branch: master

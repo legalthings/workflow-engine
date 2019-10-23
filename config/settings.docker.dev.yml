@@ -1,7 +1,7 @@
 db:
   default:
-    client: mongodb://mongo:27017
-    database: lto_workflow
+    client: !env MONGO_DB mongodb://mongo:27017
+    database: !env DB_NAME lto_workflow
 
 services:
   event_chain: null

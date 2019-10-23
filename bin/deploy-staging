@@ -1,0 +1,54 @@
+#!/bin/bash
+# Set env vars to staging
+export AWS_ACCESS_KEY_ID=$STAGING_AWS_ACCESS_KEY_ID
+export AWS_SECRET_ACCESS_KEY=$STAGING_AWS_SECRET_ACCESS_KEY
+export DOCKER_ECR=$STAGING_DOCKER_ECR
+
+# deploy docker image to ecr
+docker --version
+export PATH=$PATH:$HOME/.local/bin
+eval $(aws ecr get-login --region eu-west-1 --no-include-email | sed 's|https://||')
+
+docker tag $DOCKER_REPO $DOCKER_ECR/$DOCKER_REPO:$TAG
+docker push $DOCKER_ECR/$DOCKER_REPO:$TAG
+
+# Create app
+cat > Dockerrun.aws.json << END
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+      "name": "workflow-engine",
+      "image": "legalthings/nginx",
+      "memoryReservation": 128,
+      "links": [
+        "workflow-engine-fpm"
+      ],
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 80
+        }
+      ],
+      "environment": [
+        {
+          "name": "PHP_HOST",
+          "value": "workflow-engine-fpm"
+        }
+      ]
+    },
+    {
+      "name": "workflow-engine-fpm",
+      "image": "$DOCKER_ECR/$DOCKER_REPO:$TAG",
+      "memoryReservation": 512,
+      "environment": [
+        {
+          "name": "APPLICATION_ENV",
+          "value": "docker.dev"
+        }
+      ]
+    }
+  ]
+}
+END
+zip app Dockerrun.aws.json

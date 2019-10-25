@@ -1,7 +1,7 @@
 {
     "name": "lto/workflow-engine",
     "description": "LTO Network - Workflow Engine",
-    "version": "0.1",
+    "version": "0.1.1",
     "license": "GPL-3.0-or-later",
     "repositories": [
         {

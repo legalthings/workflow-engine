@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "deac36aad02df48435df848cff4f999a",
+    "content-hash": "49a7037a9894507d8f380126163cebe0",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -2108,16 +2108,16 @@
         },
         {
             "name": "jasny/http-signature",
-            "version": "v1.1.3",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jasny/http-signature.git",
-                "reference": "6e175dbffbefdca6945cf426b27a3894f904a388"
+                "reference": "1aa49f1104396ff1532eb6b84fcf5301bea828bf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jasny/http-signature/zipball/6e175dbffbefdca6945cf426b27a3894f904a388",
-                "reference": "6e175dbffbefdca6945cf426b27a3894f904a388",
+                "url": "https://api.github.com/repos/jasny/http-signature/zipball/1aa49f1104396ff1532eb6b84fcf5301bea828bf",
+                "reference": "1aa49f1104396ff1532eb6b84fcf5301bea828bf",
                 "shasum": ""
             },
             "require": {
@@ -2153,7 +2153,7 @@
                 }
             ],
             "description": "Implementation of the IETF HTTP Signatures draft RFC",
-            "time": "2019-06-03T17:32:58+00:00"
+            "time": "2019-10-25T08:30:39+00:00"
         },
         {
             "name": "jasny/immutable",
@@ -7614,6 +7614,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "mtdowling/jmespath.php": 20,
+        "jasny/http-signature": 20,
         "jasny/codeception-module": 20
     },
     "prefer-stable": false,

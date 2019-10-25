@@ -19,6 +19,7 @@ env:
     - STAGING_DOCKER_ECR=930677074220.dkr.ecr.eu-west-1.amazonaws.com
     - PRODUCTION_DOCKER_ECR=044051773080.dkr.ecr.eu-west-1.amazonaws.com
     - secure: "xUSNAIFubACskCTzvOqjmpRA8Nq+aPJ5s1D8ou+kXvpCH79w8YuZOeaUtFC5mTKS9aW0yGVJoOpbPp/cUgpTMrQ7gFBILZqE3QOnDtXYSwynE3BHjg9joDqCRtO7DmTVzrx8JqqVixzVYKeN18YdzBe1DWutRdqu+B84boo3KFhGr2YRFKzEmcG4dqcPKP+uppn0GyeDzZ81JqSi3XSnaNEb687ZwZy3GTGJAvECA1P/HyYloxbyxuPDH8XO0mzfWBGZhZTCu2nqZ5DFf/JZxA8SUWZMSblq4uDwqPuHe7w1KY1ZrjG5SI+QUueqb2W/oh5gPP9ZxJAwzWDm9A9nm0rnHAuobveHUOKy8lmYqps9jbs3xi6i8Vwb7VnKCsYExOgM30g7i/71bms5kWatmWBNHsjDpGo2lKhtuTlJfVp9GJtiMO2lyrjzlyiSh0wZkQ/lMUgv7SX34jI+3vM2XJ3NEypXEH8A+DYdF45GsahbTSENPsT925tUWbXB6kLtrui5PQcqgVBPDNvZKiPKHl9XxPWpaPkLFsE8dFMhPv5mWYF1C6ZPE9QxraWJgRqn1EjsxaChuHMoqivkEAQGza5bO1spUePMqtPdpU9Kwv6t9XA7ikseI4zmBN7Gwc8Eddt7DVd7eGR1F8YUpHfxCaV/wvO8hzW6BdF4hurbaQc="
+    - secure: "mIHJ+4f229svMzwJZmBS3s/BrQDs1qtDWVilvZPEbi3PCAABiLnV8REXKaVH157gq6/mmNb2nbMKb2bN1gRM/Dj+aCRklfKN3L/fe15TH4we3J3GDN1Crvk9KtmbvrfNDI+mK8F030i3KZLNo0EgCdiEfc0vPQHb2xfo7jVEzMZA2pDKcwoBRou8ycc45S8AwtRjaf4k3cSvRApNlSXmKdMJRxJuCdUPIjzZKQsDF71/osSoFd13reQygWFlH1GD33ORUCN7wUjhywEStCO4id0KycF2ICpQ/6pPBESYQw9zqFtyVoyazE7XFIQSZ/foqo3xdf0XGpbt5ZhsrUfAf45C6QcOhQePyZgsk0XpmKVdOSmhuhTAXxn9nQRvTUpRTryqAD0GwZLO1Mu7w6KTjpLS3eXYX+kTb5b2C7I1eBZQ/0rV6mw1F4fse6EN5c1m0m4atgTcHGneKcw1FbnLVC8gkvMvlg3FJVFCnPDih44L5SK1JFeVeWviVMA1K9fqsFrkIA5lTFn4EoLeaJsX0AvxJEAy9Rjq/MooOCMd8omqr5FzyAwS1C4r4h5BOOWDmJqDksJ1o69VjifF4ciJ/TeybSEThhIOIKG1fltKYidaufFyr1Q1DZpMUVeuZCvVox/b297soAqq4W1uz99/1zgFTxMrDhTJnKbvx8czCJY="
 
 services: mongodb
 
@@ -76,5 +77,26 @@ deploy:
     bucket_name: elasticbeanstalk-eu-west-1-930677074220
     skip_cleanup: true
     bucket_path: letsflow
+    on:
+      branch: master
+
+  # Production deploy image
+  - provider: script
+    script: bin/deploy-production
+    skip_cleanup: true
+    on:
+      branch: master
+
+  - provider: elasticbeanstalk
+    access_key_id: AKIAJQQQ7NJVV6B67VCA
+    secret_access_key:
+      secure: "JEE3Y4HHozfxtJ/duDrSEwSHCrWU2KPVeFs10BTRKHuG9Bt2tzdDhwKwHpqNk4aJO4E9RO1VFfi1L0i5f+WMP7ApMbXNDdgqkHdD8Vpg/CMw97K8r7WW26k7Xd8XrJ4nS6CSH/Ats7ESUXx6Nunc0AJBUK4IsDFCi/eVAurcorkzSBqCtSFqX910uXb/Jv5u6B8jKt//phmGHpHWjUc1wNZH6NHuegUxv1cqdLVlhx5P10rWCU+2pVDGnTgxiG1aYLQBgOsMqUmWglLNdmMzIc4tL292fjj1lFujefEE50UZx+ypylPv/tr2JbsDeA/jPQjtwV3qRmNKCrMtB1fRjnWUTOD1C3z3VcX/DAIchybMhbecFubkVkaqFm6cBx/gNmm5z2BOj9RurpoYRSyXeJYrisnVhl8dNqpgKqQ28phbn/uojynVy2X0BaAVWbuWyI/HuSGIBCevCni1ZZURXwcAo3KU2qwioKETYHBVQXrEiyj1Xnzh6/gYJsrlxMW6sZNUCyBEjhIlUZCzECfIKXUY76iPEABnlkj0q4DMiKfdfqe5Q7UcA5NFmFq2k1x+2LtuU/zqg+L3E0dgErJRmtS6/SfCiY1NVolf0Ei4UIxfIYjY59vHythXCr4gv9Me5HY4DYsGqNs4fY53c0EuwZv6uT9EPWJU2bNv12rXdJ0="
+    region: eu-west-1
+    app: letsflow
+    zip_file: app.zip
+    bucket_name: elasticbeanstalk-eu-west-1-044051773080
+    skip_cleanup: true
+    bucket_path: letsflow
+    only_create_app_version: true
     on:
       branch: master

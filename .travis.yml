@@ -30,9 +30,17 @@ branches:
   - /^v\d+\.\d+\.\d+$/
 
 before_install:
+ # Configure Git
+- git config --global user.email "travis-ci@legalthings.net"
+- git config --global user.name "Travis CI"
+
+# Install required PHP extension
 - pecl install --soft libsodium
 - echo "extension = mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 - echo | pecl install --soft yaml
+
+# Get all tags of git repo
+- git fetch origin 'refs/tags/*:refs/tags/*'
 
 install:
 - composer install

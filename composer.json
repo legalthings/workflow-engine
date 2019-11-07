@@ -55,7 +55,8 @@
         "ramsey/uuid": "^3.8",
         "jasny/immutable": "^1.0",
         "jasny/dummy-middleware": "^1.1",
-        "riverline/multipart-parser": "^2.0"
+        "riverline/multipart-parser": "^2.0",
+        "justinrainbow/json-schema": "^5.2"
     },
     "require-dev" : {
         "jasny/php-code-quality" : "^2.0.0",

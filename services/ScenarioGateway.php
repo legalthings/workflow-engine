@@ -27,7 +27,7 @@ class ScenarioGateway implements Gateway
      */
     public function __construct(EventDispatcher $dispatcher)
     {
-        $this->dispatcher  = $dispatcher;
+        $this->dispatcher = $dispatcher;
     }
 
     /**

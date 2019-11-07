@@ -125,13 +125,14 @@ function std_object_only_with(stdClass $object, array $with): stdClass
 
 /**
  * Check if link to schema specification is valid
- * @param  string  $link
- * @param  string  $type
+ * @param  string       $link
+ * @param  string|null  $type
  * @return boolean
  */
-function is_schema_link_valid(string $link, string $type): bool
+function is_schema_link_valid(string $link, ?string $type = null): bool
 {
-    $pattern = '|https://specs\.livecontracts\.io/v\d+\.\d+\.\d+/' . preg_quote($type) . '/schema\.json#|';
+    $type = isset($type) ? preg_quote($type) : '[^/]+';
+    $pattern = '|https://specs\.livecontracts\.io/v\d+\.\d+\.\d+/' . $type . '/schema\.json#|';
 
     return (bool)preg_match($pattern, $link);
 }
